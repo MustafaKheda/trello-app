@@ -1,0 +1,47 @@
+$blue: #5e94ff;
+$bgcolor: #f6f7fb;
+
+.trelloCard {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: fit-content;
+  min-height: 300px !important;
+  max-height: 75vh !important;
+  width: 300px;
+  align-items: stretch;
+}
+.trelloCardContent {
+  flex-grow: 1;
+  overflow: auto !important;
+}
+.trelloBody {
+  background-color: $bgcolor;
+  height: 100vh;
+  display: flex;
+  padding: 100px 40px 20px;
+  column-gap: 20px;
+}
+.trelloBox {
+  width: 90%;
+  background-color: #fff;
+  border-radius: 4px;
+  margin: 0 auto 10px;
+  border: 2px solid rgba($color: #000000, $alpha: 0.1);
+  flex-grow: 1;
+}
+
+.trelloAction {
+  padding: 0px !important;
+  margin: 0px;
+  justify-content: center;
+}
+.trelloHeader span {
+  padding-left: 15px;
+}
+.trelloButton {
+  border: none !important;
+  color: gray !important;
+  margin-bottom: 10px !important;
+  font-weight: 600 !important;
+}

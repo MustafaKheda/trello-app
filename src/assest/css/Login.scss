@@ -3,13 +3,13 @@ $bgcolor: #f6f7fb;
 $cardCarosual: 100vh;
 @font-face {
   font-family: Rooster;
-  src: url(../Font/RoosterPersonalUse-3z8d8.ttf);
+  src: url(../font/RoosterPersonalUse-3z8d8.ttf);
 }
 
 .container {
   display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
   max-height: 120vh;
   background-color: $bgcolor;
@@ -152,4 +152,15 @@ $cardCarosual: 100vh;
   margin: 0px !important;
   padding: 5px;
   color: rgba($color: #000000, $alpha: 0.4) !important;
+}
+// Nav Bar Css
+
+.navBar {
+  background-color: #fff !important;
+}
+// .navToolBar {
+// }
+.navToolBar .cardHeading {
+  margin: 0 auto;
+  cursor: default;
 }
