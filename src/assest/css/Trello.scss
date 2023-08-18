@@ -6,7 +6,7 @@ $bgcolor: #f6f7fb;
   flex-direction: column;
   position: relative;
   height: fit-content;
-  min-height: 300px !important;
+  min-height: 100px !important;
   max-height: 75vh !important;
   width: 300px;
   align-items: stretch;
@@ -44,4 +44,17 @@ $bgcolor: #f6f7fb;
   color: gray !important;
   margin-bottom: 10px !important;
   font-weight: 600 !important;
+}
+.cardContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 20px;
+}
+.trelloDrawer .MuiDrawer-paper {
+  width: 500px !important;
+}
+.drawerHeader {
+  align-items: center;
+  height: 70px !important;
 }
