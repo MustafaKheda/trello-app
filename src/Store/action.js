@@ -27,3 +27,11 @@ export const handleChangeStage = (obj) => {
     payload: obj,
   };
 };
+
+export const handleSetStage = (obj) => {
+  console.log(obj);
+  return {
+    type: Actiontypes.SET_STAGE,
+    payload: obj,
+  };
+};

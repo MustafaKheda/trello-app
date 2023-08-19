@@ -3,7 +3,7 @@ import { Actiontypes } from "./actionTypes";
 import { combineReducers } from "redux";
 const initialState = {
   currentUser: {},
-  user: [],
+  users: [],
 };
 
 const {
@@ -22,7 +22,7 @@ const userReducer = (state = initialState, action) => {
           id: action.payload.id,
           username: action.payload.username,
         },
-        user: [...state.user, action.payload],
+        users: [...state.users, action.payload],
       };
     case SET_CURRENT_USER:
       return {
@@ -41,9 +41,11 @@ const userReducer = (state = initialState, action) => {
 
 const trelloState = {
   stages: [],
-  changeStage: [],
+  changeStages: [],
+  card: [],
 };
 const stageReducer = (state = trelloState, action) => {
+  const { stages } = state;
   switch (action.type) {
     case CHANGE_STAGE:
       console.log(action.payload);
@@ -51,11 +53,17 @@ const stageReducer = (state = trelloState, action) => {
         ...state,
         stages: [...action.payload],
       };
+    case SET_STAGE:
+      console.log(action.payload);
+      return {
+        ...state,
+        stages: [...state.stages, action.payload],
+      };
     default:
       return state;
   }
 };
 export const reducer = combineReducers({
-  users: userReducer,
+  userStore: userReducer,
   trelloStage: stageReducer,
 });

@@ -20,7 +20,7 @@ import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import uuid from "react-uuid";
 
-import { setUser } from "../../store/action";
+import { setCurrentUser, setUser } from "../../store/action";
 import "../../assest/css/Login.scss";
 import img3 from "../../assest/Image/rafay-ansari-qKoEIBZ4lLM-unsplash.jpg";
 import img2 from "../../assest/Image/reinhart-julian-d4ZYpoGjUXo-unsplash.jpg";
@@ -29,9 +29,10 @@ import { useSelector } from "react-redux";
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state?.users?.user);
-  const shortUUID = uuid().slice(0, 8);
-  const [show, setShow] = useState(true);
+  const user = useSelector((state) => state?.userStore?.users);
+  console.log(user);
+  const shortUUID = uuid().slice(0, 18);
+  const [show, setShow] = useState(false);
   const [auth, setAuth] = useState({
     id: shortUUID,
     username: "",
@@ -67,6 +68,7 @@ function Login() {
       navigate("/Trello");
     }
   }, [type]);
+
   const handleClose = () => {
     setOpen({
       open: false,
@@ -74,6 +76,62 @@ function Login() {
     });
   };
 
+  const handleLogin = () => {
+    console.log(user, login);
+    if (loginPassword.trim() !== "" && loginEmail.trim() !== "") {
+      if (loginEmail.trim().length !== 10) {
+        return setOpen({
+          open: true,
+          type: "lessNumber",
+        });
+      }
+      if (loginPassword.trim().length < 8) {
+        return setOpen({
+          open: true,
+          type: "passwordContain",
+        });
+      }
+      const userExist = user?.some(
+        (user) =>
+          user.mobileNumber === loginEmail ||
+          user?.email.trim().toLowerCase() === loginEmail.toLowerCase().trim()
+      );
+      console.log(userExist);
+      if (!userExist) {
+        return setOpen({
+          open: true,
+          type: "userNotFound",
+        });
+      }
+      const userFound = user?.filter(
+        (user) =>
+          (user.mobileNumber === loginEmail ||
+            user?.email.trim().toLowerCase() ===
+              loginEmail.toLowerCase().trim()) &&
+          user.password === loginPassword
+      );
+      if (userFound.length > 0) {
+        // Successful login
+        const { username, id } = userFound[0];
+        dispatch(setCurrentUser(id, username));
+        setOpen({
+          open: true,
+          type: "login",
+        });
+      } else {
+        // Invalid credentials for login
+        setOpen({
+          open: true,
+          type: "loginFailed",
+        });
+      }
+    } else {
+      setOpen({
+        open: true,
+        type: "empty",
+      });
+    }
+  };
   const handleSignUp = (e) => {
     console.log(user);
     e.preventDefault();
@@ -139,7 +197,10 @@ function Login() {
   const toggleView = () => {
     setShow((currShow) => !currShow);
   };
-
+  const handleChangeLogin = (e) => {
+    e.preventDefault();
+    setLogin({ ...login, [e.target.name]: e.target.value });
+  };
   const handleChange = (e) => {
     e.preventDefault();
     setAuth({ ...auth, [e.target.name]: e.target.value });
@@ -157,7 +218,10 @@ function Login() {
               <Box className="cardInputs">
                 <TextField
                   fullWidth
+                  name="loginEmail"
+                  value={loginEmail}
                   placeholder="Email"
+                  onChange={handleChangeLogin}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment className="inputIcon" position="start">
@@ -168,7 +232,10 @@ function Login() {
                 ></TextField>
                 <TextField
                   fullWidth
+                  name="loginPassword"
+                  value={loginPassword}
                   placeholder="Password"
+                  onChange={handleChangeLogin}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment className="inputIcon" position="start">
@@ -180,7 +247,7 @@ function Login() {
                 <Button
                   elevation={3}
                   className="cardButton"
-                  onClick={toggleView}
+                  onClick={handleLogin}
                 >
                   Login
                 </Button>
@@ -288,6 +355,7 @@ function Login() {
                 </Button>
               </FormControl>
             </Box>
+
             {/* <CardMedia
               component={"img"}
               className={`cardMedia ${show ? "login" : "signup"}`}
@@ -317,6 +385,9 @@ function Login() {
           </>
         )}
       </Card>
+      <Button id="login" className="button" onClick={toggleView}>
+        {show ? "signup" : "Login"}
+      </Button>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={open}

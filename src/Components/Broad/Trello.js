@@ -1,40 +1,21 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardActionArea,
-  CardActions,
-  CardContent,
-  CardHeader,
-} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import Drawer from "@mui/material/Drawer";
+import Card from "@mui/material/Card";
 import { styled, useTheme } from "@mui/material/styles";
-
 import "../../assest/css/Trello.scss";
 import Header from "../Header";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { handleChangeStage } from "../../store/action";
 import StageList from "./StageList";
+import CardDrawer from "./CardDrawer";
+import Model from "./Model";
+import { Button, Grid } from "@mui/material";
 const DATA = [
   {
     id: "0e2f0db1-5457-46b0-949e-8032d2f9997a",
     name: "Walmart",
+    isDeleted: true,
     items: [
       { id: "26fd50b3-3841-496e-8b32-73636f6f4197", name: "3% Milk" },
       { id: "b0ee9d50-d0a6-46f8-96e3-7f3f0f9a2525", name: "Butter" },
@@ -44,6 +25,7 @@ const DATA = [
   {
     id: "487f68b4-1746-438c-920e-d67b7df46247",
     name: "Indigo",
+    isDeleted: false,
     items: [
       {
         id: "95ee6a5d-f927-4579-8c15-2b4eb86210ae",
@@ -55,6 +37,7 @@ const DATA = [
   },
   {
     id: "25daffdc-aae0-4d73-bd31-43f73101e7c0",
+    isDeleted: false,
     name: "Lowes",
     items: [
       { id: "960cbbcf-89a0-4d79-aa8e-56abbc15eacc", name: "Workbench" },
@@ -64,22 +47,24 @@ const DATA = [
   },
 ];
 function Trello() {
-  const [open, setOpen] = React.useState(false);
   const theme = useTheme();
   const dispatch = useDispatch();
-  // const [data, setData] = useState([]);
+  const currentUser = useSelector((state) => state.userStore.currentUser);
+  const data = useSelector((state) => state.trelloStage.stages);
+  const [openDrawer, setOpenDrawer] = React.useState(false);
+  const [openModel, setOpenModel] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpenModel(true);
+  };
+  const handleClose = () => {
+    setOpenModel(false);
+  };
 
   useEffect(() => {
     console.log("in DATA");
     dispatch(handleChangeStage(DATA));
   }, []);
-
-  const data = useSelector((state) => state.trelloStage.stages);
-
-  // useEffect(() => {
-  //   console.log("In stage");
-  //   setData(stages);
-  // }, [stages]);
 
   // useEffect(() => {
   //   let timeout;
@@ -98,11 +83,11 @@ function Trello() {
   // }, [data, dispatch]);
 
   const handleDrawerOpen = () => {
-    setOpen(true);
+    setOpenDrawer(true);
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    setOpenDrawer(false);
   };
   const handleDragDrop = (event) => {
     const { source, destination, type } = event;
@@ -125,7 +110,6 @@ function Trello() {
       reorderedStores.splice(destinationIndex, 0, removedStore);
 
       return dispatch(handleChangeStage(reorderedStores));
-      // setData(reorderedStores);
     }
     const newStores = [...data];
     const dataSourceIndex = data.findIndex(
@@ -154,65 +138,74 @@ function Trello() {
     };
     dispatch(handleChangeStage(newStores));
   };
+
   return (
     <>
       <div className="trelloBody">
         <Header />
-        <DragDropContext onDragEnd={handleDragDrop}>
-          <Droppable droppableId="ROOT" type="group" direction="horizontal">
-            {(provided) => (
-              <div
-                className="cardContainer"
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                {data.map((data, index) => (
-                  <Draggable draggableId={data.id} key={data.id} index={index}>
-                    {(provided) => (
-                      <Card
-                        className="trelloCard"
-                        {...provided.dragHandleProps}
-                        {...provided.draggableProps}
-                        ref={provided.innerRef}
-                      >
-                        <StageList {...data} onOpen={handleDrawerOpen} />
-                      </Card>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+        <Grid container rowSpacing={3}>
+          <Grid item md={12}>
+            <Button variant="outlined" onClick={handleClickOpen}>
+              Slide in alert dialog
+            </Button>
+            <Model
+              handleClose={handleClose}
+              open={openModel}
+              userID={currentUser.id}
+            />
+          </Grid>
+          <DragDropContext onDragEnd={handleDragDrop}>
+            <Droppable droppableId="ROOT" type="group" direction="horizontal">
+              {(provided) => (
+                <Grid
+                  item
+                  className="cardContainer"
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  {data &&
+                    data?.map((data, index) => {
+                      return !data.isDeleted ? (
+                        <Draggable
+                          draggableId={data.id}
+                          key={data.id}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <Card
+                              className="trelloCard"
+                              {...provided.dragHandleProps}
+                              {...provided.draggableProps}
+                              ref={provided.innerRef}
+                            >
+                              <StageList {...data} onOpen={handleDrawerOpen} />
+                            </Card>
+                          )}
+                        </Draggable>
+                      ) : null;
+                    })}
+                  {provided.placeholder}
+                </Grid>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </Grid>
       </div>
-      <Drawer
-        className="trelloDrawer"
-        anchor="right"
-        open={open}
-        onClose={handleDrawerClose}
-      >
-        <div className="drawerHeader">
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
-          </IconButton>
-        </div>
-
-        <Divider />
-      </Drawer>
+      <CardDrawer
+        cardId={data.id}
+        userId={currentUser.id}
+        open={openDrawer}
+        close={handleDrawerClose}
+      />
     </>
   );
 }
 {
   /* <Card elevation={0.9} className="trelloBox">
-<CardContent>
+  <CardContent>
   <Typography className="trelloHeading" variant="h6">
     Hello
-  </Typography>
+    </Typography>
   <Typography className="trelloHeading" variant="subtitle">
     Hello
   </Typography>
