@@ -1,11 +1,13 @@
 $blue: #5e94ff;
 $bgcolor: #f6f7fb;
-
+* {
+  font-size: small !important;
+}
 .trelloBody {
   background-color: $bgcolor;
   min-height: 100vh;
   display: flex;
-  padding: 100px 40px 20px;
+  padding: 100px 0 0;
   column-gap: 20px;
 }
 .trelloCard {
@@ -16,7 +18,7 @@ $bgcolor: #f6f7fb;
   min-height: 100px !important;
   max-height: 75vh !important;
   min-width: 300px;
-  width: 340px;
+  width: 200px;
   align-items: stretch;
 }
 .trelloCardContent {
@@ -51,6 +53,7 @@ $bgcolor: #f6f7fb;
   display: flex;
   flex-direction: row;
   width: 100%;
+  padding: 20px;
   overflow: auto !important;
   gap: 20px;
 }

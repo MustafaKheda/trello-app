@@ -21,6 +21,7 @@ function Model({ handleClose, open, userID }) {
     id: uuid().slice(0, 18),
     userID,
     name: "",
+    items: [],
     color: "",
     isDeleted: false,
   });

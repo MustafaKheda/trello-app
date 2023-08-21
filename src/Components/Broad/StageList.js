@@ -8,7 +8,7 @@ import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
 
 import "../../assest/css/Trello.scss";
-function StageList({ title, name, items, id, onOpen }) {
+function StageList({ title, name, items, id, openDrawerById }) {
   return (
     <>
       <CardHeader title={name} className="trelloHeader" variant="h4" />
@@ -44,7 +44,11 @@ function StageList({ title, name, items, id, onOpen }) {
         )}
       </Droppable>
       <CardActions disableSpacing className="trelloAction">
-        <Button variant="outlined" className="trelloButton" onClick={onOpen}>
+        <Button
+          variant="outlined"
+          className="trelloButton"
+          onClick={() => openDrawerById(id)}
+        >
           Add Card
         </Button>
       </CardActions>

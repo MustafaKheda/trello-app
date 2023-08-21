@@ -15,7 +15,7 @@ const DATA = [
   {
     id: "0e2f0db1-5457-46b0-949e-8032d2f9997a",
     name: "Walmart",
-    isDeleted: true,
+    isDeleted: false,
     items: [
       { id: "26fd50b3-3841-496e-8b32-73636f6f4197", name: "3% Milk" },
       { id: "b0ee9d50-d0a6-46f8-96e3-7f3f0f9a2525", name: "Butter" },
@@ -53,6 +53,7 @@ function Trello() {
   const data = useSelector((state) => state.trelloStage.stages);
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const [openModel, setOpenModel] = React.useState(false);
+  const [drawerStageId, setDrawerStageId] = React.useState(null);
 
   const handleClickOpen = () => {
     setOpenModel(true);
@@ -61,10 +62,10 @@ function Trello() {
     setOpenModel(false);
   };
 
-  useEffect(() => {
-    console.log("in DATA");
-    dispatch(handleChangeStage(DATA));
-  }, []);
+  // useEffect(() => {
+  //   console.log("in DATA");
+  //   dispatch(handleChangeStage(DATA));
+  // }, []);
 
   // useEffect(() => {
   //   let timeout;
@@ -82,7 +83,8 @@ function Trello() {
   //   };
   // }, [data, dispatch]);
 
-  const handleDrawerOpen = () => {
+  const handleDrawerOpen = (stageId) => {
+    setDrawerStageId(stageId);
     setOpenDrawer(true);
   };
 
@@ -143,10 +145,10 @@ function Trello() {
     <>
       <div className="trelloBody">
         <Header />
-        <Grid container rowSpacing={3}>
-          <Grid item md={12}>
+        <Grid container justifyContent={"flex-end"} rowSpacing={3}>
+          <Grid item md={2}>
             <Button variant="outlined" onClick={handleClickOpen}>
-              Slide in alert dialog
+              Create Stage's
             </Button>
             <Model
               handleClose={handleClose}
@@ -178,7 +180,10 @@ function Trello() {
                               {...provided.draggableProps}
                               ref={provided.innerRef}
                             >
-                              <StageList {...data} onOpen={handleDrawerOpen} />
+                              <StageList
+                                {...data}
+                                openDrawerById={handleDrawerOpen}
+                              />
                             </Card>
                           )}
                         </Draggable>
@@ -192,7 +197,7 @@ function Trello() {
         </Grid>
       </div>
       <CardDrawer
-        cardId={data.id}
+        cardId={drawerStageId}
         userId={currentUser.id}
         open={openDrawer}
         close={handleDrawerClose}
