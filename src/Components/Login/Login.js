@@ -18,6 +18,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
+import { messageMap } from "../../assest/Constant";
 import uuid from "react-uuid";
 
 import { setCurrentUser, setUser } from "../../store/action";
@@ -30,7 +31,7 @@ function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.userStore?.users);
-  console.log(user);
+
   const shortUUID = uuid().slice(0, 18);
   const [show, setShow] = useState(false);
   const [auth, setAuth] = useState({
@@ -39,6 +40,8 @@ function Login() {
     mobileNumber: "",
     password: "",
     email: "",
+    loginPassword: "",
+    loginEmail: "",
   });
   const [login, setLogin] = useState({
     loginPassword: "",
@@ -48,17 +51,7 @@ function Login() {
     open: false,
     type: "",
   });
-  const messageMap = {
-    signup: "Signup Successful",
-    login: "Login Successful",
-    emailExist: "This email already exists!",
-    loginFailed: "Wrong Password",
-    numberExist: "Someone is already registered with this number",
-    empty: "Please fill the form",
-    lessNumber: "Please enter a 10-digit mobile number.",
-    passwordContain: "Password must have at least 8 characters.",
-    userNotFound: "User not found. Please sign up.",
-  };
+
   const { username, mobileNumber, password, email } = auth;
   const { open, type } = openSnackBar;
   const { loginPassword, loginEmail } = login;
@@ -77,14 +70,16 @@ function Login() {
   };
 
   const handleLogin = () => {
-    console.log(user, login);
+    // console.log(user, login);
+    console.log(typeof loginEmail);
     if (loginPassword.trim() !== "" && loginEmail.trim() !== "") {
-      if (loginEmail.trim().length !== 10) {
+      if (loginEmail.trim().length < 10) {
         return setOpen({
           open: true,
           type: "lessNumber",
         });
       }
+
       if (loginPassword.trim().length < 8) {
         return setOpen({
           open: true,
@@ -96,7 +91,7 @@ function Login() {
           user.mobileNumber === loginEmail ||
           user?.email.trim().toLowerCase() === loginEmail.toLowerCase().trim()
       );
-      console.log(userExist);
+
       if (!userExist) {
         return setOpen({
           open: true,
@@ -159,7 +154,7 @@ function Login() {
         (user) => user?.email.toLowerCase() === email.toLowerCase()
       );
 
-      // Checking if the mobile number already exists
+      // Check the mobile number already exists
       const numberExist = user?.some(
         (user) => user.mobileNumber === mobileNumber
       );
@@ -176,7 +171,7 @@ function Login() {
         });
       } else {
         // Create new user
-        dispatch(setUser(auth));
+        dispatch(setUser({ login: "", saddhjka: "" }));
         setOpen({
           open: true,
           type: "signup",
@@ -184,15 +179,12 @@ function Login() {
         setAuth({ password: "", username: "", email: "", mobileNumber: "" });
       }
     } else {
-      // to send message the to fill the form
+      // Empty Form Msg
       setOpen({
         open: true,
         type: "empty",
       });
     }
-    // dispatch(setUser(auth));
-    // setAuth({ password: "", username: "", email: "", mobileNumber: "" });
-    // console.log(auth);
   };
   const toggleView = () => {
     setShow((currShow) => !currShow);
@@ -220,7 +212,7 @@ function Login() {
                   fullWidth
                   name="loginEmail"
                   value={loginEmail}
-                  placeholder="Email"
+                  placeholder="Email or Mobile Number"
                   onChange={handleChangeLogin}
                   InputProps={{
                     startAdornment: (

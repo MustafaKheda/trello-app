@@ -4,14 +4,45 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
-
+import AddIcon from "@mui/icons-material/Add";
+import MoreHoriz from "@mui/icons-material/MoreHoriz";
+import LensIcon from "@mui/icons-material/Lens";
 import "../../assest/css/Trello.scss";
-function StageList({ title, name, items, id, openDrawerById }) {
+import { IconButton } from "@mui/material";
+function StageList({ name, items, index, id, openDrawerById }) {
   return (
     <>
-      <CardHeader title={name} className="trelloHeader" variant="h4" />
+      {/* <CardHeader
+        title={name}
+        className="trelloHeader"
+        variant="h4"
+        action={
+          <IconButton aria-label="settings" id="setting">
+            <MoreHoriz />
+          </IconButton>
+        }
+      /> */}
+      <div
+        className={`trelloCardHeading ${index % 2 ? "primary" : "secondary"}`}
+      >
+        <Typography variant="h4" fontWeight={600}>
+          <LensIcon /> {name} {index}
+        </Typography>
+        <IconButton id="setting">
+          <MoreHoriz />
+        </IconButton>
+      </div>
+      <CardActions disableSpacing className="trelloAction">
+        <Button
+          variant="contained"
+          className="trelloButton"
+          startIcon={<AddIcon />}
+          onClick={() => openDrawerById(id)}
+        >
+          Add Card
+        </Button>
+      </CardActions>
       <Droppable droppableId={id} key={id}>
         {(provided) => (
           <CardContent
@@ -27,7 +58,6 @@ function StageList({ title, name, items, id, openDrawerById }) {
                       {...provided.dragHandleProps}
                       {...provided.draggableProps}
                       ref={provided.innerRef}
-                      elevation={0}
                       className="trelloBox"
                     >
                       <CardContent>
@@ -43,15 +73,6 @@ function StageList({ title, name, items, id, openDrawerById }) {
           </CardContent>
         )}
       </Droppable>
-      <CardActions disableSpacing className="trelloAction">
-        <Button
-          variant="outlined"
-          className="trelloButton"
-          onClick={() => openDrawerById(id)}
-        >
-          Add Card
-        </Button>
-      </CardActions>
     </>
   );
 }

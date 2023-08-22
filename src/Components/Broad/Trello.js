@@ -14,7 +14,7 @@ import { Button, Grid } from "@mui/material";
 const DATA = [
   {
     id: "0e2f0db1-5457-46b0-949e-8032d2f9997a",
-    name: "Walmart",
+    name: "TO DO",
     isDeleted: false,
     items: [
       { id: "26fd50b3-3841-496e-8b32-73636f6f4197", name: "3% Milk" },
@@ -24,7 +24,7 @@ const DATA = [
   },
   {
     id: "487f68b4-1746-438c-920e-d67b7df46247",
-    name: "Indigo",
+    name: "Doing ",
     isDeleted: false,
     items: [
       {
@@ -38,7 +38,7 @@ const DATA = [
   {
     id: "25daffdc-aae0-4d73-bd31-43f73101e7c0",
     isDeleted: false,
-    name: "Lowes",
+    name: "Done",
     items: [
       { id: "960cbbcf-89a0-4d79-aa8e-56abbc15eacc", name: "Workbench" },
       { id: "d3edf796-6449-4931-a777-ff66965a025b", name: "Hammer" },
@@ -51,9 +51,9 @@ function Trello() {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.userStore.currentUser);
   const data = useSelector((state) => state.trelloStage.stages);
-  const [openDrawer, setOpenDrawer] = React.useState(false);
-  const [openModel, setOpenModel] = React.useState(false);
-  const [drawerStageId, setDrawerStageId] = React.useState(null);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [openModel, setOpenModel] = useState(false);
+  const [drawerStageId, setDrawerStageId] = useState(null);
 
   const handleClickOpen = () => {
     setOpenModel(true);
@@ -62,10 +62,10 @@ function Trello() {
     setOpenModel(false);
   };
 
-  // useEffect(() => {
-  //   console.log("in DATA");
-  //   dispatch(handleChangeStage(DATA));
-  // }, []);
+  useEffect(() => {
+    console.log("in DATA");
+    dispatch(handleChangeStage(DATA));
+  }, []);
 
   // useEffect(() => {
   //   let timeout;
@@ -101,14 +101,10 @@ function Trello() {
       return;
 
     if (type === "group") {
-      console.log("in type", data, event);
       const reorderedStores = [...data];
       const sourceIndex = source.index;
-      console.log(sourceIndex);
       const destinationIndex = destination.index;
-      console.log(destinationIndex);
       const [removedStore] = reorderedStores.splice(sourceIndex, 1);
-      console.log(removedStore);
       reorderedStores.splice(destinationIndex, 0, removedStore);
 
       return dispatch(handleChangeStage(reorderedStores));
@@ -145,13 +141,13 @@ function Trello() {
     <>
       <div className="trelloBody">
         <Header />
-        <Grid container justifyContent={"flex-end"} rowSpacing={3}>
-          <Grid item md={2}>
+        <Grid container className="trelloContainer">
+          <Grid item md={12} xs={12} sm={12} className="trelloGridItem">
             <Button variant="outlined" onClick={handleClickOpen}>
-              Create Stage's
+              Create Stage
             </Button>
             <Model
-              handleClose={handleClose}
+              close={handleClose}
               open={openModel}
               userID={currentUser.id}
             />
@@ -175,6 +171,7 @@ function Trello() {
                         >
                           {(provided) => (
                             <Card
+                              elevation={0}
                               className="trelloCard"
                               {...provided.dragHandleProps}
                               {...provided.draggableProps}
@@ -182,6 +179,7 @@ function Trello() {
                             >
                               <StageList
                                 {...data}
+                                index={index}
                                 openDrawerById={handleDrawerOpen}
                               />
                             </Card>
@@ -197,8 +195,8 @@ function Trello() {
         </Grid>
       </div>
       <CardDrawer
-        cardId={drawerStageId}
-        userId={currentUser.id}
+        stageId={drawerStageId}
+        currentUser={currentUser}
         open={openDrawer}
         close={handleDrawerClose}
       />
