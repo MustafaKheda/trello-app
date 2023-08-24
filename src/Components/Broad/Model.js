@@ -8,7 +8,7 @@ import Slide from "@mui/material/Slide";
 import { Divider, TextField } from "@mui/material";
 import uuid from "react-uuid";
 import { useDispatch } from "react-redux";
-import { handleSetStage } from "../../store/action";
+import { handleSetStage } from "../../Store/action";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;

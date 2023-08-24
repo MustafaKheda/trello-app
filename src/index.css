@@ -3,3 +3,16 @@
   padding: 0;
   box-sizing: border-box !important;
 }
+.navBar {
+  background-color: transparent !important;
+  backdrop-filter: blur(10px);
+  height: 60px;
+}
+.navToolBar .cardHeading {
+  margin: 0 auto;
+  cursor: default;
+  font-size: 30px !important;
+}
+.headerAvatar {
+  background-color: #3f1651 !important;
+}

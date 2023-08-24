@@ -1,5 +1,6 @@
 import { Actiontypes } from "./actionTypes";
 export const setUser = (data) => {
+  console.log(data);
   return {
     type: Actiontypes.SET_USER,
     payload: data,

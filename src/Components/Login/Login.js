@@ -1,12 +1,7 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardMedia,
-  Snackbar,
-  TextField,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Snackbar from "@mui/material/Snackbar";
+import Typography from "@mui/material/Typography";
 import InputAdornment from "@mui/material/InputAdornment";
 import Person2Icon from "@mui/icons-material/Person2";
 import KeyIcon from "@mui/icons-material/Key";
@@ -17,23 +12,21 @@ import React, { useEffect, useId, useState } from "react";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import { useNavigate } from "react-router";
-import { useDispatch } from "react-redux";
-import { messageMap } from "../../assest/Constant";
+import { useDispatch, useSelector } from "react-redux";
+import BasicTextField from "../../Common/BasicTextField";
+import { messageMap } from "../../Common/Constant";
 import uuid from "react-uuid";
-
-import { setCurrentUser, setUser } from "../../store/action";
+import { setCurrentUser, setUser } from "../../Store/action";
 import "../../assest/css/Login.scss";
 import img3 from "../../assest/Image/rafay-ansari-qKoEIBZ4lLM-unsplash.jpg";
 import img2 from "../../assest/Image/reinhart-julian-d4ZYpoGjUXo-unsplash.jpg";
 import img1 from "../../assest/Image/larissa-cardoso-zHUHeNT_UtE-unsplash.jpg";
-import { useSelector } from "react-redux";
+import BasicButton from "../../Common/BasicButton";
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.userStore?.users);
-
   const shortUUID = uuid().slice(0, 18);
-  const [show, setShow] = useState(false);
   const [auth, setAuth] = useState({
     id: shortUUID,
     username: "",
@@ -42,49 +35,57 @@ function Login() {
     email: "",
     loginPassword: "",
     loginEmail: "",
-  });
-  const [login, setLogin] = useState({
-    loginPassword: "",
-    loginEmail: "",
-  });
-  const [openSnackBar, setOpen] = useState({
     open: false,
     type: "",
+    show: false,
   });
 
-  const { username, mobileNumber, password, email } = auth;
-  const { open, type } = openSnackBar;
-  const { loginPassword, loginEmail } = login;
+  const {
+    id,
+    username,
+    mobileNumber,
+    password,
+    email,
+    loginEmail,
+    loginPassword,
+    open,
+    type,
+    show,
+  } = auth;
 
   useEffect(() => {
     if (type === "login" || type === "signup") {
+      console.log("succesfull");
       navigate("/Trello");
     }
   }, [type]);
 
   const handleClose = () => {
-    setOpen({
+    setAuth((prvAuth) => ({
+      ...prvAuth,
       open: false,
       type: "",
-    });
+    }));
   };
 
   const handleLogin = () => {
     // console.log(user, login);
-    console.log(typeof loginEmail);
+
     if (loginPassword.trim() !== "" && loginEmail.trim() !== "") {
       if (loginEmail.trim().length < 10) {
-        return setOpen({
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
           open: true,
           type: "lessNumber",
-        });
+        }));
       }
 
       if (loginPassword.trim().length < 8) {
-        return setOpen({
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
           open: true,
           type: "passwordContain",
-        });
+        }));
       }
       const userExist = user?.some(
         (user) =>
@@ -93,10 +94,11 @@ function Login() {
       );
 
       if (!userExist) {
-        return setOpen({
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
           open: true,
           type: "userNotFound",
-        });
+        }));
       }
       const userFound = user?.filter(
         (user) =>
@@ -108,27 +110,30 @@ function Login() {
       if (userFound.length > 0) {
         // Successful login
         const { username, id } = userFound[0];
+
         dispatch(setCurrentUser(id, username));
-        setOpen({
+        setAuth((prvAuth) => ({
+          ...prvAuth,
           open: true,
           type: "login",
-        });
+        }));
       } else {
         // Invalid credentials for login
-        setOpen({
+        setAuth((prvAuth) => ({
+          ...prvAuth,
           open: true,
           type: "loginFailed",
-        });
+        }));
       }
     } else {
-      setOpen({
+      setAuth((prvAuth) => ({
+        ...prvAuth,
         open: true,
         type: "empty",
-      });
+      }));
     }
   };
   const handleSignUp = (e) => {
-    console.log(user);
     e.preventDefault();
     if (
       username.trim() !== "" &&
@@ -137,16 +142,18 @@ function Login() {
       email.trim() !== ""
     ) {
       if (mobileNumber.trim().length !== 10) {
-        return setOpen({
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
           open: true,
           type: "lessNumber",
-        });
+        }));
       }
       if (password.trim().length < 8) {
-        return setOpen({
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
           open: true,
           type: "passwordContain",
-        });
+        }));
       }
 
       // Check if username already exists
@@ -160,38 +167,41 @@ function Login() {
       );
       // Attempting to sign up
       if (emailExist) {
-        setOpen({
+        setAuth((prvAuth) => ({
+          ...prvAuth,
           open: true,
           type: "emailExist",
-        });
+        }));
       } else if (numberExist) {
-        setOpen({
+        setAuth((prvAuth) => ({
+          ...prvAuth,
           open: true,
           type: "numberExist",
-        });
+        }));
       } else {
         // Create new user
-        dispatch(setUser({ login: "", saddhjka: "" }));
-        setOpen({
+        dispatch(setUser({ id, username, email, mobileNumber, password }));
+        setAuth((prvAuth) => ({
+          ...prvAuth,
+          password: "",
+          username: "",
+          email: "",
+          mobileNumber: "",
           open: true,
           type: "signup",
-        });
-        setAuth({ password: "", username: "", email: "", mobileNumber: "" });
+        }));
       }
     } else {
       // Empty Form Msg
-      setOpen({
+      setAuth((prvAuth) => ({
+        ...prvAuth,
         open: true,
         type: "empty",
-      });
+      }));
     }
   };
   const toggleView = () => {
-    setShow((currShow) => !currShow);
-  };
-  const handleChangeLogin = (e) => {
-    e.preventDefault();
-    setLogin({ ...login, [e.target.name]: e.target.value });
+    setAuth((prvAuth) => ({ ...prvAuth, show: !show }));
   };
   const handleChange = (e) => {
     e.preventDefault();
@@ -207,13 +217,13 @@ function Login() {
           <>
             <Box className={`cardBox ${show ? "login" : "signup"} `}>
               <Typography className="cardHeading">Trello</Typography>
-              <Box className="cardInputs">
-                <TextField
+              <FormControl className="cardInputs">
+                <BasicTextField
                   fullWidth
                   name="loginEmail"
                   value={loginEmail}
                   placeholder="Email or Mobile Number"
-                  onChange={handleChangeLogin}
+                  onChange={handleChange}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment className="inputIcon" position="start">
@@ -221,13 +231,13 @@ function Login() {
                       </InputAdornment>
                     ),
                   }}
-                ></TextField>
-                <TextField
+                />
+                <BasicTextField
                   fullWidth
                   name="loginPassword"
                   value={loginPassword}
                   placeholder="Password"
-                  onChange={handleChangeLogin}
+                  onChange={handleChange}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment className="inputIcon" position="start">
@@ -235,15 +245,14 @@ function Login() {
                       </InputAdornment>
                     ),
                   }}
-                ></TextField>
-                <Button
+                />
+                <BasicButton
                   elevation={3}
                   className="cardButton"
                   onClick={handleLogin}
-                >
-                  Login
-                </Button>
-              </Box>
+                  name="Login"
+                />
+              </FormControl>
             </Box>
             <Carousel
               infiniteLoop={true}
@@ -277,7 +286,7 @@ function Login() {
             >
               <Typography className="cardHeading">Trello</Typography>
               <FormControl className="cardInputs">
-                <TextField
+                <BasicTextField
                   value={username}
                   name="username"
                   fullWidth
@@ -291,9 +300,8 @@ function Login() {
                     ),
                   }}
                 />
-                <TextField
+                <BasicTextField
                   value={email}
-                  required
                   name="email"
                   fullWidth
                   placeholder="Email"
@@ -308,7 +316,7 @@ function Login() {
                   }}
                 />
 
-                <TextField
+                <BasicTextField
                   value={mobileNumber}
                   name="mobileNumber"
                   fullWidth
@@ -323,7 +331,7 @@ function Login() {
                     ),
                   }}
                 />
-                <TextField
+                <BasicTextField
                   value={password}
                   name="password"
                   fullWidth
@@ -338,13 +346,12 @@ function Login() {
                     ),
                   }}
                 />
-                <Button
+                <BasicButton
                   elevation={3}
                   className="cardButton"
                   onClick={handleSignUp}
-                >
-                  Sign up
-                </Button>
+                  name="sign up"
+                />
               </FormControl>
             </Box>
 
@@ -377,9 +384,13 @@ function Login() {
           </>
         )}
       </Card>
-      <Button id="login" className="button" onClick={toggleView}>
-        {show ? "signup" : "Login"}
-      </Button>
+      <BasicButton
+        id="login"
+        className="button"
+        onClick={toggleView}
+        name={show ? "signup" : "Login"}
+      />
+
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={open}

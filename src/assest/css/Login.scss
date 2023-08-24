@@ -138,13 +138,13 @@ $cardCarosual: 80vh;
   background-color: $blue !important;
 }
 
-.MuiInputBase-adornedStart {
+.cardInputs .MuiInputBase-adornedStart {
   padding-left: 0px !important;
   margin: 0px !important;
   height: 40px;
 }
 
-.MuiInputBase-adornedStart input {
+.cardInputs .MuiInputBase-adornedStart input {
   border-left: 0.1px solid rgba($color: #000000, $alpha: 0.2) !important;
   padding-left: 10px !important;
 }
@@ -155,13 +155,3 @@ $cardCarosual: 80vh;
   color: rgba($color: #000000, $alpha: 0.4) !important;
 }
 // Nav Bar Css
-
-.navBar {
-  background-color: #fff !important;
-  height: 60px;
-}
-.navToolBar .cardHeading {
-  margin: 0 auto;
-  cursor: default;
-  font-size: 30px !important;
-}

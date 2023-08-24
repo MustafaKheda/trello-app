@@ -4,41 +4,41 @@ $bgcolor: #f6f7fb;
   font-size: small !important;
 }
 .trelloBody {
-  background-color: #fff;
+  // background: url("../Image/BG5.jpg") no-repeat;
+  background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+  background-size: fill;
   min-height: 100vh;
   display: flex;
-  padding: 75px 0 10px;
+  padding: 0;
   column-gap: 20px;
+  overflow: hidden;
 }
 .trelloCard {
-  background-color: inherit !important;
-  position: relative;
+  background-color: #f1f2f4 !important;
   display: flex;
   flex-direction: column;
   height: fit-content;
-  min-width: 30%;
   min-height: 100px !important;
-  max-height: 450px !important;
+  // max-height: 435px !important;
+
   padding: 10px !important;
-  border-radius: 0px !important;
-  border-right: 1px dashed !important;
-  border-left: 1px dashed !important;
+  border-radius: 25px !important;
 }
 .trelloCard:hover {
   transform: scale(1.01);
 }
 .trelloCardContent {
-  flex-grow: 1;
-  padding: 10px 0 !important;
-  overflow-x: auto !important;
-  // border: 1px solid !important;
+  margin: 10px 0 !important;
+  padding: 0 !important;
+  // overflow-x: auto !important;
+  // overflow-y: auto !important ;
   border-radius: 25px;
 }
 
 .trelloBox {
   background-color: #fff;
   border-radius: 25px !important;
-  width: 230px;
+  width: 95%;
   height: 150px !important;
   margin: 0 auto 10px;
   flex-grow: 1;
@@ -48,7 +48,7 @@ $bgcolor: #f6f7fb;
 
 .trelloAction {
   padding: 0px !important;
-  margin: 10px 0;
+  margin: 0;
   justify-content: flex-start;
 }
 .trelloHeader {
@@ -62,24 +62,23 @@ $bgcolor: #f6f7fb;
   color: rgb(0, 0, 0) !important;
   margin-bottom: 0px !important;
   font-weight: 600 !important;
-  border-radius: 4px !important;
+  border-radius: 8px !important;
   background: transparent !important;
-  border: 1px solid black !important;
-  width: 100% !important;
+  border: none !important;
+  width: 90% !important;
+  margin: 0 !important;
+  backdrop-filter: blur(10px);
+  box-shadow: none !important;
   justify-content: flex-start !important;
-  border-radius: 35px !important;
-  /* Apply glass blur effect */
-  backdrop-filter: blur(10px); /* Adjust the blur radius as needed */
-  -webkit-backdrop-filter: blur(10px); /* For Safari */
 }
 
 .cardContainer {
   display: flex;
   flex-direction: row;
   width: 100%;
-  padding: 10px 20px 0;
+  padding: 10px 20px;
   gap: 10px !important;
-  overflow: auto;
+  overflow-y: auto;
 }
 .trelloDrawer .MuiDrawer-paper {
   width: 500px !important;
@@ -113,10 +112,12 @@ $bgcolor: #f6f7fb;
   font-size: 20px !important;
 }
 .trelloContainer {
-  background-color: rgb(101 152 255 / 10%);
-  width: 90% !important;
-  border-radius: 25px !important;
+  width: 95% !important;
   margin: 0 auto;
+  backdrop-filter: blur(10px);
+  border-radius: 25px !important;
+  margin-top: 75px;
+  align-content: flex-start;
 }
 .trelloCardHeading {
   display: flex;
@@ -135,13 +136,13 @@ $bgcolor: #f6f7fb;
   gap: 5px;
 }
 .primary {
-  background-color: #acc7ff !important;
+  color: #0055ff !important;
 }
 .primary svg {
   color: #77a4ff !important;
 }
 .secondary {
-  background-color: #fbf2de !important;
+  color: #ffb20a !important;
 }
 .secondary svg {
   color: #f9c03e !important;
@@ -169,53 +170,99 @@ $bgcolor: #f6f7fb;
     width: 100% !important; /* Utilize full width of the screen */
   }
 }
-
-@media only screen and (max-width: 600px) {
-  .trelloCard {
+@media only screen and (max-width: 500px) {
+  .size {
+    min-width: 100%;
+  }
+}
+@media only screen and (min-width: 500px) {
+  .size {
+    min-width: 75%;
+  }
+  .sm {
+    min-width: 75%;
+  }
+  .md {
+    min-width: 75%;
+  }
+  .lg {
+    width: 75%;
+    min-width: 75%;
+  }
+  .xl {
+    width: 100%;
+    min-width: 100%;
+  }
+}
+@media only screen and (min-width: 700px) {
+  // For Mobile
+  .size {
     min-width: 50%;
   }
-}
-
-@media only screen and (min-width: 768px) {
-  /* For desktop: */
-  .col-1 {
-    width: 8.33%;
+  .sm {
+    min-width: 50%;
   }
-  .col-2 {
-    width: 16.66%;
-  }
-  .col-3 {
-    width: 25%;
-  }
-  .col-4 {
-    width: 33.33%;
-  }
-  .col-5 {
-    width: 41.66%;
-  }
-  .col-6 {
+  .md {
     width: 50%;
+    min-width: 50%;
   }
-  .col-7 {
-    width: 58.33%;
-  }
-  .col-8 {
-    width: 66.66%;
-  }
-  .col-9 {
+  .lg {
     width: 75%;
+    min-width: 75%;
   }
-  .col-10 {
-    width: 83.33%;
-  }
-  .col-11 {
-    width: 91.66%;
-  }
-  .col-12 {
+  .xl {
     width: 100%;
+    min-width: 100%;
   }
 }
 
+@media only screen and (min-width: 850px) {
+  /* For tablet: */
+  .size {
+    width: 33%;
+    min-width: 33%;
+  }
+  .sm {
+    width: 33.33%;
+    min-width: 33.33%;
+  }
+  .md {
+    width: 50%;
+    min-width: 50%;
+  }
+  .lg {
+    width: 75%;
+    min-width: 75%;
+  }
+  .xl {
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+@media only screen and (min-width: 1100px) {
+  /* For desktop: */
+  .size {
+    width: 25%;
+    min-width: 25%;
+  }
+  .sm {
+    width: 30%;
+    min-width: 30%;
+  }
+  .md {
+    width: 50%;
+    min-width: 50%;
+  }
+  .lg {
+    width: 75%;
+    min-width: 75%;
+  }
+  .xl {
+    width: 100%;
+    min-width: 100%;
+  }
+}
 // Custom Scroll Bar
 /* Add custom scroll styling */
 .trelloCardContent::-webkit-scrollbar,
