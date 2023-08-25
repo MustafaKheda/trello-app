@@ -3,10 +3,12 @@
   padding: 0;
   box-sizing: border-box !important;
 }
+
 .navBar {
   background-color: transparent !important;
   backdrop-filter: blur(10px);
   height: 60px;
+  margin-bottom: 100px !important;
 }
 .navToolBar .cardHeading {
   margin: 0 auto;
@@ -15,4 +17,33 @@
 }
 .headerAvatar {
   background-color: #3f1651 !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+.picker {
+  margin-top: 20px;
+  width: 300px;
+  background: #f0f0f4;
+  border-radius: 10px;
+}
+
+.picker .react-colorful {
+  width: auto;
+}
+
+.picker__swatches {
+  display: flex;
+  padding: 12px;
+  flex-wrap: wrap;
+}
+
+.picker__swatch {
+  width: 24px;
+  height: 24px;
+  margin: 4px;
+  border: none;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
 }

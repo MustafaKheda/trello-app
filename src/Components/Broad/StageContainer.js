@@ -12,7 +12,7 @@ import CardDrawer from "./CardDrawer";
 import Model from "./Model";
 import { Button, Grid, IconButton, Typography } from "@mui/material";
 import { DATA } from "../../Common/Constant";
-function Trello() {
+function StageContainer() {
   const buttonRef = useRef(null);
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -121,68 +121,58 @@ function Trello() {
 
   return (
     <>
-      <div className="trelloBody">
-        <Header />
-        <div className="trelloGridItem">
-          <Button
-            ref={buttonRef}
-            className="trelloStageButton"
-            variant="outlined"
-            onClick={handleClickOpen}
-          >
-            Create Stage
-          </Button>
-        </div>
-        <Model
-          buttonRef={buttonRef}
-          close={handleClose}
-          open={openModel}
-          userID={currentUser.id}
-        />
+      <Model close={handleClose} open={openModel} userID={currentUser.id} />
+      <Button
+        className="trelloStageButton size"
+        variant="outlined"
+        onClick={handleClickOpen}
+      >
+        Create Stage
+      </Button>
 
-        <DragDropContext onDragEnd={handleDragDrop}>
-          <Droppable droppableId="ROOT" type="group" direction="horizontal">
-            {(provided) => (
-              <div
-                className="cardContainer"
-                disableScrollOverlapDetection={true}
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                {data &&
-                  data?.map((data, index) => {
-                    return !data.isDeleted ? (
-                      <Draggable
-                        draggableId={data.id}
-                        key={data.id}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <>
-                            <Card
-                              elevation={0}
-                              className="trelloCard size"
-                              {...provided.dragHandleProps}
-                              {...provided.draggableProps}
-                              ref={provided.innerRef}
-                            >
-                              <StageList
-                                {...data}
-                                index={index}
-                                openDrawerById={handleDrawerOpen}
-                              />
-                            </Card>
-                          </>
-                        )}
-                      </Draggable>
-                    ) : null;
-                  })}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </div>
+      <DragDropContext onDragEnd={handleDragDrop}>
+        <Droppable droppableId="ROOT" type="group" direction="horizontal">
+          {(provided) => (
+            <div
+              className="cardContainer"
+              disableScrollOverlapDetection={true}
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {data &&
+                data?.map((data, index) => {
+                  return !data.isDeleted ? (
+                    <Draggable
+                      draggableId={data.id}
+                      key={data.id}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <>
+                          <Card
+                            elevation={0}
+                            className="trelloCard size"
+                            {...provided.dragHandleProps}
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                          >
+                            <StageList
+                              {...data}
+                              index={index}
+                              openDrawerById={handleDrawerOpen}
+                            />
+                          </Card>
+                        </>
+                      )}
+                    </Draggable>
+                  ) : null;
+                })}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+
       <CardDrawer
         stageId={drawerStageId}
         currentUser={currentUser}
@@ -193,7 +183,7 @@ function Trello() {
   );
 }
 
-export default Trello;
+export default StageContainer;
 // // <>
 // <div className="trelloBody">
 // <Header />

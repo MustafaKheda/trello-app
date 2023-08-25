@@ -10,7 +10,9 @@ import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import LensIcon from "@mui/icons-material/Lens";
 import "../../assest/css/Trello.scss";
 import { IconButton } from "@mui/material";
-function StageList({ name, items, index, id, openDrawerById }) {
+import { red } from "@mui/material/colors";
+function StageList(props) {
+  const { name, items, index, id, openDrawerById, color } = props;
   return (
     <>
       {/* <CardHeader
@@ -23,14 +25,12 @@ function StageList({ name, items, index, id, openDrawerById }) {
           </IconButton>
         }
       /> */}
-      <div
-        className={`trelloCardHeading ${index % 2 ? "primary" : "secondary"}`}
-      >
-        <Typography variant="h4" fontWeight={600}>
+      <div className={`trelloCardHeading `}>
+        <Typography variant="h4" color={`${color}`} fontWeight={600}>
           <LensIcon /> {name} {index}
         </Typography>
         <IconButton id="setting">
-          <MoreHoriz />
+          <MoreHoriz style={{ color: `${color}` }} />
         </IconButton>
       </div>
       <CardActions disableSpacing className="trelloAction">

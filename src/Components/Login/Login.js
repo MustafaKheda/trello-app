@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import BasicTextField from "../../Common/BasicTextField";
 import { messageMap } from "../../Common/Constant";
 import uuid from "react-uuid";
-import { setCurrentUser, setUser } from "../../Store/action";
+import { setCurrentUser, setUser } from "../../Store/Action";
 import "../../assest/css/Login.scss";
 import img3 from "../../assest/Image/rafay-ansari-qKoEIBZ4lLM-unsplash.jpg";
 import img2 from "../../assest/Image/reinhart-julian-d4ZYpoGjUXo-unsplash.jpg";

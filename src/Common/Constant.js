@@ -44,3 +44,12 @@ export const DATA = [
     tint: 3,
   },
 ];
+export const presetColors = [
+  "#cd9323",
+  "#1a53d8",
+  "#9a2151",
+  "#0d6416",
+  "#8d2808",
+  "#ffb20a",
+  "#77a4ff",
+];

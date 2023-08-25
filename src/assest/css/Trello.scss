@@ -1,5 +1,12 @@
 $blue: #5e94ff;
 $bgcolor: #f6f7fb;
+$buttonBg: #f1f2f4;
+@mixin button {
+  color: $buttonText !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+$buttonText: rgb(0, 0, 0);
 * {
   font-size: small !important;
 }
@@ -8,19 +15,20 @@ $bgcolor: #f6f7fb;
   background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
   background-size: fill;
   min-height: 100vh;
-  display: flex;
-  padding: 0;
+  padding-top: 75px;
   column-gap: 20px;
-  overflow: hidden;
+  min-width: 100vw;
+  width: fit-content !important;
+  // overflow: auto;
 }
 .trelloCard {
-  background-color: #f1f2f4 !important;
+  background-color: $buttonBg !important;
   display: flex;
   flex-direction: column;
   height: fit-content;
+  margin: 5px;
   min-height: 100px !important;
-  // max-height: 435px !important;
-
+  max-height: 450px;
   padding: 10px !important;
   border-radius: 25px !important;
 }
@@ -30,8 +38,8 @@ $bgcolor: #f6f7fb;
 .trelloCardContent {
   margin: 10px 0 !important;
   padding: 0 !important;
-  // overflow-x: auto !important;
-  // overflow-y: auto !important ;
+  overflow-x: auto !important;
+  overflow-y: auto !important ;
   border-radius: 25px;
 }
 
@@ -59,10 +67,8 @@ $bgcolor: #f6f7fb;
   font-size: medium !important;
 }
 .trelloButton {
-  color: rgb(0, 0, 0) !important;
+  @include button;
   margin-bottom: 0px !important;
-  font-weight: 600 !important;
-  border-radius: 8px !important;
   background: transparent !important;
   border: none !important;
   width: 90% !important;
@@ -71,15 +77,19 @@ $bgcolor: #f6f7fb;
   box-shadow: none !important;
   justify-content: flex-start !important;
 }
-
-.cardContainer {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  padding: 10px 20px;
-  gap: 10px !important;
-  overflow-y: auto;
+.trelloStageButton {
+  @include button;
+  height: fit-content !important;
+  background-color: $buttonBg !important;
+  color: $buttonText !important;
 }
+.cardContainer {
+  box-sizing: border-box;
+  width: 100% !important;
+  display: flex;
+  gap: 10px !important;
+}
+
 .trelloDrawer .MuiDrawer-paper {
   width: 500px !important;
 }
@@ -100,10 +110,9 @@ $bgcolor: #f6f7fb;
 }
 .trelloGridItem {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   height: 50px !important;
   padding: 10px 40px 0;
-  width: 100% !important;
 }
 .trelloButton span svg {
   font-size: 26px !important ;
@@ -112,8 +121,8 @@ $bgcolor: #f6f7fb;
   font-size: 20px !important;
 }
 .trelloContainer {
-  width: 95% !important;
   margin: 0 auto;
+  padding: 0 5px;
   backdrop-filter: blur(10px);
   border-radius: 25px !important;
   margin-top: 75px;
@@ -147,37 +156,15 @@ $bgcolor: #f6f7fb;
 .secondary svg {
   color: #f9c03e !important;
 }
-@media only screen and (max-width: 768px) {
-  .cardContainer {
-    display: flex;
-    flex-direction: row !important;
-    min-width: 50%;
-    padding: 20px;
-    gap: 10px !important;
-  }
-  * {
-    height: auto !important;
-  }
-  .trelloBody {
-    min-height: auto;
-  }
-  .trelloBody {
-    min-height: auto; /* Remove min-height for smaller screens */
-  }
 
-  /* Adjust drawer width for smaller screens */
-  .trelloDrawer .MuiDrawer-paper {
-    width: 100% !important; /* Utilize full width of the screen */
+@media only screen and (max-width: 400px) {
+  .size {
+    min-width: 100% !important;
   }
 }
-@media only screen and (max-width: 500px) {
+@media only screen and (min-width: 400px) {
   .size {
-    min-width: 100%;
-  }
-}
-@media only screen and (min-width: 500px) {
-  .size {
-    min-width: 75%;
+    min-width: 60% !important;
   }
   .sm {
     min-width: 75%;
@@ -194,10 +181,10 @@ $bgcolor: #f6f7fb;
     min-width: 100%;
   }
 }
-@media only screen and (min-width: 700px) {
+@media only screen and (min-width: 600px) {
   // For Mobile
   .size {
-    min-width: 50%;
+    min-width: 50% !important;
   }
   .sm {
     min-width: 50%;
@@ -216,11 +203,11 @@ $bgcolor: #f6f7fb;
   }
 }
 
-@media only screen and (min-width: 850px) {
+@media only screen and (min-width: 800px) {
   /* For tablet: */
   .size {
     width: 33%;
-    min-width: 33%;
+    min-width: 33% !important;
   }
   .sm {
     width: 33.33%;
@@ -244,7 +231,7 @@ $bgcolor: #f6f7fb;
   /* For desktop: */
   .size {
     width: 25%;
-    min-width: 25%;
+    min-width: 300px !important;
   }
   .sm {
     width: 30%;
@@ -265,26 +252,19 @@ $bgcolor: #f6f7fb;
 }
 // Custom Scroll Bar
 /* Add custom scroll styling */
-.trelloCardContent::-webkit-scrollbar,
-.cardContainer::-webkit-scrollbar {
-  width: 0;
-  height: 0px;
+::-webkit-scrollbar {
+  width: 8px;
+  height: 15px;
 }
 
 /* Show scrollbar on hover */
-.trelloCardContent:hover::-webkit-scrollbar,
-.cardContainer:hover::-webkit-scrollbar {
-  width: 8px; /* Width of the scrollbar */
-  height: 8px;
-}
-.trelloCardContent::-webkit-scrollbar-thumb,
-.cardContainer::-webkit-scrollbar-thumb {
+
+::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.3); /* Color of the thumb */
   border-radius: 25px; /* Rounded corners for the thumb */
 }
 
-.trelloCardContent::-webkit-scrollbar-track,
-.cardContainer::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background-color: transparent; /* Color of the track */
   width: 120%;
 }

@@ -1,5 +1,5 @@
 import { act } from "@testing-library/react";
-import { Actiontypes } from "./actionTypes";
+import { Actiontypes } from "./ActionTypes";
 import { combineReducers } from "redux";
 const initialState = {
   currentUser: {},

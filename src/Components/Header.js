@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 
 export default function Header() {
   const user = useSelector((store) => store.userStore.currentUser);
-  console.log(user);
   const letter = user.username.slice(0, 1).toUpperCase();
   return (
     <AppBar position="fixed" className="navBar" elevation={3}>
