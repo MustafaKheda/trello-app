@@ -36,3 +36,16 @@ export const handleSetStage = (obj) => {
     payload: obj,
   };
 };
+
+export const handleSetCard = (obj) => {
+  return {
+    type: Actiontypes.SET_CARD,
+    payload: obj,
+  };
+};
+export const handleChangeCard = (obj) => {
+  return {
+    type: Actiontypes.CHANGE_CARD,
+    payload: obj,
+  };
+};

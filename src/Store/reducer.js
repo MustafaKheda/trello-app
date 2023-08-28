@@ -5,13 +5,14 @@ const initialState = {
   currentUser: {},
   users: [],
 };
-
 const {
   SET_USER,
   SET_CURRENT_USER,
   UNSET_CURRENT_USER,
   SET_STAGE,
   CHANGE_STAGE,
+  SET_CARD,
+  CHANGE_CARD,
 } = Actiontypes;
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -41,23 +42,30 @@ const userReducer = (state = initialState, action) => {
 
 const trelloState = {
   stages: [],
-  changeStages: [],
   card: [],
 };
 const stageReducer = (state = trelloState, action) => {
   const { stages } = state;
   switch (action.type) {
     case CHANGE_STAGE:
-      console.log(action.payload);
       return {
         ...state,
         stages: [...action.payload],
       };
     case SET_STAGE:
-      console.log(action.payload);
       return {
         ...state,
-        stages: [...state.stages, action.payload],
+        stages: [...stages, action.payload],
+      };
+    case SET_CARD:
+      return {
+        ...state,
+        card: [...state.card, action.payload],
+      };
+    case CHANGE_CARD:
+      return {
+        ...state,
+        card: [...action.payload],
       };
     default:
       return state;

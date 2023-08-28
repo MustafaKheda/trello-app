@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Card from "@mui/material/Card";
 import { styled, useTheme } from "@mui/material/styles";
-import "../../assest/css/Trello.scss";
+import "../../assest/Css/Trello.scss";
 import Header from "../Header";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";

@@ -1,33 +1,66 @@
-import react, { useState, forwardRef } from "react";
+import react, { useState, forwardRef, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
-import { Divider, TextField } from "@mui/material";
+import { Divider, Snackbar, TextField } from "@mui/material";
 import uuid from "react-uuid";
 import { useDispatch } from "react-redux";
 import { handleSetStage } from "../../Store/Action";
 import { SwatchesPicker } from "./SwatchesPicker";
+import { messageMap } from "../../Common/Constant";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function Model({ buttonRef, close, open, userID }) {
+function Model({ buttonRef, close, open, currentUser }) {
+  const { id: userId, username } = currentUser;
   const dispatch = useDispatch();
   const [stage, setStage] = useState({
     id: uuid().slice(0, 18),
-    userID,
     name: "",
-    items: [],
-    color: "",
+    color: "#000",
     isDeleted: false,
+    openBar: false,
+    type: "",
+    createdBy: new Date(),
+    createdAt: username,
+    modifiedBy: "",
+    modifiedAt: "",
   });
-  const { color } = stage;
+  const {
+    id,
+    color,
+    name,
+    openBar,
+    type,
+    isDeleted,
+    createdBy,
+    createdAt,
+    modifiedBy,
+    modifiedAt,
+  } = stage;
+  console.log(createdBy, createdAt);
+  const handleSetDate = () => {
+    if (createdAt) {
+      setStage((prevStage) => ({
+        ...prevStage,
+        modifiedAt: new Date(),
+        modifiedBy: username,
+      }));
+    } else {
+      console.log("success");
+      setStage((prevStage) => ({
+        ...prevStage,
+        createdAt: new Date(),
+        createdBy: username,
+      }));
+    }
+  };
   const handleChange = (e) => {
-    console.log(e.target.value);
     setStage((prevStage) => ({
       ...prevStage,
       [e.target.name]: e.target.value,
@@ -38,23 +71,58 @@ function Model({ buttonRef, close, open, userID }) {
       ...prevStage,
       name: "",
       color: "",
+      createdAt: "", // Reset the createdAt field
+      createdBy: "", // Reset the createdBy field
+      modifiedAt: "", // Reset the modifiedAt field
+      modifiedBy: "", // Reset the modifiedBy field
     }));
     close();
   };
-
+  const handleCloseSnackbar = () => {
+    setStage((stage) => ({
+      ...stage,
+      openBar: false,
+      type: "",
+    }));
+  };
+  console.log(stage);
   const handleSubmit = (e) => {
-    console.log(buttonRef);
-    dispatch(handleSetStage(stage));
+    handleSetDate();
+    if (name !== "") {
+      console.log(stage);
+      dispatch(
+        handleSetStage({
+          userId,
+          id,
+          color,
+          name,
+          isDeleted,
+          createdAt: stage.createdAt, // Use the updated createdAt value
+          modifiedAt: stage.modifiedAt, // Use the updated modifiedAt value
+          createdBy: stage.createdBy, // Use the updated createdBy value
+          modifiedBy: stage.modifiedBy, // Use the updated modifiedBy value,
+        })
+      );
+      setStage((prevStage) => ({
+        ...prevStage,
+        id: uuid().slice(0, 18),
+      }));
+      buttonRef?.current.scrollIntoView({ behavior: "smooth" });
+    } else {
+      setStage((prvStage) => ({
+        ...prvStage,
+        openBar: true,
+        type: "emptyModel",
+      }));
+    }
+    handleClose();
+  };
+  useEffect(() => {
     setStage((prevStage) => ({
       ...prevStage,
-      id: uuid().slice(0, 18),
-      userID,
-      name: "",
-      color: "#000",
+      userId,
     }));
-    buttonRef?.current.scrollIntoView({ behavior: "smooth" });
-    close();
-  };
+  }, [userId]);
   return (
     <>
       <Dialog
@@ -66,11 +134,12 @@ function Model({ buttonRef, close, open, userID }) {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{"Create Stage's"}</DialogTitle>
+        <DialogTitle>{"Create Stage"}</DialogTitle>
         <Divider />
         <DialogContent className="dialogBoxContent">
           <TextField
-            value={stage.name}
+            value={name}
+            fullWidth
             name="name"
             label="Title"
             placeholder="Title"
@@ -84,6 +153,12 @@ function Model({ buttonRef, close, open, userID }) {
           <Button onClick={handleSubmit}>submit</Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={openBar}
+        onClose={handleCloseSnackbar}
+        message={messageMap[type]}
+      />
     </>
   );
 }

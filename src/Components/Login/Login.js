@@ -17,7 +17,7 @@ import BasicTextField from "../../Common/BasicTextField";
 import { messageMap } from "../../Common/Constant";
 import uuid from "react-uuid";
 import { setCurrentUser, setUser } from "../../Store/Action";
-import "../../assest/css/Login.scss";
+import "../../assest/Css/Login.scss";
 import img3 from "../../assest/Image/rafay-ansari-qKoEIBZ4lLM-unsplash.jpg";
 import img2 from "../../assest/Image/reinhart-julian-d4ZYpoGjUXo-unsplash.jpg";
 import img1 from "../../assest/Image/larissa-cardoso-zHUHeNT_UtE-unsplash.jpg";
@@ -205,7 +205,7 @@ function Login() {
   };
   const handleChange = (e) => {
     e.preventDefault();
-    setAuth({ ...auth, [e.target.name]: e.target.value });
+    setAuth({ ...auth, [e.target.name]: e.target.value.trim() });
   };
   return (
     <div className="container">

@@ -7,9 +7,7 @@ $buttonBg: #f1f2f4;
   border-radius: 8px !important;
 }
 $buttonText: rgb(0, 0, 0);
-* {
-  font-size: small !important;
-}
+
 .trelloBody {
   // background: url("../Image/BG5.jpg") no-repeat;
   background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
@@ -26,7 +24,7 @@ $buttonText: rgb(0, 0, 0);
   display: flex;
   flex-direction: column;
   height: fit-content;
-  margin: 5px;
+  margin: 0px 10px 5px;
   min-height: 100px !important;
   max-height: 450px;
   padding: 10px !important;
@@ -42,22 +40,90 @@ $buttonText: rgb(0, 0, 0);
   overflow-y: auto !important ;
   border-radius: 25px;
 }
-
-.trelloBox {
+.trelloStages {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+//  Trello Stage inner Card's
+.trelloInnerCard {
+  box-sizing: border-box !important;
   background-color: #fff;
   border-radius: 25px !important;
   width: 95%;
-  height: 150px !important;
+  min-height: 150px !important;
+  display: flex;
+  flex-direction: column;
   margin: 0 auto 10px;
-  flex-grow: 1;
   border: none !important;
   box-shadow: rgba(0, 0, 0, 0.1) -4px 9px 25px -6px !important;
+  gap: 5px;
 }
-
+.innerCardAvatar {
+  width: 30px !important;
+  height: 30px !important;
+  font-size: 15px !important;
+}
+.innerCardContent {
+  padding-top: 2px !important;
+  flex-grow: 1 !important;
+  align-items: center !important;
+  align-content: center !important;
+  overflow-wrap: break-word;
+}
+.actionStack {
+  align-items: center;
+}
+.actionIconStack {
+  width: 105px !important;
+  justify-content: space-around !important;
+  margin-right: 10px;
+  align-items: center;
+  align-content: center;
+  height: 30px !important;
+  justify-content: flex-end;
+  flex-direction: row !important;
+}
+.innerCardTitle.MuiCardHeader-root {
+  padding: 16px !important;
+  padding-bottom: 0px !important ;
+  padding-top: 10px !important ;
+}
+.actionIconStack svg {
+  font-size: 25px !important;
+}
+.actionStack svg {
+  font-size: medium;
+}
 .trelloAction {
   padding: 0px !important;
   margin: 0;
   justify-content: flex-start;
+}
+.innerCardActions {
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+}
+.innerActionIconButton {
+  padding: 0 !important;
+}
+.innerActionIconButton svg {
+  font-size: larger;
+}
+.innerCardTitle .MuiCardHeader-content span {
+  font-size: medium !important;
+  font-weight: 700 !important;
+  text-transform: capitalize;
+}
+.actionStackDueDate {
+  display: flex;
+  align-items: center;
+  align-content: center;
+
+  gap: 2px;
 }
 .trelloHeader {
   align-items: center !important;
@@ -80,8 +146,9 @@ $buttonText: rgb(0, 0, 0);
 .trelloStageButton {
   @include button;
   height: fit-content !important;
-  background-color: $buttonBg !important;
+  background-color: #f1f2f4 !important;
   color: $buttonText !important;
+  border: none !important;
 }
 .cardContainer {
   box-sizing: border-box;
@@ -91,7 +158,11 @@ $buttonText: rgb(0, 0, 0);
 }
 
 .trelloDrawer .MuiDrawer-paper {
-  width: 500px !important;
+  width: 600px !important;
+  gap: 10px;
+}
+.cardDrawerTextField {
+  width: 60% !important;
 }
 .drawerHeader {
   align-items: center;
@@ -100,10 +171,11 @@ $buttonText: rgb(0, 0, 0);
 .dialogBoxContent {
   padding: 10px !important;
   min-height: 130px;
-  width: 70%;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: center;
+  align-items: center;
 }
 .dialogBoxContent input {
   height: 40px !important;
@@ -128,35 +200,34 @@ $buttonText: rgb(0, 0, 0);
   margin-top: 75px;
   align-content: flex-start;
 }
+
 .trelloCardHeading {
   display: flex;
-  border-radius: 4px !important;
-  color: #000000 !important;
-  width: 100%;
-  min-height: 40px;
+  border-top-right-radius: 100px !important;
+  border-bottom-right-radius: 100px !important;
+  border-radius: 8px;
+  color: #fff !important;
+  background-color: #fff;
+  width: 95%;
+  margin: 0 auto;
+  height: 45px;
   align-items: center;
   justify-content: space-between;
   padding-left: 10px;
   font-weight: 600 !important;
+  clip-path: polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%);
+}
+.trelloCardHeading:last-of-type {
+  clip-path: none;
 }
 .trelloCardHeading h4 {
   align-items: center;
   display: flex;
   gap: 5px;
 }
-.primary {
-  color: #0055ff !important;
+.trelloCardHeading svg {
+  color: #fff !important;
 }
-.primary svg {
-  color: #77a4ff !important;
-}
-.secondary {
-  color: #ffb20a !important;
-}
-.secondary svg {
-  color: #f9c03e !important;
-}
-
 @media only screen and (max-width: 400px) {
   .size {
     min-width: 100% !important;
@@ -230,7 +301,7 @@ $buttonText: rgb(0, 0, 0);
 @media only screen and (min-width: 1100px) {
   /* For desktop: */
   .size {
-    width: 25%;
+    width: 300px;
     min-width: 300px !important;
   }
   .sm {

@@ -8,6 +8,8 @@ export const messageMap = {
   lessNumber: "Please enter a 10-digit mobile number.",
   passwordContain: "Password must have at least 8 characters.",
   userNotFound: "User not found. Please sign up.",
+  emptyCardForm: "Please fill the form, to create the card",
+  emptyModel: "Please enter the title of the Stage",
 };
 export const DATA = [
   {
@@ -18,7 +20,7 @@ export const DATA = [
       { id: "26fd50b3-3841-496e-8b32-73636f6f4197", name: "3% Milk" },
       { id: "b0ee9d50-d0a6-46f8-96e3-7f3f0f9a2525", name: "Butter" },
     ],
-    tint: 1,
+    color: "#000",
   },
   {
     id: "487f68b4-1746-438c-920e-d67b7df46247",
@@ -31,7 +33,7 @@ export const DATA = [
       },
       { id: "5bee94eb-6bde-4411-b438-1c37fa6af364", name: "Atomic Habits" },
     ],
-    tint: 2,
+    color: "#000",
   },
   {
     id: "25daffdc-aae0-4d73-bd31-43f73101e7c0",
@@ -41,7 +43,7 @@ export const DATA = [
       { id: "960cbbcf-89a0-4d79-aa8e-56abbc15eacc", name: "Workbench" },
       { id: "d3edf796-6449-4931-a777-ff66965a025b", name: "Hammer" },
     ],
-    tint: 3,
+    color: "#000",
   },
 ];
 export const presetColors = [
@@ -52,4 +54,18 @@ export const presetColors = [
   "#8d2808",
   "#ffb20a",
   "#77a4ff",
+];
+export const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "June",
+  "July",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
 ];

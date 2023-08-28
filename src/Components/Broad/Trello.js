@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import Card from "@mui/material/Card";
 import { styled, useTheme } from "@mui/material/styles";
-import "../../assest/css/Trello.scss";
+import "../../assest/Css/Trello.scss";
 import Header from "../Header";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { handleChangeStage } from "../../Store/Action";
+import { handleChangeCard, handleChangeStage } from "../../Store/Action";
 import StageList from "./StageList";
 import CardDrawer from "./CardDrawer";
 import Model from "./Model";
@@ -16,6 +17,7 @@ function Trello() {
   const buttonRef = useRef(null);
   const theme = useTheme();
   const dispatch = useDispatch();
+  const cards = useSelector((store) => store.trelloStage.card);
   const currentUser = useSelector((state) => state.userStore.currentUser);
   const data = useSelector((state) => state.trelloStage.stages);
   const [open, setOpen] = useState({
@@ -39,7 +41,6 @@ function Trello() {
   };
 
   useEffect(() => {
-    console.log("in DATA");
     dispatch(handleChangeStage(DATA));
   }, []);
 
@@ -48,7 +49,6 @@ function Trello() {
   //   if (data.length > 0) {
   //     clearTimeout(timeout);
   //     timeout = setTimeout(() => {
-  //       console.log("in data", data);
   //       dispatch(handleChangeStage(data));
   //     }, 2000);
   //   }
@@ -74,7 +74,7 @@ function Trello() {
     }));
   };
   const handleDragDrop = (result) => {
-    const { source, destination, type } = result;
+    const { source, destination, type, draggableId } = result;
     if (!destination) return;
     if (
       source.droppableId === destination.droppableId &&
@@ -83,6 +83,7 @@ function Trello() {
       return;
 
     if (type === "group") {
+      // Handle Stage drag-and-drop
       const reorderedStores = [...data];
       const sourceIndex = source.index;
       const destinationIndex = destination.index;
@@ -91,32 +92,42 @@ function Trello() {
 
       return dispatch(handleChangeStage(reorderedStores));
     }
-    const newStores = [...data];
-    const dataSourceIndex = data.findIndex(
-      (data) => data.id === source.droppableId
-    );
-    const dataDestinationIndex = data.findIndex(
-      (data) => data.id === destination.droppableId
-    );
-    const newSourceItems = [...data[dataSourceIndex].items];
-    const newDestinationItems =
-      source.droppableId !== destination.droppableId
-        ? [...data[dataDestinationIndex].items]
-        : newSourceItems;
 
-    const [deletedItem] = newSourceItems.splice(source.index, 1);
-    newDestinationItems.splice(destination.index, 0, deletedItem);
+    if (type === "card") {
+      // Handle card drag-and-drop
+      const newCards = [...cards];
+      const [draggedCard] = newCards.splice(source.index, 1);
+      draggedCard.stageId = destination.droppableId;
+      newCards.splice(destination.index, 0, draggedCard);
+      return dispatch(handleChangeCard(newCards));
+    }
 
-    newStores[dataSourceIndex] = {
-      ...data[dataSourceIndex],
-      items: newSourceItems,
-    };
+    // const newStores = [...data];
+    // const dataSourceIndex = data.findIndex(
+    //   (data) => data.id === source.droppableId
+    // );
+    // const dataDestinationIndex = data.findIndex(
+    //   (data) => data.id === destination.droppableId
+    // );
+    // const newSourceItems = [...data[dataSourceIndex].items];
+    // const newDestinationItems =
+    //   source.droppableId !== destination.droppableId
+    //     ? [...data[dataDestinationIndex].items]
+    //     : newSourceItems;
 
-    newStores[dataDestinationIndex] = {
-      ...data[dataDestinationIndex],
-      items: newDestinationItems,
-    };
-    dispatch(handleChangeStage(newStores));
+    // const [deletedItem] = newSourceItems.splice(source.index, 1);
+    // newDestinationItems.splice(destination.index, 0, deletedItem);
+
+    // newStores[dataSourceIndex] = {
+    //   ...data[dataSourceIndex],
+    //   items: newSourceItems,
+    // };
+
+    // newStores[dataDestinationIndex] = {
+    //   ...data[dataDestinationIndex],
+    //   items: newDestinationItems,
+    // };
+    // dispatch(handleChangeStage(newStores));
   };
 
   return (
@@ -137,7 +148,7 @@ function Trello() {
           buttonRef={buttonRef}
           close={handleClose}
           open={openModel}
-          userID={currentUser.id}
+          currentUser={currentUser}
         />
 
         <DragDropContext onDragEnd={handleDragDrop}>
@@ -151,6 +162,9 @@ function Trello() {
               >
                 {data &&
                   data?.map((data, index) => {
+                    const cardCount = cards.filter(
+                      (card) => card.stageId === data.id
+                    );
                     return !data.isDeleted ? (
                       <Draggable
                         draggableId={data.id}
@@ -158,21 +172,31 @@ function Trello() {
                         index={index}
                       >
                         {(provided) => (
-                          <>
-                            <Card
-                              elevation={0}
-                              className="trelloCard size"
-                              {...provided.dragHandleProps}
-                              {...provided.draggableProps}
-                              ref={provided.innerRef}
+                          <div
+                            className="trelloStages"
+                            {...provided.dragHandleProps}
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                          >
+                            <div
+                              className={`trelloCardHeading`}
+                              style={{ backgroundColor: `${data?.color}` }}
                             >
+                              <Typography fontWeight={600}>
+                                {data.name} ({cardCount.length})
+                              </Typography>
+                              <IconButton id="setting">
+                                <MoreHoriz />
+                              </IconButton>
+                            </div>
+                            <Card elevation={0} className="trelloCard size">
                               <StageList
                                 {...data}
                                 index={index}
                                 openDrawerById={handleDrawerOpen}
                               />
                             </Card>
-                          </>
+                          </div>
                         )}
                       </Draggable>
                     ) : null;
@@ -218,3 +242,17 @@ export default Trello;
 // userID={currentUser.id}
 // />
 // </>
+
+// const newCards = [...cards];
+
+// const card = newCards.filter((card) => card.id === draggableId);
+// console.log(cards);
+// const dataSourceIndex = cards.findIndex(
+//   (data) => data.id === draggableId && data.stageId === source.droppableId
+// );
+// console.log(dataSourceIndex);
+// const dataDestinationIndex = cards.findIndex(
+//   (data) =>
+//     data.id === draggableId && data.stageId === destination.droppableId
+// );
+// console.log(dataDestinationIndex);

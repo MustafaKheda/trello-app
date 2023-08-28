@@ -6,14 +6,18 @@
 
 .navBar {
   background-color: transparent !important;
-  backdrop-filter: blur(10px);
   height: 60px;
   margin-bottom: 100px !important;
 }
+.navToolBar {
+  justify-content: space-between;
+  padding-left: 100px;
+  padding-right: 50px;
+}
 .navToolBar .cardHeading {
-  margin: 0 auto;
   cursor: default;
-  font-size: 30px !important;
+  font-size: 48px !important;
+  color: #ffffff;
 }
 .headerAvatar {
   background-color: #3f1651 !important;
