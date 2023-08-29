@@ -6,16 +6,12 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Drawer from "@mui/material/Drawer";
 import "../../assest/Css/Trello.scss";
 import { useTheme } from "@emotion/react";
-import {
-  Button,
-  Card,
-  CardContent,
-  MenuItem,
-  Select,
-  Snackbar,
-  TextField,
-  Typography,
-} from "@mui/material";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Card from "@mui/material/Card";
+import MenuItem from "@mui/material/MenuItem";
+import Snackbar from "@mui/material/Snackbar";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import uuid from "react-uuid";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -44,7 +40,12 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     title: "",
     description: "",
     dueDate: "",
-    comment: "",
+    comment: {
+      id: uuid().slice(0, 18),
+      userId,
+      username,
+      commentText: "",
+    },
     comments: [],
     type: "",
     isDelete: false,
@@ -99,17 +100,22 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       type: "",
     });
   };
+
   const resetCard = () => {
     setCard({
       id: uuid().slice(0, 18),
       userId,
       stageId,
-      assignBy: "",
       assignTo: "",
       title: "",
       description: "",
       dueDate: "",
-      comment: "",
+      comment: {
+        id: uuid().slice(0, 18),
+        userId,
+        username,
+        commentText: "",
+      },
       comments: [],
       type: "",
       isDelete: false,
@@ -129,6 +135,15 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     setCard((prvCard) => ({
       ...prvCard,
       [e.target.name]: e.target.value,
+    }));
+  };
+  const handleComment = (e) => {
+    setCard((prvCard) => ({
+      ...prvCard,
+      comment: {
+        ...comment,
+        commentText: e.target.value,
+      },
     }));
   };
   const handleSubmit = (e) => {
@@ -160,25 +175,38 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         assignBy: username,
         userId,
         stageId,
+        comment: {
+          id: uuid().slice(0, 18),
+          userId,
+          username,
+          commentText: "",
+        },
       }));
     }
     if (editCardData !== null) {
       setCard((prevStage) => ({
         ...prevStage,
-        assignBy: editCardData.assignBy,
-        userId: editCardData.userId,
-        stageId: editCardData.stageId,
+        comment: {
+          id: uuid().slice(0, 18),
+          userId,
+          username,
+          commentText: "",
+        },
       }));
     }
-  }, [stageId, userId]);
+  }, [stageId, userId, editCardData]);
 
   const handleUpdateComments = () => {
     if (comment !== "") {
       dispatch(handleUpdateComment({ id, comment }));
-
       setCard((prvCard) => ({
         ...prvCard,
-        comment: "",
+        comment: {
+          id: uuid().slice(0, 18),
+          userId,
+          username,
+          commentText: "",
+        },
       }));
     } else {
       setCard((prevStage) => ({
@@ -277,37 +305,56 @@ function CardDrawer({ open, close, currentUser, stageId }) {
               ) : null
             )}
         </TextField>
-        <BasicButton
-          onClick={editCardData ? handleUpdate : handleSubmit}
-          name={editCardData ? "update" : "submit"}
-          className="drawerButton"
-        />
+        <ButtonGroup className="drawerButtonGroup">
+          <BasicButton
+            onClick={editCardData ? handleUpdate : handleSubmit}
+            name={editCardData ? "update" : "submit"}
+            className="drawerButton"
+          />
+          <BasicButton
+            className="drawerButton"
+            onClick={handleClose}
+            name={"Close"}
+          />
+        </ButtonGroup>
       </Card>
       {editCardData ? (
-        <Card className="commentCard">
-          <Typography variant="h6" fontWeight={600}>
+        <Card className="commentCard" elevation={0}>
+          <Typography variant="h6" className="commentHeading" fontWeight={600}>
             Comment Section
           </Typography>
           <BasicTextField
-            value={comment}
+            value={comment.commentText}
             name="comment"
-            onChange={handleChange}
+            onChange={handleComment}
             variant="standard"
             className="commentTextField"
           />
-          <BasicButton
-            className="drawerButton"
-            onClick={handleUpdateComments}
-            name="Save"
-          />
-          <BasicButton
-            className="drawerButton"
-            onClick={handleCancel}
-            name="cancel"
-          />
-          {editCardData?.comments?.map((comment) => {
-            return <BasicTextField value={comment} readonly />;
-          })}
+          <ButtonGroup className="commentButtonGroup">
+            <BasicButton
+              className="drawerButton"
+              onClick={handleUpdateComments}
+              name="Save"
+            />
+            <BasicButton
+              className="drawerButton"
+              onClick={comment ? handleCancel : handleClose}
+              name={comment ? "Cancle" : "Close"}
+            />
+          </ButtonGroup>
+
+          <div className="commentSection">
+            {editCardData?.comments?.map((comment) => {
+              console.log(comment.commentText);
+              return (
+                <BasicTextField
+                  className="commentTextField"
+                  value={comment.commentText || comment}
+                  readonly
+                />
+              );
+            })}
+          </div>
         </Card>
       ) : null}
 

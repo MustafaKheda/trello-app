@@ -12,9 +12,9 @@ $buttonText: rgb(0, 0, 0);
   // background: url("../Image/BG5.jpg") no-repeat;
   background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
   background-size: fill;
-  min-height: 100vh;
-
-  padding: 75px 50px 0;
+  min-height: 97.5vh;
+  height: 97vh !important;
+  padding: 45px 50px 0;
   column-gap: 20px;
   min-width: 100vw;
   width: fit-content !important;
@@ -27,7 +27,7 @@ $buttonText: rgb(0, 0, 0);
   height: fit-content;
   margin: 0px 10px 5px;
   min-height: 100px !important;
-  max-height: 450px;
+  max-height: 410px;
   padding: 10px !important;
   border-radius: 25px !important;
 }
@@ -150,7 +150,7 @@ $buttonText: rgb(0, 0, 0);
   background-color: transparent !important;
   color: #000 !important;
   border: 1px solid black !important;
-  margin: 20px 10px !important;
+  margin: 20px 10px 10px !important;
 }
 .cardContainer {
   box-sizing: border-box;
@@ -185,12 +185,13 @@ $buttonText: rgb(0, 0, 0);
 }
 
 .drawerCard {
-  margin: 30px auto !important ;
+  margin: 30px auto 0 !important ;
   padding: 20px !important;
   width: 90%;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-height: 55vh;
   align-items: center;
   justify-content: center !important;
 }
@@ -237,15 +238,38 @@ $buttonText: rgb(0, 0, 0);
   margin-top: 75px;
   align-content: flex-start;
 }
-.commentCard {
-  min-height: 300px;
-  padding: 30px !important ;
+.commentHeading {
+  position: relative;
+  right: 30%;
+}
+.drawerButtonGroup {
+  position: relative;
+  right: 27%;
+}
+.commentButtonGroup {
+  position: relative;
+  right: 27%;
 }
 .commentTextField {
+  width: 90%;
+}
+.commentCard {
+  margin: 30px auto !important ;
+  padding: 20px !important;
+  width: 90%;
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  width: 90% !important;
-  // margin: 20px 0 !important;
+  min-height: 50vh;
+  align-items: center;
+  justify-content: center !important;
+}
+.commentSection {
+  display: flex;
+  align-items: center;
+  justify-content: center !important;
+  width: 100%;
+  // margin-top: 50px !important;
 }
 .trelloCardHeading {
   display: flex;
@@ -256,7 +280,7 @@ $buttonText: rgb(0, 0, 0);
   background-color: #fff;
   width: 95%;
   margin: 0 auto;
-  height: 45px;
+  height: 35px;
   align-items: center;
   justify-content: space-between;
   padding-left: 10px;
@@ -275,97 +299,23 @@ $buttonText: rgb(0, 0, 0);
   color: #fff !important;
 }
 @media only screen and (max-width: 400px) {
-  .size {
-    min-width: 100% !important;
-  }
 }
 @media only screen and (min-width: 400px) {
-  .size {
-    min-width: 60% !important;
-  }
-  .sm {
-    min-width: 75%;
-  }
-  .md {
-    min-width: 75%;
-  }
-  .lg {
-    width: 75%;
-    min-width: 75%;
-  }
-  .xl {
-    width: 100%;
-    min-width: 100%;
-  }
 }
 @media only screen and (min-width: 600px) {
   // For Mobile
-  .size {
-    min-width: 50% !important;
-  }
-  .sm {
-    min-width: 50%;
-  }
-  .md {
-    width: 50%;
-    min-width: 50%;
-  }
-  .lg {
-    width: 75%;
-    min-width: 75%;
-  }
-  .xl {
-    width: 100%;
-    min-width: 100%;
-  }
 }
 
 @media only screen and (min-width: 800px) {
   /* For tablet: */
-  .size {
-    width: 33%;
-    min-width: 33% !important;
-  }
-  .sm {
-    width: 33.33%;
-    min-width: 33.33%;
-  }
-  .md {
-    width: 50%;
-    min-width: 50%;
-  }
-  .lg {
-    width: 75%;
-    min-width: 75%;
-  }
-  .xl {
-    width: 100%;
-    min-width: 100%;
-  }
 }
 
 @media only screen and (min-width: 1100px) {
   /* For desktop: */
-  .size {
-    width: 300px;
-    min-width: 300px !important;
-  }
-  .sm {
-    width: 30%;
-    min-width: 30%;
-  }
-  .md {
-    width: 50%;
-    min-width: 50%;
-  }
-  .lg {
-    width: 75%;
-    min-width: 75%;
-  }
-  .xl {
-    width: 100%;
-    min-width: 100%;
-  }
+}
+.size {
+  width: 250px;
+  min-width: 280px !important;
 }
 // Custom Scroll Bar
 /* Add custom scroll styling */
@@ -384,4 +334,11 @@ $buttonText: rgb(0, 0, 0);
 ::-webkit-scrollbar-track {
   background-color: transparent; /* Color of the track */
   width: 120%;
+}
+
+.commentSection {
+  display: flex;
+  margin-top: 20px;
+  flex-direction: column;
+  gap: 10px;
 }

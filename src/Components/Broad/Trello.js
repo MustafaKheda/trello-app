@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import Card from "@mui/material/Card";
@@ -17,28 +17,24 @@ import {
 import StageList from "./StageList";
 import CardDrawer from "./CardDrawer";
 import Model from "./Model";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-  IconButton,
-  Menu,
-  MenuItem,
-  Typography,
-} from "@mui/material";
-import { DATA } from "../../Common/Constant";
+import Typography from "@mui/material/Typography";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+import IconButton from "@mui/material/IconButton";
+import Grid from "@mui/material/Grid";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Dialog from "@mui/material/Dialog";
+import BasicButton from "../../Common/BasicButton";
 function Trello() {
-  const buttonRef = useRef(null);
   const theme = useTheme();
   const dispatch = useDispatch();
   const cards = useSelector((store) => store.trelloStage.card);
   const currentUser = useSelector((state) => state.userStore.currentUser);
   const data = useSelector((state) => state.trelloStage.stages);
-
+  console.log();
   const [open, setOpen] = useState({
     openDrawer: false,
     openModel: false,
@@ -46,6 +42,7 @@ function Trello() {
     drawerStageId: null,
     tempData: "",
     anchorEl: null,
+    openMenu: false,
   });
 
   const {
@@ -55,9 +52,8 @@ function Trello() {
     tempData,
     openDailog,
     anchorEl,
+    openMenu,
   } = open;
-
-  const openMenu = Boolean(anchorEl);
 
   const handleClickOpen = () => {
     setOpen((prvState) => ({
@@ -71,25 +67,6 @@ function Trello() {
       openModel: false,
     }));
   };
-
-  // useEffect(() => {
-  //   dispatch(handleChangeStage(DATA));
-  // }, []);
-
-  // useEffect(() => {
-  //   let timeout;
-  //   if (data.length > 0) {
-  //     clearTimeout(timeout);
-  //     timeout = setTimeout(() => {
-  //       dispatch(handleChangeStage(data));
-  //     }, 2000);
-  //   }
-
-  //   // Clean up the timeout when the component unmounts or when data changes
-  //   return () => {
-  //     clearTimeout(timeout);
-  //   };
-  // }, [data, dispatch]);
 
   const handleDrawerOpen = (stageId) => {
     setOpen((prvState) => ({
@@ -146,6 +123,7 @@ function Trello() {
       ...prv,
       anchorEl: event.currentTarget,
       tempData: temp,
+      openMenu: true,
     }));
   };
   const handleCloseMenu = () => {
@@ -153,6 +131,7 @@ function Trello() {
       ...prv,
       anchorEl: null,
       tempData: "",
+      openMenu: false,
     }));
   };
   const handelOpenDeleteDailogBox = () => {
@@ -168,10 +147,15 @@ function Trello() {
       tempData: "",
     }));
   };
-
+  const handleDelete = () => {
+    handleCloseMenu();
+    dispatch(handleDeleteStage(tempData.id));
+    handleCloseDialogBox();
+  };
   function renderStage(provided, data, index) {
     const cardCount = cards?.filter((card) => card?.stageId === data?.id);
-    return !data.isDeleted ? (
+    console.log(data.userId);
+    return (
       <div
         className="trelloStages"
         {...provided.dragHandleProps}
@@ -185,11 +169,11 @@ function Trello() {
           <Typography fontWeight={600}>
             {data.name} ({cardCount?.length})
           </Typography>
-          <IconButton id={`setting-${data.id}`}>
+          <IconButton id={`setting`}>
             <MoreHoriz onClick={(event) => handleClick(event, data.id)} />
           </IconButton>
           <Menu
-            id={`basic-menu-${data.id}`}
+            id={`basic-menu`}
             anchorEl={anchorEl}
             open={openMenu}
             onClose={handleCloseMenu}
@@ -209,28 +193,20 @@ function Trello() {
           />
         </Card>
       </div>
-    ) : null;
+    );
   }
-
   return (
     <>
       <div className="trelloBody">
         <Header />
-        <Button
-          ref={buttonRef}
+        <BasicButton
           className="trelloStageButton"
           variant="outlined"
           onClick={handleClickOpen}
-        >
-          Create Stage
-        </Button>
-
-        <Model
-          buttonRef={buttonRef}
-          close={handleClose}
-          open={openModel}
-          currentUser={currentUser}
+          name="Create Stage"
         />
+
+        <Model close={handleClose} open={openModel} currentUser={currentUser} />
 
         <DragDropContext onDragEnd={handleDragDrop}>
           <Droppable droppableId="ROOT" type="group" direction="horizontal">
@@ -243,13 +219,17 @@ function Trello() {
                 {data &&
                   data?.map((data, index) => {
                     console.log();
-                    return !data.isDelete ? (
+                    return !data.isDelete && data.userId === currentUser.id ? (
                       <Draggable
                         draggableId={data.id}
                         key={data.id}
                         index={index}
                       >
                         {(provided) => {
+                          const cardCount = cards?.filter(
+                            (card) => card?.stageId === data?.id
+                          );
+
                           return renderStage(provided, data, index);
                         }}
                       </Draggable>
@@ -284,17 +264,17 @@ function Trello() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialogBox}>Disagree</Button>
-          {console.log(tempData)}
-          <Button
-            onClick={() => {
-              dispatch(handleDeleteStage(tempData.id));
-              handleCloseDialogBox();
-            }}
+          <BasicButton
+            className="trelloStageButton"
+            onClick={handleCloseDialogBox}
+            name="Disagree"
+          />
+          <BasicButton
+            className="trelloStageButton"
+            onClick={handleDelete}
             autoFocus
-          >
-            Agree
-          </Button>
+            name="Agree"
+          />
         </DialogActions>
       </Dialog>
     </>

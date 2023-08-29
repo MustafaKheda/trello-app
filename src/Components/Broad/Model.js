@@ -20,7 +20,7 @@ const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function Model({ buttonRef, close, open, currentUser }) {
+function Model({ close, open, currentUser }) {
   const { id: userId, username } = currentUser;
   const editStageData = useSelector(
     (store) => store?.trelloStage?.editStageData
@@ -30,6 +30,7 @@ function Model({ buttonRef, close, open, currentUser }) {
 
   const [stage, setStage] = useState({
     id: uuid().slice(0, 18),
+    userId,
     name: "",
     color: "#000",
     isDeleted: false,
@@ -50,6 +51,7 @@ function Model({ buttonRef, close, open, currentUser }) {
         color: editStageData?.color || "#000",
         openBar: false,
         type: "",
+        userId: editStageData?.userId,
         isDeleted: editStageData?.isDeleted || false,
         createdBy: editStageData?.createdBy,
         createdAt: editStageData?.createdAt,
@@ -79,13 +81,13 @@ function Model({ buttonRef, close, open, currentUser }) {
 
   const handleSubmit = () => {
     if (name !== "") {
+      // console.log(sta);
       dispatch(handleSetStage(stage, username));
       setStage((prevStage) => ({
         ...prevStage,
         id: uuid().slice(0, 18),
       }));
       handleClose();
-      buttonRef?.current.scrollIntoView({ behavior: "smooth" });
     } else {
       setStage((prvStage) => ({
         ...prvStage,
@@ -97,6 +99,7 @@ function Model({ buttonRef, close, open, currentUser }) {
   const resetStage = () => {
     setStage({
       id: uuid().slice(0, 18),
+      userId: "",
       name: "",
       color: "#000",
       isDeleted: false,

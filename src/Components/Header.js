@@ -7,7 +7,7 @@ export default function Header() {
   const user = useSelector((store) => store.userStore.currentUser);
   const letter = user.username.slice(0, 1).toUpperCase();
   return (
-    <AppBar position="absolute" className="navBar" elevation={0}>
+    <AppBar position="fixed" className="navBar" elevation={0}>
       <Toolbar disableGutters className="navToolBar">
         <Typography className="cardHeading">Trello</Typography>
         <Avatar className="headerAvatar">{letter}</Avatar>

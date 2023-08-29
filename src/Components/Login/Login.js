@@ -250,8 +250,15 @@ function Login() {
                   elevation={3}
                   className="cardButton"
                   onClick={handleLogin}
-                  name="Login"
+                  name="SignIN"
                 />
+                <Typography onClick={toggleView} className="login_link">
+                  Don't have an account?
+                  <Typography className="link" variant="subtitle">
+                    {" "}
+                    Signup
+                  </Typography>
+                </Typography>
               </FormControl>
             </Box>
             <Carousel
@@ -348,6 +355,13 @@ function Login() {
                   onClick={handleSignUp}
                   name="sign up"
                 />
+                <Typography onClick={toggleView} className="login_link">
+                  Already have an Account!
+                  <Typography className="link" variant="subtitle">
+                    {" "}
+                    Signin
+                  </Typography>
+                </Typography>
               </FormControl>
             </Box>
 
@@ -380,13 +394,6 @@ function Login() {
           </>
         )}
       </Card>
-      <BasicButton
-        id="login"
-        className="button"
-        onClick={toggleView}
-        name={show ? "signup" : "Login"}
-      />
-
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={open}
