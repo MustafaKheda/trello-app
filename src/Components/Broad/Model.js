@@ -5,10 +5,14 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
-import { Divider, Snackbar, TextField } from "@mui/material";
+import { Divider, Snackbar, TextField, Typography } from "@mui/material";
 import uuid from "react-uuid";
-import { useDispatch } from "react-redux";
-import { handleSetStage } from "../../Store/Action";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  handleSetStage,
+  handleUpdateStage,
+  unSetEditStage,
+} from "../../Store/Action";
 import { SwatchesPicker } from "./SwatchesPicker";
 import { messageMap } from "../../Common/Constant";
 
@@ -18,7 +22,12 @@ const Transition = forwardRef(function Transition(props, ref) {
 
 function Model({ buttonRef, close, open, currentUser }) {
   const { id: userId, username } = currentUser;
+  const editStageData = useSelector(
+    (store) => store?.trelloStage?.editStageData
+  );
+
   const dispatch = useDispatch();
+
   const [stage, setStage] = useState({
     id: uuid().slice(0, 18),
     name: "",
@@ -26,40 +35,29 @@ function Model({ buttonRef, close, open, currentUser }) {
     isDeleted: false,
     openBar: false,
     type: "",
-    createdBy: new Date(),
-    createdAt: username,
+    createdBy: "",
+    createdAt: "",
     modifiedBy: "",
     modifiedAt: "",
   });
-  const {
-    id,
-    color,
-    name,
-    openBar,
-    type,
-    isDeleted,
-    createdBy,
-    createdAt,
-    modifiedBy,
-    modifiedAt,
-  } = stage;
-  console.log(createdBy, createdAt);
-  const handleSetDate = () => {
-    if (createdAt) {
-      setStage((prevStage) => ({
-        ...prevStage,
-        modifiedAt: new Date(),
-        modifiedBy: username,
-      }));
-    } else {
-      console.log("success");
-      setStage((prevStage) => ({
-        ...prevStage,
-        createdAt: new Date(),
-        createdBy: username,
+
+  useEffect(() => {
+    if (editStageData !== null) {
+      setStage((prv) => ({
+        ...prv,
+        id: editStageData?.id || uuid().slice(0, 18),
+        name: editStageData?.name || "",
+        color: editStageData?.color || "#000",
+        openBar: false,
+        type: "",
+        isDeleted: editStageData?.isDeleted || false,
+        createdBy: editStageData?.createdBy,
+        createdAt: editStageData?.createdAt,
       }));
     }
-  };
+  }, [editStageData]);
+  const { id, color, name, openBar, type, createdAt, modifiedAt } = stage;
+
   const handleChange = (e) => {
     setStage((prevStage) => ({
       ...prevStage,
@@ -67,46 +65,26 @@ function Model({ buttonRef, close, open, currentUser }) {
     }));
   };
   const handleClose = () => {
-    setStage((prevStage) => ({
-      ...prevStage,
-      name: "",
-      color: "",
-      createdAt: "", // Reset the createdAt field
-      createdBy: "", // Reset the createdBy field
-      modifiedAt: "", // Reset the modifiedAt field
-      modifiedBy: "", // Reset the modifiedBy field
-    }));
+    dispatch(unSetEditStage());
+    resetStage();
     close();
   };
   const handleCloseSnackbar = () => {
-    setStage((stage) => ({
-      ...stage,
+    setStage((prvstage) => ({
+      ...prvstage,
       openBar: false,
       type: "",
     }));
   };
-  console.log(stage);
-  const handleSubmit = (e) => {
-    handleSetDate();
+
+  const handleSubmit = () => {
     if (name !== "") {
-      console.log(stage);
-      dispatch(
-        handleSetStage({
-          userId,
-          id,
-          color,
-          name,
-          isDeleted,
-          createdAt: stage.createdAt, // Use the updated createdAt value
-          modifiedAt: stage.modifiedAt, // Use the updated modifiedAt value
-          createdBy: stage.createdBy, // Use the updated createdBy value
-          modifiedBy: stage.modifiedBy, // Use the updated modifiedBy value,
-        })
-      );
+      dispatch(handleSetStage(stage, username));
       setStage((prevStage) => ({
         ...prevStage,
         id: uuid().slice(0, 18),
       }));
+      handleClose();
       buttonRef?.current.scrollIntoView({ behavior: "smooth" });
     } else {
       setStage((prvStage) => ({
@@ -115,13 +93,33 @@ function Model({ buttonRef, close, open, currentUser }) {
         type: "emptyModel",
       }));
     }
+  };
+  const resetStage = () => {
+    setStage({
+      id: uuid().slice(0, 18),
+      name: "",
+      color: "#000",
+      isDeleted: false,
+      openBar: false,
+      type: "",
+      createdBy: "",
+      createdAt: "",
+      modifiedBy: "",
+      modifiedAt: "",
+    });
+  };
+  const handleUpdate = () => {
+    console.log(stage);
+    dispatch(handleUpdateStage(stage, username));
     handleClose();
   };
   useEffect(() => {
-    setStage((prevStage) => ({
-      ...prevStage,
-      userId,
-    }));
+    if (editStageData === null) {
+      setStage((prevStage) => ({
+        ...prevStage,
+        userId,
+      }));
+    }
   }, [userId]);
   return (
     <>
@@ -134,7 +132,11 @@ function Model({ buttonRef, close, open, currentUser }) {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{"Create Stage"}</DialogTitle>
+        <DialogTitle>
+          <Typography fontWeight={"600"} textTransform={"uppercase"}>
+            Create Stage
+          </Typography>
+        </DialogTitle>
         <Divider />
         <DialogContent className="dialogBoxContent">
           <TextField
@@ -149,8 +151,15 @@ function Model({ buttonRef, close, open, currentUser }) {
         </DialogContent>
         <Divider />
         <DialogActions>
-          <Button onClick={handleClose}>cancel</Button>
-          <Button onClick={handleSubmit}>submit</Button>
+          <Button className="trelloStageButton" onClick={handleClose}>
+            cancel
+          </Button>
+          <Button
+            className="trelloStageButton"
+            onClick={editStageData ? handleUpdate : handleSubmit}
+          >
+            {editStageData ? "Update" : "submit"}
+          </Button>
         </DialogActions>
       </Dialog>
       <Snackbar

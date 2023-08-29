@@ -273,10 +273,6 @@ function Login() {
                 <p className="legend">Legend 3</p>
               </div>
             </Carousel>
-            {/* <CardMedia
-              component={"img"}
-              className={`cardMedia ${show ? "login" : "signup"}`}
-            /> */}
           </>
         ) : (
           <>

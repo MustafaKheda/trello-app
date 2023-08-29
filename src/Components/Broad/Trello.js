@@ -7,11 +7,29 @@ import "../../assest/Css/Trello.scss";
 import Header from "../Header";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { handleChangeCard, handleChangeStage } from "../../Store/Action";
+import EditIcon from "@mui/icons-material/Edit";
+import {
+  editStage,
+  handleChangeCard,
+  handleChangeStage,
+  handleDeleteStage,
+} from "../../Store/Action";
 import StageList from "./StageList";
 import CardDrawer from "./CardDrawer";
 import Model from "./Model";
-import { Button, Grid, IconButton, Typography } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import { DATA } from "../../Common/Constant";
 function Trello() {
   const buttonRef = useRef(null);
@@ -20,12 +38,26 @@ function Trello() {
   const cards = useSelector((store) => store.trelloStage.card);
   const currentUser = useSelector((state) => state.userStore.currentUser);
   const data = useSelector((state) => state.trelloStage.stages);
+
   const [open, setOpen] = useState({
     openDrawer: false,
     openModel: false,
+    openDailog: false,
     drawerStageId: null,
+    tempData: "",
+    anchorEl: null,
   });
-  const { drawerStageId, openModel, openDrawer } = open;
+
+  const {
+    drawerStageId,
+    openModel,
+    openDrawer,
+    tempData,
+    openDailog,
+    anchorEl,
+  } = open;
+
+  const openMenu = Boolean(anchorEl);
 
   const handleClickOpen = () => {
     setOpen((prvState) => ({
@@ -40,9 +72,9 @@ function Trello() {
     }));
   };
 
-  useEffect(() => {
-    dispatch(handleChangeStage(DATA));
-  }, []);
+  // useEffect(() => {
+  //   dispatch(handleChangeStage(DATA));
+  // }, []);
 
   // useEffect(() => {
   //   let timeout;
@@ -101,49 +133,98 @@ function Trello() {
       newCards.splice(destination.index, 0, draggedCard);
       return dispatch(handleChangeCard(newCards));
     }
-
-    // const newStores = [...data];
-    // const dataSourceIndex = data.findIndex(
-    //   (data) => data.id === source.droppableId
-    // );
-    // const dataDestinationIndex = data.findIndex(
-    //   (data) => data.id === destination.droppableId
-    // );
-    // const newSourceItems = [...data[dataSourceIndex].items];
-    // const newDestinationItems =
-    //   source.droppableId !== destination.droppableId
-    //     ? [...data[dataDestinationIndex].items]
-    //     : newSourceItems;
-
-    // const [deletedItem] = newSourceItems.splice(source.index, 1);
-    // newDestinationItems.splice(destination.index, 0, deletedItem);
-
-    // newStores[dataSourceIndex] = {
-    //   ...data[dataSourceIndex],
-    //   items: newSourceItems,
-    // };
-
-    // newStores[dataDestinationIndex] = {
-    //   ...data[dataDestinationIndex],
-    //   items: newDestinationItems,
-    // };
-    // dispatch(handleChangeStage(newStores));
   };
+
+  const handleEditStage = (data) => {
+    handleClickOpen();
+    dispatch(editStage(data));
+    handleCloseMenu();
+  };
+  const handleClick = (event, id) => {
+    const [temp] = data.filter((stage) => stage.id === id);
+    setOpen((prv) => ({
+      ...prv,
+      anchorEl: event.currentTarget,
+      tempData: temp,
+    }));
+  };
+  const handleCloseMenu = () => {
+    setOpen((prv) => ({
+      ...prv,
+      anchorEl: null,
+      tempData: "",
+    }));
+  };
+  const handelOpenDeleteDailogBox = () => {
+    setOpen((prv) => ({
+      ...prv,
+      openDailog: true,
+    }));
+  };
+  const handleCloseDialogBox = () => {
+    setOpen((prv) => ({
+      ...prv,
+      openDailog: false,
+      tempData: "",
+    }));
+  };
+
+  function renderStage(provided, data, index) {
+    const cardCount = cards?.filter((card) => card?.stageId === data?.id);
+    return !data.isDeleted ? (
+      <div
+        className="trelloStages"
+        {...provided.dragHandleProps}
+        {...provided.draggableProps}
+        ref={provided.innerRef}
+      >
+        <div
+          className={`trelloCardHeading`}
+          style={{ backgroundColor: `${data?.color}` }}
+        >
+          <Typography fontWeight={600}>
+            {data.name} ({cardCount?.length})
+          </Typography>
+          <IconButton id={`setting-${data.id}`}>
+            <MoreHoriz onClick={(event) => handleClick(event, data.id)} />
+          </IconButton>
+          <Menu
+            id={`basic-menu-${data.id}`}
+            anchorEl={anchorEl}
+            open={openMenu}
+            onClose={handleCloseMenu}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+          >
+            <MenuItem onClick={() => handleEditStage(tempData)}>Edit</MenuItem>
+            <MenuItem onClick={handelOpenDeleteDailogBox}>Delete</MenuItem>
+          </Menu>
+        </div>
+        <Card elevation={0} className="trelloCard size">
+          <StageList
+            {...data}
+            index={index}
+            openDrawerById={handleDrawerOpen}
+          />
+        </Card>
+      </div>
+    ) : null;
+  }
 
   return (
     <>
       <div className="trelloBody">
         <Header />
-        <div className="trelloGridItem">
-          <Button
-            ref={buttonRef}
-            className="trelloStageButton"
-            variant="outlined"
-            onClick={handleClickOpen}
-          >
-            Create Stage
-          </Button>
-        </div>
+        <Button
+          ref={buttonRef}
+          className="trelloStageButton"
+          variant="outlined"
+          onClick={handleClickOpen}
+        >
+          Create Stage
+        </Button>
+
         <Model
           buttonRef={buttonRef}
           close={handleClose}
@@ -156,48 +237,21 @@ function Trello() {
             {(provided) => (
               <div
                 className="cardContainer"
-                disableScrollOverlapDetection={true}
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
                 {data &&
                   data?.map((data, index) => {
-                    const cardCount = cards.filter(
-                      (card) => card.stageId === data.id
-                    );
-                    return !data.isDeleted ? (
+                    console.log();
+                    return !data.isDelete ? (
                       <Draggable
                         draggableId={data.id}
                         key={data.id}
                         index={index}
                       >
-                        {(provided) => (
-                          <div
-                            className="trelloStages"
-                            {...provided.dragHandleProps}
-                            {...provided.draggableProps}
-                            ref={provided.innerRef}
-                          >
-                            <div
-                              className={`trelloCardHeading`}
-                              style={{ backgroundColor: `${data?.color}` }}
-                            >
-                              <Typography fontWeight={600}>
-                                {data.name} ({cardCount.length})
-                              </Typography>
-                              <IconButton id="setting">
-                                <MoreHoriz />
-                              </IconButton>
-                            </div>
-                            <Card elevation={0} className="trelloCard size">
-                              <StageList
-                                {...data}
-                                index={index}
-                                openDrawerById={handleDrawerOpen}
-                              />
-                            </Card>
-                          </div>
-                        )}
+                        {(provided) => {
+                          return renderStage(provided, data, index);
+                        }}
                       </Draggable>
                     ) : null;
                   })}
@@ -213,46 +267,37 @@ function Trello() {
         open={openDrawer}
         close={handleDrawerClose}
       />
+
+      <Dialog
+        open={openDailog}
+        onClose={handleCloseDialogBox}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Do you Want to delete the Stage"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            If you want to delete this stage click on Agree button else on
+            Disagree
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialogBox}>Disagree</Button>
+          {console.log(tempData)}
+          <Button
+            onClick={() => {
+              dispatch(handleDeleteStage(tempData.id));
+              handleCloseDialogBox();
+            }}
+            autoFocus
+          >
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
-
 export default Trello;
-// // <>
-// <div className="trelloBody">
-// <Header />
-// <Grid container className="trelloContainer">
-//   <Grid item md={12} xs={12} sm={12} className="trelloGridItem">
-//     <Button
-//       ref={Ref}
-//       variant="contained"
-//       className="trelloStageButton size"
-//       onClick={handleClickOpen}
-//     >
-//       Create Stage
-//     </Button>
-//   </Grid>
-//   <StageContainer />
-// </Grid>
-// </div>
-// <Model
-// buttonRef={Ref}
-// close={handleClose}
-// open={openModel}
-// userID={currentUser.id}
-// />
-// </>
-
-// const newCards = [...cards];
-
-// const card = newCards.filter((card) => card.id === draggableId);
-// console.log(cards);
-// const dataSourceIndex = cards.findIndex(
-//   (data) => data.id === draggableId && data.stageId === source.droppableId
-// );
-// console.log(dataSourceIndex);
-// const dataDestinationIndex = cards.findIndex(
-//   (data) =>
-//     data.id === draggableId && data.stageId === destination.droppableId
-// );
-// console.log(dataDestinationIndex);

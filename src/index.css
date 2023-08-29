@@ -7,13 +7,12 @@
 .navBar {
   background-color: transparent !important;
   height: 60px;
-  margin-bottom: 100px !important;
 }
 .navToolBar {
   justify-content: space-between;
-  padding-left: 100px;
-  padding-right: 50px;
+  padding: 0 60px;
 }
+
 .navToolBar .cardHeading {
   cursor: default;
   font-size: 48px !important;

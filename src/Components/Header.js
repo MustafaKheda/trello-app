@@ -8,12 +8,10 @@ export default function Header() {
   const letter = user.username.slice(0, 1).toUpperCase();
   return (
     <AppBar position="absolute" className="navBar" elevation={0}>
-      <Container maxWidth="xl">
-        <Toolbar disableGutters className="navToolBar">
-          <Typography className="cardHeading">Trello</Typography>
-          <Avatar className="headerAvatar">{letter}</Avatar>
-        </Toolbar>
-      </Container>
+      <Toolbar disableGutters className="navToolBar">
+        <Typography className="cardHeading">Trello</Typography>
+        <Avatar className="headerAvatar">{letter}</Avatar>
+      </Toolbar>
     </AppBar>
   );
 }

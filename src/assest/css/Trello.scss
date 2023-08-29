@@ -13,7 +13,8 @@ $buttonText: rgb(0, 0, 0);
   background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
   background-size: fill;
   min-height: 100vh;
-  padding-top: 75px;
+
+  padding: 75px 50px 0;
   column-gap: 20px;
   min-width: 100vw;
   width: fit-content !important;
@@ -60,8 +61,8 @@ $buttonText: rgb(0, 0, 0);
   gap: 5px;
 }
 .innerCardAvatar {
-  width: 30px !important;
-  height: 30px !important;
+  width: 25px !important;
+  height: 25px !important;
   font-size: 15px !important;
 }
 .innerCardContent {
@@ -90,7 +91,7 @@ $buttonText: rgb(0, 0, 0);
   padding-top: 10px !important ;
 }
 .actionIconStack svg {
-  font-size: 25px !important;
+  font-size: 18px !important;
 }
 .actionStack svg {
   font-size: medium;
@@ -119,10 +120,10 @@ $buttonText: rgb(0, 0, 0);
   text-transform: capitalize;
 }
 .actionStackDueDate {
+  font-size: 14px !important;
   display: flex;
   align-items: center;
   align-content: center;
-
   gap: 2px;
 }
 .trelloHeader {
@@ -146,9 +147,10 @@ $buttonText: rgb(0, 0, 0);
 .trelloStageButton {
   @include button;
   height: fit-content !important;
-  background-color: #f1f2f4 !important;
-  color: $buttonText !important;
-  border: none !important;
+  background-color: transparent !important;
+  color: #000 !important;
+  border: 1px solid black !important;
+  margin: 20px 10px !important;
 }
 .cardContainer {
   box-sizing: border-box;
@@ -156,17 +158,58 @@ $buttonText: rgb(0, 0, 0);
   display: flex;
   gap: 10px !important;
 }
-
+//  Drawer
 .trelloDrawer .MuiDrawer-paper {
   width: 600px !important;
-  gap: 10px;
+}
+.innerActionBadge span {
+  height: 16px !important;
+  width: 16px !important;
+  min-width: none !important;
 }
 .cardDrawerTextField {
-  width: 60% !important;
+  width: 90% !important;
+  background-color: #fff;
+  // padding: 8px !important;
+  margin: 10px auto !important;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.7) !important;
 }
-.drawerHeader {
+.cardDrawerTextField .MuiInput-root {
+  border-bottom: none !important;
+}
+.cardDrawerTextField label {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #000;
+  // padding-bottom: 10px !important;
+}
+
+.drawerCard {
+  margin: 30px auto !important ;
+  padding: 20px !important;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   align-items: center;
-  height: 70px !important;
+  justify-content: center !important;
+}
+.drawerInnerCard {
+  background-color: rgb(182, 233, 255) !important;
+  margin: 10px 10px 0 !important;
+  width: 70%;
+  height: 60px !important;
+  border-radius: 25px !important;
+}
+.drawerButton {
+  background-color: #715e9b !important;
+  color: #fff !important;
+  width: 100px;
+  border-radius: 8px !important;
+  margin: 5px !important;
+}
+.drawerButton:last-of-type {
+  margin-left: 10px;
 }
 .dialogBoxContent {
   padding: 10px !important;
@@ -179,12 +222,6 @@ $buttonText: rgb(0, 0, 0);
 }
 .dialogBoxContent input {
   height: 40px !important;
-}
-.trelloGridItem {
-  display: flex;
-  justify-content: flex-start;
-  height: 50px !important;
-  padding: 10px 40px 0;
 }
 .trelloButton span svg {
   font-size: 26px !important ;
@@ -200,7 +237,16 @@ $buttonText: rgb(0, 0, 0);
   margin-top: 75px;
   align-content: flex-start;
 }
-
+.commentCard {
+  min-height: 300px;
+  padding: 30px !important ;
+}
+.commentTextField {
+  display: flex;
+  gap: 10px;
+  width: 90% !important;
+  // margin: 20px 0 !important;
+}
 .trelloCardHeading {
   display: flex;
   border-top-right-radius: 100px !important;

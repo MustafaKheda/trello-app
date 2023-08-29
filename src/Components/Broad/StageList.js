@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -15,18 +15,69 @@ import {
   Avatar,
   Badge,
   CardHeader,
-  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   IconButton,
+  Menu,
+  MenuItem,
   Stack,
   Tooltip,
 } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { monthNames } from "../../Common/Constant";
+import { handleDeleteCard, handleEditCard } from "../../Store/Action";
+import BasicButton from "../../Common/BasicButton";
 function StageList(props) {
+  const dispatch = useDispatch();
   const cards = useSelector((store) => store.trelloStage.card);
   const { name, item, index, id, openDrawerById, color } = props;
+  const [open, setOpen] = useState({
+    tempData: "",
+    anchorEl: null,
+    openDailog: false,
+    openMenu: false,
+  });
+  const { tempData, anchorEl, openDailog, openMenu } = open;
 
+  const handleClick = (event, id) => {
+    const [temp] = cards.filter((card) => card.id === id);
+    setOpen((prv) => ({
+      ...prv,
+      anchorEl: event.currentTarget,
+      tempData: temp,
+      openMenu: true,
+    }));
+  };
+  const handleEditStage = (data) => {
+    openDrawerById();
+    dispatch(handleEditCard(data));
+    handleCloseMenu();
+  };
+  const handleCloseMenu = () => {
+    setOpen((prv) => ({
+      ...prv,
+      anchorEl: null,
+      tempData: "",
+      openMenu: false,
+    }));
+  };
+  const handleCloseDialogBox = () => {
+    setOpen((prv) => ({
+      ...prv,
+      openDailog: false,
+      tempData: "",
+    }));
+  };
+  const handelOpenDeleteDailogBox = () => {
+    setOpen((prv) => ({
+      ...prv,
+      openDailog: true,
+    }));
+  };
   return (
     <>
       {/* <CardHeader
@@ -71,7 +122,7 @@ function StageList(props) {
                 const dDate = date.getDate();
                 const dueMonth = date.getMonth();
                 const stringDate = date.toString().slice(0, 25);
-                return id === card.stageId ? (
+                return id === card.stageId && !card.isDelete ? (
                   <Draggable draggableId={card.id} key={card.id} index={index}>
                     {(provided) => (
                       <Card
@@ -85,10 +136,36 @@ function StageList(props) {
                           className="innerCardTitle"
                           action={
                             <IconButton>
-                              <MoreHoriz className="cardHeaderIconButton"></MoreHoriz>
+                              <MoreHoriz
+                                id={`setting`}
+                                className="cardHeaderIconButton"
+                                onClick={(event) => handleClick(event, card.id)}
+                              />
                             </IconButton>
                           }
                         />
+                        <Menu
+                          id={`basic-menu-${card.id}`}
+                          anchorEl={anchorEl}
+                          open={openMenu}
+                          onClose={handleCloseMenu}
+                          MenuListProps={{
+                            "aria-labelledby": "basic-button",
+                          }}
+                        >
+                          <MenuItem
+                            key={"edit"}
+                            onClick={() => handleEditStage(tempData)}
+                          >
+                            Edit
+                          </MenuItem>
+                          <MenuItem
+                            key={"delete"}
+                            onClick={handelOpenDeleteDailogBox}
+                          >
+                            Delete
+                          </MenuItem>
+                        </Menu>
                         <Divider />
                         <CardContent className="innerCardContent">
                           <Typography variant="body2">{description}</Typography>
@@ -96,15 +173,15 @@ function StageList(props) {
 
                         <CardActions className="innerCardActions">
                           <Stack direction={"row"} className="actionStack">
-                            <Tooltip title={assignBy.toUpperCase()}>
+                            <Tooltip title={assignBy?.toUpperCase()}>
                               <Avatar className="innerCardAvatar">
-                                {assignBy.slice(0, 1).toUpperCase()}
+                                {assignBy?.slice(0, 1)?.toUpperCase()}
                               </Avatar>
                             </Tooltip>
                             <ArrowForwardIosIcon />
-                            <Tooltip title={assignTo.toUpperCase()}>
+                            <Tooltip title={assignTo?.toUpperCase()}>
                               <Avatar className="innerCardAvatar">
-                                {assignTo.slice(0, 1).toUpperCase()}
+                                {assignTo?.slice(0, 1)?.toUpperCase()}
                               </Avatar>
                             </Tooltip>
                           </Stack>
@@ -123,12 +200,15 @@ function StageList(props) {
                             <IconButton
                               aria-label="cart"
                               className="innerActionIconButton"
+                              onClick={() => handleEditStage(card)}
                             >
                               <Badge
-                                badgeContent={comment.length}
+                                className="innerActionBadge"
+                                badgeContent={
+                                  card?.comments?.length || comment.length
+                                }
                                 color="secondary"
                                 showZero
-                                max={160}
                               >
                                 <CommentIcon />
                               </Badge>
@@ -144,6 +224,35 @@ function StageList(props) {
           </CardContent>
         )}
       </Droppable>
+      <Dialog
+        open={openDailog}
+        onClose={handleCloseDialogBox}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Do you want to delete this card"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            If you want to delete this card click on Agree button else on
+            Disagree
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <BasicButton onClick={handleCloseDialogBox} name="Disagree" />
+          {console.log(tempData)}
+          <BasicButton
+            name="Agree"
+            onClick={() => {
+              handleCloseMenu();
+              dispatch(handleDeleteCard(tempData.id));
+              handleCloseDialogBox();
+            }}
+            autoFocus
+          />
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
