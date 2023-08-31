@@ -32,47 +32,50 @@ import BasicButton from "../../Common/BasicButton";
 function StageList(props) {
   const dispatch = useDispatch();
   const cards = useSelector((store) => store.trelloStage.card);
-  const { name, item, index, id, openDrawerById, color } = props;
+  const { id, openDrawerById } = props;
   const [open, setOpen] = useState({
-    tempData: "",
+    tempData: null,
     anchorEl: null,
     openDailog: false,
     openMenu: false,
   });
   const { tempData, anchorEl, openDailog, openMenu } = open;
 
-  const handleClick = (event, id) => {
-    const [temp] = cards.filter((card) => card.id === id);
-    setOpen((prv) => ({
-      ...prv,
+  const handleClick = (event, cardId) => {
+    const temp = cards.find((card) => card.id === cardId);
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       anchorEl: event.currentTarget,
       tempData: temp,
       openMenu: true,
     }));
   };
+
   const handleEditStage = (data) => {
     openDrawerById();
     dispatch(handleEditCard(data));
     handleCloseMenu();
   };
+
   const handleCloseMenu = () => {
-    setOpen((prv) => ({
-      ...prv,
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       anchorEl: null,
-      tempData: "",
       openMenu: false,
     }));
   };
+
   const handleCloseDialogBox = () => {
-    setOpen((prv) => ({
-      ...prv,
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       openDailog: false,
-      tempData: "",
+      tempData: null,
     }));
   };
-  const handelOpenDeleteDailogBox = () => {
-    setOpen((prv) => ({
-      ...prv,
+  const handelOpenDailogBox = () => {
+    handleCloseMenu();
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       openDailog: true,
     }));
   };
@@ -81,6 +84,100 @@ function StageList(props) {
     dispatch(handleDeleteCard(tempData.id));
     handleCloseDialogBox();
   };
+  function cardComponent(provided, card) {
+    const { title, description, assignTo, assignBy, dueDate, comment, id } =
+      card;
+    const date = new Date(dueDate);
+    const dDate = date.getDate();
+    const dueMonth = date.getMonth();
+    const stringDate = date.toString().slice(0, 25);
+    return (
+      <Card
+        {...provided.dragHandleProps}
+        {...provided.draggableProps}
+        ref={provided.innerRef}
+        className="trelloInnerCard"
+      >
+        <CardHeader
+          title={title}
+          className="innerCardTitle"
+          action={
+            <IconButton
+              id={`setting`}
+              onClick={(event) => handleClick(event, id)}
+            >
+              <MoreHoriz className="cardHeaderIconButton" />
+            </IconButton>
+          }
+        />
+        <Menu
+          id={`basic-menu-${card.id}`}
+          anchorEl={anchorEl}
+          open={openMenu}
+          onClose={handleCloseMenu}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
+          }}
+        >
+          <MenuItem key={"edit"} onClick={() => handleEditStage(tempData)}>
+            Edit
+          </MenuItem>
+          <MenuItem key={"delete"} onClick={handelOpenDailogBox}>
+            Delete
+          </MenuItem>
+        </Menu>
+        <Divider />
+        <CardContent className="innerCardContent">
+          <Typography variant="body2">{description}</Typography>
+        </CardContent>
+
+        <CardActions className="innerCardActions">
+          <Stack direction={"row"} className="actionStack">
+            <Tooltip title={assignBy?.toUpperCase()}>
+              <Avatar className="innerCardAvatar">
+                {assignBy?.slice(0, 1)?.toUpperCase()}
+              </Avatar>
+            </Tooltip>
+
+            {assignTo ? (
+              <>
+                <ArrowForwardIosIcon />
+                <Tooltip title={assignTo?.toUpperCase()}>
+                  <Avatar className="innerCardAvatar">
+                    {assignTo?.slice(0, 1)?.toUpperCase()}
+                  </Avatar>
+                </Tooltip>
+              </>
+            ) : null}
+          </Stack>
+
+          <Stack className="actionIconStack">
+            <Tooltip title={stringDate}>
+              <Typography component={"div"} className="actionStackDueDate">
+                <AccessTimeIcon />
+                {monthNames[dueMonth]} {dDate}
+              </Typography>
+            </Tooltip>
+
+            <IconButton
+              aria-label="cart"
+              className="innerActionIconButton"
+              onClick={() => handleEditStage(card)}
+            >
+              <Badge
+                className="innerActionBadge"
+                badgeContent={card?.comments?.length || comment.length}
+                color="secondary"
+                showZero
+              >
+                <CommentIcon />
+              </Badge>
+            </IconButton>
+          </Stack>
+        </CardActions>
+      </Card>
+    );
+  }
   return (
     <>
       <CardActions disableSpacing className="trelloAction">
@@ -102,120 +199,9 @@ function StageList(props) {
           >
             {cards &&
               cards?.map((card, index) => {
-                const {
-                  title,
-                  description,
-                  assignTo,
-                  assignBy,
-                  dueDate,
-                  comment,
-                } = card;
-                const date = new Date(dueDate);
-                const dDate = date.getDate();
-                const dueMonth = date.getMonth();
-                const stringDate = date.toString().slice(0, 25);
                 return id === card.stageId && !card.isDelete ? (
                   <Draggable draggableId={card.id} key={card.id} index={index}>
-                    {(provided) => {
-                      console.log(provided);
-                      return (
-                        <Card
-                          {...provided.dragHandleProps}
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                          className="trelloInnerCard"
-                        >
-                          <CardHeader
-                            title={title}
-                            className="innerCardTitle"
-                            action={
-                              <IconButton>
-                                <MoreHoriz
-                                  id={`setting`}
-                                  className="cardHeaderIconButton"
-                                  onClick={(event) =>
-                                    handleClick(event, card.id)
-                                  }
-                                />
-                              </IconButton>
-                            }
-                          />
-                          <Menu
-                            id={`basic-menu-${card.id}`}
-                            anchorEl={anchorEl}
-                            open={openMenu}
-                            onClose={handleCloseMenu}
-                            MenuListProps={{
-                              "aria-labelledby": "basic-button",
-                            }}
-                          >
-                            <MenuItem
-                              key={"edit"}
-                              onClick={() => handleEditStage(tempData)}
-                            >
-                              Edit
-                            </MenuItem>
-                            <MenuItem
-                              key={"delete"}
-                              onClick={handelOpenDeleteDailogBox}
-                            >
-                              Delete
-                            </MenuItem>
-                          </Menu>
-                          <Divider />
-                          <CardContent className="innerCardContent">
-                            <Typography variant="body2">
-                              {description}
-                            </Typography>
-                          </CardContent>
-
-                          <CardActions className="innerCardActions">
-                            <Stack direction={"row"} className="actionStack">
-                              <Tooltip title={assignBy?.toUpperCase()}>
-                                <Avatar className="innerCardAvatar">
-                                  {assignBy?.slice(0, 1)?.toUpperCase()}
-                                </Avatar>
-                              </Tooltip>
-                              <ArrowForwardIosIcon />
-                              <Tooltip title={assignTo?.toUpperCase()}>
-                                <Avatar className="innerCardAvatar">
-                                  {assignTo?.slice(0, 1)?.toUpperCase()}
-                                </Avatar>
-                              </Tooltip>
-                            </Stack>
-
-                            <Stack className="actionIconStack">
-                              <Tooltip title={stringDate}>
-                                <Typography
-                                  component={"div"}
-                                  className="actionStackDueDate"
-                                >
-                                  <AccessTimeIcon />
-                                  {monthNames[dueMonth]} {dDate}
-                                </Typography>
-                              </Tooltip>
-
-                              <IconButton
-                                aria-label="cart"
-                                className="innerActionIconButton"
-                                onClick={() => handleEditStage(card)}
-                              >
-                                <Badge
-                                  className="innerActionBadge"
-                                  badgeContent={
-                                    card?.comments?.length || comment.length
-                                  }
-                                  color="secondary"
-                                  showZero
-                                >
-                                  <CommentIcon />
-                                </Badge>
-                              </IconButton>
-                            </Stack>
-                          </CardActions>
-                        </Card>
-                      );
-                    }}
+                    {(provided) => cardComponent(provided, card)}
                   </Draggable>
                 ) : null;
               })}
@@ -244,7 +230,7 @@ function StageList(props) {
             onClick={handleCloseDialogBox}
             name="Disagree"
           />
-          {console.log(tempData)}
+
           <BasicButton
             className="trelloStageButton"
             name="Agree"

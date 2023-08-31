@@ -28,6 +28,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   const currentDate = new Date();
   const users = useSelector((store) => store?.userStore.users);
   const editCardData = useSelector((store) => store?.trelloStage?.editCardData);
+  const isEditMode = editCardData !== null;
   const dispatch = useDispatch();
   const theme = useTheme();
   const { id: userId, username } = currentUser;
@@ -73,7 +74,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     comment,
   } = card;
   useEffect(() => {
-    if (editCardData !== null) {
+    if (isEditMode) {
       setCard((prv) => ({
         ...prv,
         id: editCardData?.id,
@@ -102,7 +103,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   };
 
   const resetCard = () => {
-    setCard({
+    setCard((prevCard) => ({
+      ...prevCard,
       id: uuid().slice(0, 18),
       userId,
       stageId,
@@ -124,7 +126,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       createdAt: "",
       modifiedBy: "",
       modifiedAt: "",
-    });
+    }));
   };
   const handleClose = () => {
     dispatch(handleUnsetEditCard());
@@ -132,46 +134,63 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     close();
   };
   const handleChange = (e) => {
-    setCard((prvCard) => ({
-      ...prvCard,
+    setCard((prevCard) => ({
+      ...prevCard,
       [e.target.name]: e.target.value,
     }));
   };
   const handleComment = (e) => {
-    setCard((prvCard) => ({
-      ...prvCard,
+    setCard((prevCard) => ({
+      ...prevCard,
       comment: {
         ...comment,
         commentText: e.target.value,
       },
     }));
   };
-  const handleSubmit = (e) => {
-    if (
-      title.trim() !== "" &&
-      assignTo !== "" &&
-      description !== "" &&
-      dueDate !== ""
-    ) {
-      dispatch(handleSetCard(card));
-      handleClose();
+  const handleCheckDueDate = () => {
+    const enteredDate = new Date(dueDate);
+    const currentDate = new Date();
+    return (
+      Date.parse(enteredDate.toString().slice(0, 10)) >=
+      Date.parse(currentDate.toString().slice(0, 10))
+    );
+  };
+
+  const handleFormSubmit = (isUpdate = false) => {
+    if (title.trim() !== "" && description !== "" && dueDate !== "") {
+      if (handleCheckDueDate()) {
+        const actionFunction = isUpdate ? handleUpdateCard : handleSetCard;
+        dispatch(actionFunction(card, username));
+        handleClose();
+      } else {
+        setCard((prevCard) => ({
+          ...prevCard,
+          openBar: true,
+          type: "invalidDueDate",
+        }));
+      }
     } else {
-      setCard((prevStage) => ({
-        ...prevStage,
+      setCard((prevCard) => ({
+        ...prevCard,
         openBar: true,
         type: "emptyCardForm",
       }));
     }
   };
+
+  const handleSubmit = (e) => {
+    handleFormSubmit();
+  };
+
   const handleUpdate = (e) => {
-    dispatch(handleUpdateCard(card, username));
-    handleClose();
+    handleFormSubmit(true);
   };
 
   useEffect(() => {
     if (editCardData === null) {
-      setCard((prevStage) => ({
-        ...prevStage,
+      setCard((prevCard) => ({
+        ...prevCard,
         assignBy: username,
         userId,
         stageId,
@@ -183,9 +202,9 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         },
       }));
     }
-    if (editCardData !== null) {
-      setCard((prevStage) => ({
-        ...prevStage,
+    if (isEditMode) {
+      setCard((prevCard) => ({
+        ...prevCard,
         comment: {
           id: uuid().slice(0, 18),
           userId,
@@ -197,10 +216,10 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   }, [stageId, userId, editCardData]);
 
   const handleUpdateComments = () => {
-    if (comment !== "") {
+    if (comment.commentText !== "") {
       dispatch(handleUpdateComment({ id, comment }));
-      setCard((prvCard) => ({
-        ...prvCard,
+      setCard((prevCard) => ({
+        ...prevCard,
         comment: {
           id: uuid().slice(0, 18),
           userId,
@@ -209,8 +228,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         },
       }));
     } else {
-      setCard((prevStage) => ({
-        ...prevStage,
+      setCard((prevCard) => ({
+        ...prevCard,
         openBar: true,
         type: "emptyComment",
       }));
@@ -218,9 +237,9 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   };
 
   const handleCancel = () => {
-    setCard((prvCard) => ({
-      ...prvCard,
-      comment: "",
+    setCard((prevCard) => ({
+      ...prevCard,
+      comment: { ...comment, commentText: "" },
     }));
   };
   return (
@@ -250,9 +269,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           label="Title"
           onChange={handleChange}
           variant="standard"
-          InputProps={{
-            disableUnderline: true,
-          }}
         />
         <BasicTextField
           color="secondary"
@@ -262,9 +278,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           label="Description"
           onChange={handleChange}
           variant="standard"
-          InputProps={{
-            disableUnderline: true,
-          }}
         />
         <BasicTextField
           color="secondary"
@@ -283,28 +296,61 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           }}
           onChange={handleChange}
         />
-        <TextField
-          color="secondary"
-          className="cardDrawerTextField"
-          select
-          name="assignTo"
-          label="Assign To"
-          value={assignTo}
-          onChange={handleChange}
-          variant="standard"
-          inputProps={{
-            disableUnderline: true,
-          }}
-        >
-          {users &&
-            users.map((user) =>
-              userId !== user.id ? (
-                <MenuItem key={user.id} value={user.username}>
-                  {user.username}
-                </MenuItem>
-              ) : null
-            )}
-        </TextField>
+        {users.length > 1 ? (
+          <TextField
+            color="secondary"
+            className="cardDrawerTextField"
+            select
+            name="assignTo"
+            label="Assign To"
+            value={assignTo}
+            onChange={handleChange}
+            variant="standard"
+          >
+            {users &&
+              users.map((user) =>
+                userId !== user.id ? (
+                  <MenuItem key={user.id} value={user.username}>
+                    {user.username}
+                  </MenuItem>
+                ) : null
+              )}
+          </TextField>
+        ) : null}
+
+        {editCardData ? (
+          <>
+            <div className="commentTextFieldBox">
+              <BasicTextField
+                label="Comment"
+                value={comment.commentText}
+                name="comment"
+                onChange={handleComment}
+                variant="standard"
+                className="cardDrawerTextField"
+                inputProps={{
+                  disableUnderline: true,
+                }}
+              />
+              <BasicButton
+                className="drawerButton"
+                onClick={handleUpdateComments}
+                name="Save"
+              />
+            </div>
+          </>
+        ) : null}
+        <div className="commentSection">
+          {editCardData?.comments?.map((comment) => {
+            return (
+              <BasicTextField
+                className="commentTextField"
+                value={comment.commentText || comment}
+                readonly
+              />
+            );
+          })}
+        </div>
         <ButtonGroup className="drawerButtonGroup">
           <BasicButton
             onClick={editCardData ? handleUpdate : handleSubmit}
@@ -314,49 +360,15 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           <BasicButton
             className="drawerButton"
             onClick={handleClose}
-            name={"Close"}
+            name={"cancel"}
           />
         </ButtonGroup>
       </Card>
-      {editCardData ? (
+      {/*
         <Card className="commentCard" elevation={0}>
-          <Typography variant="h6" className="commentHeading" fontWeight={600}>
-            Comment Section
-          </Typography>
-          <BasicTextField
-            value={comment.commentText}
-            name="comment"
-            onChange={handleComment}
-            variant="standard"
-            className="commentTextField"
-          />
-          <ButtonGroup className="commentButtonGroup">
-            <BasicButton
-              className="drawerButton"
-              onClick={handleUpdateComments}
-              name="Save"
-            />
-            <BasicButton
-              className="drawerButton"
-              onClick={comment ? handleCancel : handleClose}
-              name={comment ? "Cancle" : "Close"}
-            />
-          </ButtonGroup>
-
-          <div className="commentSection">
-            {editCardData?.comments?.map((comment) => {
-              console.log(comment.commentText);
-              return (
-                <BasicTextField
-                  className="commentTextField"
-                  value={comment.commentText || comment}
-                  readonly
-                />
-              );
-            })}
-          </div>
+          
         </Card>
-      ) : null}
+      ) : null} */}
 
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}

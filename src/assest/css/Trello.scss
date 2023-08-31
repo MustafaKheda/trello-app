@@ -12,7 +12,7 @@ $buttonText: rgb(0, 0, 0);
   // background: url("../Image/BG5.jpg") no-repeat;
   background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
   background-size: fill;
-  min-height: 97.5vh;
+  min-height: 100vh;
   height: 97vh !important;
   padding: 45px 50px 0;
   column-gap: 20px;
@@ -37,7 +37,7 @@ $buttonText: rgb(0, 0, 0);
 .trelloCardContent {
   margin: 10px 0 !important;
   padding: 0 !important;
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   overflow-y: auto !important ;
   border-radius: 25px;
 }
@@ -170,27 +170,24 @@ $buttonText: rgb(0, 0, 0);
 .cardDrawerTextField {
   width: 90% !important;
   background-color: #fff;
-  // padding: 8px !important;
   margin: 10px auto !important;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.7) !important;
 }
 .cardDrawerTextField .MuiInput-root {
-  border-bottom: none !important;
+  padding-bottom: 6px;
 }
 .cardDrawerTextField label {
   font-size: 16px !important;
   font-weight: 500 !important;
   color: #000;
-  // padding-bottom: 10px !important;
 }
 
 .drawerCard {
-  margin: 30px auto 0 !important ;
-  padding: 20px !important;
+  margin: 0px auto 0 !important ;
+  padding-bottom: 10px !important;
   width: 90%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
   min-height: 55vh;
   align-items: center;
   justify-content: center !important;
@@ -242,10 +239,10 @@ $buttonText: rgb(0, 0, 0);
   position: relative;
   right: 30%;
 }
-.drawerButtonGroup {
-  position: relative;
-  right: 27%;
-}
+// .drawerButtonGroup {
+//   position: relative;
+//   left: 25%;
+// }
 .commentButtonGroup {
   position: relative;
   right: 27%;
@@ -264,13 +261,26 @@ $buttonText: rgb(0, 0, 0);
   align-items: center;
   justify-content: center !important;
 }
+.commentTextFieldBox {
+  display: flex;
+  align-items: last baseline;
+  width: 90%;
+}
 .commentSection {
+  // border: 1px solid;
+  border-radius: 10px;
   display: flex;
   align-items: center;
-  justify-content: center !important;
+  padding: 5px 0;
+  row-gap: 5px;
+  flex-direction: column;
   width: 100%;
+  overflow-y: auto;
+  flex-grow: 1;
+  height: 300px;
   // margin-top: 50px !important;
 }
+
 .trelloCardHeading {
   display: flex;
   border-top-right-radius: 100px !important;
@@ -336,9 +346,13 @@ $buttonText: rgb(0, 0, 0);
   width: 120%;
 }
 
-.commentSection {
+.fullWidth {
   display: flex;
-  margin-top: 20px;
   flex-direction: column;
-  gap: 10px;
+  width: 100%;
+  align-items: center;
+}
+.navToolBar div {
+  display: flex;
+  align-items: center;
 }

@@ -10,6 +10,10 @@ export const messageMap = {
   userNotFound: "User not found. Please sign up.",
   emptyCardForm: "Please fill the form, to create the card",
   emptyModel: "Please enter the title of the Stage",
+  emptyComment: "Please enter the comment",
+  invalidDueDate:
+    "Please choose a due date and time that is today or later. Thank you.",
+  invaildEmail: "Invaild Email",
 };
 export const DATA = [
   {

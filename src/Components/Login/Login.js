@@ -37,7 +37,7 @@ function Login() {
     loginEmail: "",
     open: false,
     type: "",
-    show: false,
+    show: true,
   });
 
   const {
@@ -134,6 +134,7 @@ function Login() {
     }
   };
   const handleSignUp = (e) => {
+    const regEx = /[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,8}(.[a-z{2,8}])?/;
     e.preventDefault();
     if (
       username.trim() !== "" &&
@@ -165,6 +166,14 @@ function Login() {
       const numberExist = user?.some(
         (user) => user.mobileNumber === mobileNumber
       );
+      //validation for email
+      if (!regEx.test(email)) {
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
+          open: true,
+          type: "invaildEmail",
+        }));
+      }
       // Attempting to sign up
       if (emailExist) {
         setAuth((prvAuth) => ({
@@ -180,7 +189,7 @@ function Login() {
         }));
       } else {
         // Create new user
-        dispatch(setUser({ id, username, email, mobileNumber, password }));
+        // dispatch(setUser({ id, username, email, mobileNumber, password }));
         setAuth((prvAuth) => ({
           ...prvAuth,
           password: "",
@@ -238,6 +247,7 @@ function Login() {
                   value={loginPassword}
                   placeholder="Password"
                   onChange={handleChange}
+                  type="password"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment className="inputIcon" position="start">
@@ -250,7 +260,7 @@ function Login() {
                   elevation={3}
                   className="cardButton"
                   onClick={handleLogin}
-                  name="SignIN"
+                  name="Sign IN"
                 />
                 <Typography onClick={toggleView} className="login_link">
                   Don't have an account?
@@ -311,6 +321,8 @@ function Login() {
                   type="email"
                   onChange={handleChange}
                   InputProps={{
+                    pattern:
+                      "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+[.]{1}[a-zA-Z]{2,}$",
                     startAdornment: (
                       <InputAdornment className="inputIcon" position="start">
                         <Person2Icon />

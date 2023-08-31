@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import Card from "@mui/material/Card";
@@ -28,19 +28,22 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Dialog from "@mui/material/Dialog";
 import BasicButton from "../../Common/BasicButton";
+import { useNavigate } from "react-router";
 function Trello() {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const cards = useSelector((store) => store.trelloStage.card);
   const currentUser = useSelector((state) => state.userStore.currentUser);
   const data = useSelector((state) => state.trelloStage.stages);
-  console.log();
+
   const [open, setOpen] = useState({
     openDrawer: false,
     openModel: false,
     openDailog: false,
     drawerStageId: null,
-    tempData: "",
+    tempStage: null,
     anchorEl: null,
     openMenu: false,
   });
@@ -49,36 +52,41 @@ function Trello() {
     drawerStageId,
     openModel,
     openDrawer,
-    tempData,
+    tempStage,
     openDailog,
     anchorEl,
     openMenu,
   } = open;
 
+  useEffect(() => {
+    if (Object.keys(currentUser).length <= 0) {
+      navigate("/");
+    }
+  }, [currentUser]);
   const handleClickOpen = () => {
-    setOpen((prvState) => ({
-      ...prvState,
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       openModel: true,
     }));
   };
   const handleClose = () => {
-    setOpen((prvState) => ({
-      ...prvState,
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       openModel: false,
     }));
   };
 
   const handleDrawerOpen = (stageId) => {
-    setOpen((prvState) => ({
-      ...prvState,
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       openDrawer: true,
       drawerStageId: stageId,
     }));
   };
 
   const handleDrawerClose = () => {
-    setOpen((prvState) => ({
-      ...prvState,
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       openDrawer: false,
     }));
   };
@@ -118,43 +126,43 @@ function Trello() {
     handleCloseMenu();
   };
   const handleClick = (event, id) => {
-    const [temp] = data.filter((stage) => stage.id === id);
-    setOpen((prv) => ({
-      ...prv,
+    const temp = data.find((stage) => stage.id === id);
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       anchorEl: event.currentTarget,
-      tempData: temp,
+      tempStage: temp,
       openMenu: true,
     }));
   };
+
   const handleCloseMenu = () => {
-    setOpen((prv) => ({
-      ...prv,
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       anchorEl: null,
-      tempData: "",
       openMenu: false,
     }));
   };
   const handelOpenDeleteDailogBox = () => {
-    setOpen((prv) => ({
-      ...prv,
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       openDailog: true,
     }));
+    handleCloseMenu();
   };
   const handleCloseDialogBox = () => {
-    setOpen((prv) => ({
-      ...prv,
+    setOpen((prevOpen) => ({
+      ...prevOpen,
       openDailog: false,
-      tempData: "",
+      tempStage: null,
     }));
   };
   const handleDelete = () => {
     handleCloseMenu();
-    dispatch(handleDeleteStage(tempData.id));
+    dispatch(handleDeleteStage(tempStage.id));
     handleCloseDialogBox();
   };
   function renderStage(provided, data, index) {
     const cardCount = cards?.filter((card) => card?.stageId === data?.id);
-    console.log(data.userId);
     return (
       <div
         className="trelloStages"
@@ -166,7 +174,7 @@ function Trello() {
           className={`trelloCardHeading`}
           style={{ backgroundColor: `${data?.color}` }}
         >
-          <Typography fontWeight={600}>
+          <Typography textTransform={"uppercase"} fontWeight={600}>
             {data.name} ({cardCount?.length})
           </Typography>
           <IconButton id={`setting`}>
@@ -181,7 +189,7 @@ function Trello() {
               "aria-labelledby": "basic-button",
             }}
           >
-            <MenuItem onClick={() => handleEditStage(tempData)}>Edit</MenuItem>
+            <MenuItem onClick={() => handleEditStage(tempStage)}>Edit</MenuItem>
             <MenuItem onClick={handelOpenDeleteDailogBox}>Delete</MenuItem>
           </Menu>
         </div>
@@ -195,7 +203,7 @@ function Trello() {
       </div>
     );
   }
-  return (
+  return Object.keys(currentUser).length > 0 ? (
     <>
       <div className="trelloBody">
         <Header />
@@ -218,7 +226,6 @@ function Trello() {
               >
                 {data &&
                   data?.map((data, index) => {
-                    console.log();
                     return !data.isDelete && data.userId === currentUser.id ? (
                       <Draggable
                         draggableId={data.id}
@@ -278,6 +285,6 @@ function Trello() {
         </DialogActions>
       </Dialog>
     </>
-  );
+  ) : null;
 }
 export default Trello;

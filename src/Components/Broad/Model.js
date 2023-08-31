@@ -15,18 +15,19 @@ import {
 } from "../../Store/Action";
 import { SwatchesPicker } from "./SwatchesPicker";
 import { messageMap } from "../../Common/Constant";
+import BasicTextField from "../../Common/BasicTextField";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 function Model({ close, open, currentUser }) {
-  const { id: userId, username } = currentUser;
+  const dispatch = useDispatch();
   const editStageData = useSelector(
     (store) => store?.trelloStage?.editStageData
   );
 
-  const dispatch = useDispatch();
+  const { id: userId, username } = currentUser;
 
   const [stage, setStage] = useState({
     id: uuid().slice(0, 18),
@@ -44,9 +45,9 @@ function Model({ close, open, currentUser }) {
 
   useEffect(() => {
     if (editStageData !== null) {
-      setStage((prv) => ({
-        ...prv,
-        id: editStageData?.id || uuid().slice(0, 18),
+      setStage((prevStage) => ({
+        ...prevStage,
+        id: editStageData?.id,
         name: editStageData?.name || "",
         color: editStageData?.color || "#000",
         openBar: false,
@@ -58,12 +59,13 @@ function Model({ close, open, currentUser }) {
       }));
     }
   }, [editStageData]);
-  const { id, color, name, openBar, type, createdAt, modifiedAt } = stage;
+  const { id, color, name, openBar, type } = stage;
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setStage((prevStage) => ({
       ...prevStage,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
   };
   const handleClose = () => {
@@ -72,21 +74,17 @@ function Model({ close, open, currentUser }) {
     close();
   };
   const handleCloseSnackbar = () => {
-    setStage((prvstage) => ({
-      ...prvstage,
+    setStage((prevStage) => ({
+      ...prevStage,
       openBar: false,
       type: "",
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
     if (name !== "") {
-      // console.log(sta);
       dispatch(handleSetStage(stage, username));
-      setStage((prevStage) => ({
-        ...prevStage,
-        id: uuid().slice(0, 18),
-      }));
       handleClose();
     } else {
       setStage((prvStage) => ({
@@ -96,10 +94,11 @@ function Model({ close, open, currentUser }) {
       }));
     }
   };
+
   const resetStage = () => {
-    setStage({
+    setStage((prevStage) => ({
+      ...prevStage,
       id: uuid().slice(0, 18),
-      userId: "",
       name: "",
       color: "#000",
       isDeleted: false,
@@ -109,13 +108,15 @@ function Model({ close, open, currentUser }) {
       createdAt: "",
       modifiedBy: "",
       modifiedAt: "",
-    });
+    }));
   };
-  const handleUpdate = () => {
-    console.log(stage);
+
+  const handleUpdate = (event) => {
+    event.preventDefault();
     dispatch(handleUpdateStage(stage, username));
     handleClose();
   };
+
   useEffect(() => {
     if (editStageData === null) {
       setStage((prevStage) => ({
@@ -124,6 +125,9 @@ function Model({ close, open, currentUser }) {
       }));
     }
   }, [userId]);
+
+  const isEditMode = editStageData !== null;
+
   return (
     <>
       <Dialog
@@ -137,12 +141,12 @@ function Model({ close, open, currentUser }) {
       >
         <DialogTitle>
           <Typography fontWeight={"600"} textTransform={"uppercase"}>
-            Create Stage
+            {isEditMode ? "Edit Stage" : "Create Stage"}
           </Typography>
         </DialogTitle>
         <Divider />
         <DialogContent className="dialogBoxContent">
-          <TextField
+          <BasicTextField
             value={name}
             fullWidth
             name="name"
