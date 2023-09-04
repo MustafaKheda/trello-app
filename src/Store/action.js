@@ -1,4 +1,5 @@
 import { Actiontypes } from "./ActionTypes";
+
 export const setUser = (data) => {
   console.log(data);
   return {
@@ -6,6 +7,7 @@ export const setUser = (data) => {
     payload: data,
   };
 };
+
 export const setCurrentUser = (id, username) => {
   return {
     type: Actiontypes.SET_CURRENT_USER,
@@ -41,9 +43,41 @@ export const handleSetStage = (obj, username) => {
 };
 
 export const handleSetCard = (obj) => {
+  const {
+    assignTo,
+    assignBy,
+    comments,
+    createdAt,
+    createdBy,
+    description,
+    dueDate,
+    id,
+    isDelete,
+    modifiedAt,
+    modifiedBy,
+    stageId,
+    title,
+    userId,
+  } = obj;
+  console.log(obj);
   return {
     type: Actiontypes.SET_CARD,
-    payload: obj,
+    payload: {
+      assignTo,
+      assignBy,
+      comments,
+      createdAt,
+      createdBy,
+      description,
+      dueDate,
+      id,
+      isDelete,
+      modifiedAt,
+      modifiedBy,
+      stageId,
+      title,
+      userId,
+    },
   };
 };
 export const handleChangeCard = (obj) => {
@@ -116,5 +150,34 @@ export const handleUpdateComment = (obj) => {
   return {
     type: Actiontypes.UPDATE_COMMENT,
     payload: obj,
+  };
+};
+
+export const deleteCard = (id) => {
+  return {
+    type: Actiontypes.LIST_DELETE_CARD,
+    payload: id,
+  };
+};
+export const deleteStage = (id) => {
+  return {
+    type: Actiontypes.LIST_DELETE_STAGE,
+    payload: id,
+  };
+};
+export const deleteUser = (id) => {
+  return {
+    type: Actiontypes.LIST_DELETE_USER,
+    payload: id,
+  };
+};
+
+export const deleteComment = (id, cardId) => {
+  return {
+    type: Actiontypes.DELETE_COMMENT,
+    payload: {
+      id,
+      cardId,
+    },
   };
 };

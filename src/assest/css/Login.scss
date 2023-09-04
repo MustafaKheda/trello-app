@@ -40,6 +40,7 @@ $cardCarosual: 100vh;
   text-align: center;
 }
 .link {
+  cursor: pointer;
   color: #5f4596;
 }
 .cardBox {
@@ -67,6 +68,7 @@ $cardCarosual: 100vh;
 .cardBox.login {
   animation-name: cardLogin;
   animation-duration: 1s;
+  transition: transform 1s ease-in-out;
   transform: translate(150%);
 }
 .loginCard .cardBox.login {
@@ -96,6 +98,7 @@ $cardCarosual: 100vh;
   box-shadow: 6px 1px 10px 3px rgba(0, 0, 0, 0.2);
 }
 .loginCard .cardMedia.signup {
+  // transition: transform 2s ease-in-out;
   transform: translateX(-43%);
 }
 @keyframes mediaSignup {
@@ -159,7 +162,7 @@ $cardCarosual: 100vh;
   color: rgba($color: #000000, $alpha: 0.4) !important;
 }
 // Nav Bar Css
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1000px) {
   .cardMedia {
     display: none !important;
   }
@@ -175,13 +178,57 @@ $cardCarosual: 100vh;
     .cardBox.signup {
       min-width: 400px;
       transition: transform 1s ease-in-out;
-      transform: translate(60%, 25%) !important;
+      transform: translate(60%, 7%) !important;
     }
 
     .cardBox.login {
       min-width: 400px;
       transition: transform 1s ease-in-out;
-      transform: translate(60%, 25%) !important;
+      transform: translate(60%, 15%) !important;
+    }
+  }
+}
+@media only screen and (max-width: 768px) {
+  .loginCard {
+    &,
+    .cardBox.signup,
+    .cardBox.login {
+      animation: none !important;
+      transform: translateX(0) !important;
+    }
+
+    .cardBox.signup {
+      min-width: 400px;
+      transition: transform 1s ease-in-out;
+      transform: translate(40%, 7%) !important;
+    }
+
+    .cardBox.login {
+      min-width: 400px;
+      transition: transform 1s ease-in-out;
+      transform: translate(40%, 15%) !important;
+    }
+  }
+}
+@media only screen and (max-width: 600px) {
+  .loginCard {
+    &,
+    .cardBox.signup,
+    .cardBox.login {
+      animation: none !important;
+      transform: translateX(0) !important;
+    }
+
+    .cardBox.signup {
+      min-width: 400px;
+      transition: transform 1s ease-in-out;
+      transform: translate(30%, 7%) !important;
+    }
+
+    .cardBox.login {
+      min-width: 400px;
+      transition: transform 1s ease-in-out;
+      transform: translate(27%, 15%) !important;
     }
   }
 }

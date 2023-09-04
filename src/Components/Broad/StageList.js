@@ -29,6 +29,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { monthNames } from "../../Common/Constant";
 import { handleDeleteCard, handleEditCard } from "../../Store/Action";
 import BasicButton from "../../Common/BasicButton";
+import { Chip } from "@mui/material";
 function StageList(props) {
   const dispatch = useDispatch();
   const cards = useSelector((store) => store.trelloStage.card);
@@ -85,12 +86,15 @@ function StageList(props) {
     handleCloseDialogBox();
   };
   function cardComponent(provided, card) {
-    const { title, description, assignTo, assignBy, dueDate, comment, id } =
+    const { title, description, assignTo, assignBy, dueDate, comments, id } =
       card;
     const date = new Date(dueDate);
     const dDate = date.getDate();
     const dueMonth = date.getMonth();
     const stringDate = date.toString().slice(0, 25);
+    const undeletedCommetsCount = comments.filter(
+      (comment) => !comment.isDelete
+    ).length;
     return (
       <Card
         {...provided.dragHandleProps}
@@ -152,12 +156,14 @@ function StageList(props) {
           </Stack>
 
           <Stack className="actionIconStack">
-            <Tooltip title={stringDate}>
-              <Typography component={"div"} className="actionStackDueDate">
-                <AccessTimeIcon />
-                {monthNames[dueMonth]} {dDate}
-              </Typography>
-            </Tooltip>
+            {dueDate ? (
+              <Tooltip title={stringDate}>
+                <Typography component={"div"} className="actionStackDueDate">
+                  <AccessTimeIcon />
+                  {monthNames[dueMonth]} {dDate}
+                </Typography>
+              </Tooltip>
+            ) : null}
 
             <IconButton
               aria-label="cart"
@@ -166,7 +172,7 @@ function StageList(props) {
             >
               <Badge
                 className="innerActionBadge"
-                badgeContent={card?.comments?.length || comment.length}
+                badgeContent={undeletedCommetsCount}
                 color="secondary"
                 showZero
               >

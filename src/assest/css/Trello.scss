@@ -12,13 +12,15 @@ $buttonText: rgb(0, 0, 0);
   // background: url("../Image/BG5.jpg") no-repeat;
   background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
   background-size: fill;
-  min-height: 100vh;
-  height: 97vh !important;
-  padding: 45px 50px 0;
+  min-height: 97.5vh;
+  padding: 85px 50px 0;
   column-gap: 20px;
   min-width: 100vw;
   width: fit-content !important;
   // overflow: auto;
+}
+.commentDeleteIcon {
+  cursor: pointer;
 }
 .trelloCard {
   background-color: $buttonBg !important;

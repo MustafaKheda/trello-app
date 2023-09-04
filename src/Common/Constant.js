@@ -14,6 +14,8 @@ export const messageMap = {
   invalidDueDate:
     "Please choose a due date and time that is today or later. Thank you.",
   invaildEmail: "Invaild Email",
+  invaildPassword:
+    "password should contain atleast one number and one special character",
 };
 export const DATA = [
   {

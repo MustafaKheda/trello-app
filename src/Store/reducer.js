@@ -22,6 +22,10 @@ const {
   UPDATE_CARD,
   UNSET_EDIT_CARD,
   UPDATE_COMMENT,
+  LIST_DELETE_CARD,
+  LIST_DELETE_STAGE,
+  LIST_DELETE_USER,
+  DELETE_COMMENT,
 } = Actiontypes;
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -44,6 +48,12 @@ const userReducer = (state = initialState, action) => {
         ...state,
         currentUser: {},
       };
+    case LIST_DELETE_USER: {
+      return {
+        ...state,
+        users: state.users.filter((user) => user.id !== action.payload),
+      };
+    }
     default:
       return state;
   }
@@ -68,14 +78,12 @@ const stageReducer = (state = trelloState, action) => {
       const { obj, username } = action.payload;
       obj.createdBy = username;
       obj.createdAt = new Date();
-      console.log(obj);
       return {
         ...state,
         stages: [...stages, obj],
       };
     }
     case EDIT_STAGE:
-      console.log(action.payload);
       return {
         ...state,
         editStageData: action.payload,
@@ -87,10 +95,8 @@ const stageReducer = (state = trelloState, action) => {
       };
     case DELETE_STAGE: {
       let indexValue = stages.findIndex((item) => item.id === action.payload);
-      console.log(indexValue);
       const newStages = [...stages];
       newStages[indexValue].isDelete = true;
-      console.log(newStages);
       return {
         ...state,
         stages: [...newStages],
@@ -103,7 +109,6 @@ const stageReducer = (state = trelloState, action) => {
       const updatedStageList = stages.map((stage) =>
         stage.id === obj.id ? obj : stage
       );
-      console.log(updatedStageList);
       return {
         ...state,
         editStageData: null,
@@ -113,7 +118,6 @@ const stageReducer = (state = trelloState, action) => {
       const newCard = action.payload;
       newCard.createdAt = new Date();
       newCard.createdBy = newCard.assignBy;
-      console.log(newCard);
       return {
         ...state,
         card: [...state.card, newCard],
@@ -126,17 +130,14 @@ const stageReducer = (state = trelloState, action) => {
       };
     case DELETE_CARD: {
       let indexValue = card.findIndex((item) => item.id === action.payload);
-      console.log(indexValue);
       const newCards = [...card];
       newCards[indexValue].isDelete = true;
-      console.log(newCards);
       return {
         ...state,
         card: [...newCards],
       };
     }
     case EDIT_CARD: {
-      console.log(action.payload);
       return {
         ...state,
         editCardData: action.payload,
@@ -147,7 +148,6 @@ const stageReducer = (state = trelloState, action) => {
       obj.modifiedAt = new Date();
       obj.modifiedBy = username;
       const updatedCard = card.map((card) => (card.id === obj.id ? obj : card));
-      console.log(updatedCard);
       return {
         ...state,
         editCardData: null,
@@ -160,25 +160,67 @@ const stageReducer = (state = trelloState, action) => {
         editCardData: null,
       };
     case UPDATE_COMMENT: {
-      console.log(action.payload);
       let indexValue = card.findIndex((item) => item.id === action.payload.id);
-      console.log(indexValue);
       const newCards = [...card];
       newCards[indexValue].comments = [
         ...newCards[indexValue].comments,
         action.payload.comment,
       ];
-      console.log(newCards);
+
       return {
         ...state,
+        editCardData: newCards[indexValue],
         card: [...newCards],
       };
     }
+    case LIST_DELETE_CARD: {
+      const deleted_Card = card.filter((card) =>
+        card.id !== action.payload ? card : null
+      );
+      return {
+        ...state,
+        card: deleted_Card,
+      };
+    }
+    case LIST_DELETE_STAGE: {
+      const deletedStage = stages.filter((stage) =>
+        stage.id !== action.payload ? stage : null
+      );
+      return {
+        ...state,
+        stages: deletedStage,
+      };
+    }
+    case DELETE_COMMENT: {
+      const { cardId, id } = action.payload;
+
+      const updatedCard = card.map((card) => {
+        if (card.id === cardId) {
+          const updatedComments = card.comments.map((comment) =>
+            comment.id === id ? { ...comment, isDelete: true } : comment
+          );
+          return { ...card, comments: updatedComments };
+        }
+        return card;
+      });
+
+      return {
+        ...state,
+        editCardData: updatedCard.find((card) => card.id === cardId) || null,
+        card: updatedCard,
+      };
+    }
+
     default:
       return state;
   }
 };
-export const reducer = combineReducers({
+const rootReducer = combineReducers({
   userStore: userReducer,
   trelloStage: stageReducer,
 });
+//  const reducer = combineReducers({
+//   userStore: userReducer,
+//   trelloStage: stageReducer,
+// });
+export default rootReducer;

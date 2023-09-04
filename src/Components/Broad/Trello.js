@@ -36,7 +36,7 @@ function Trello() {
 
   const cards = useSelector((store) => store.trelloStage.card);
   const currentUser = useSelector((state) => state.userStore.currentUser);
-  const data = useSelector((state) => state.trelloStage.stages);
+  const stages = useSelector((state) => state.trelloStage.stages);
 
   const [open, setOpen] = useState({
     openDrawer: false,
@@ -101,7 +101,7 @@ function Trello() {
 
     if (type === "group") {
       // Handle Stage drag-and-drop
-      const reorderedStores = [...data];
+      const reorderedStores = [...stages];
       const sourceIndex = source.index;
       const destinationIndex = destination.index;
       const [removedStore] = reorderedStores.splice(sourceIndex, 1);
@@ -120,13 +120,13 @@ function Trello() {
     }
   };
 
-  const handleEditStage = (data) => {
+  const handleEditStage = (stage) => {
     handleClickOpen();
-    dispatch(editStage(data));
+    dispatch(editStage(stage));
     handleCloseMenu();
   };
   const handleClick = (event, id) => {
-    const temp = data.find((stage) => stage.id === id);
+    const temp = stages.find((stage) => stage.id === id);
     setOpen((prevOpen) => ({
       ...prevOpen,
       anchorEl: event.currentTarget,
@@ -161,8 +161,10 @@ function Trello() {
     dispatch(handleDeleteStage(tempStage.id));
     handleCloseDialogBox();
   };
-  function renderStage(provided, data, index) {
-    const cardCount = cards?.filter((card) => card?.stageId === data?.id);
+  function renderStage(provided, stages, index) {
+    const cardCount = cards.filter(
+      (card) => card?.stageId === stages?.id && !card.isDelete
+    ).length;
     return (
       <div
         className="trelloStages"
@@ -172,13 +174,16 @@ function Trello() {
       >
         <div
           className={`trelloCardHeading`}
-          style={{ backgroundColor: `${data?.color}` }}
+          style={{ backgroundColor: `${stages?.color}` }}
         >
           <Typography textTransform={"uppercase"} fontWeight={600}>
-            {data.name} ({cardCount?.length})
+            {stages.name} ({cardCount})
           </Typography>
-          <IconButton id={`setting`}>
-            <MoreHoriz onClick={(event) => handleClick(event, data.id)} />
+          <IconButton
+            id={`setting`}
+            onClick={(event) => handleClick(event, stages.id)}
+          >
+            <MoreHoriz />
           </IconButton>
           <Menu
             id={`basic-menu`}
@@ -195,7 +200,7 @@ function Trello() {
         </div>
         <Card elevation={0} className="trelloCard size">
           <StageList
-            {...data}
+            {...stages}
             index={index}
             openDrawerById={handleDrawerOpen}
           />
@@ -224,20 +229,21 @@ function Trello() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                {data &&
-                  data?.map((data, index) => {
-                    return !data.isDelete && data.userId === currentUser.id ? (
+                {stages &&
+                  stages?.map((stages, index) => {
+                    return !stages.isDelete &&
+                      stages.userId === currentUser.id ? (
                       <Draggable
-                        draggableId={data.id}
-                        key={data.id}
+                        draggableId={stages.id}
+                        key={stages.id}
                         index={index}
                       >
                         {(provided) => {
                           const cardCount = cards?.filter(
-                            (card) => card?.stageId === data?.id
+                            (card) => card?.stageId === stages?.id
                           );
 
-                          return renderStage(provided, data, index);
+                          return renderStage(provided, stages, index);
                         }}
                       </Draggable>
                     ) : null;

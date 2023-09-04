@@ -11,10 +11,11 @@ import Card from "@mui/material/Card";
 import MenuItem from "@mui/material/MenuItem";
 import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import DeleteIcon from "@mui/icons-material/Close";
 import uuid from "react-uuid";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  deleteComment,
   handleSetCard,
   handleUnsetEditCard,
   handleUpdateCard,
@@ -25,10 +26,10 @@ import BasicTextField from "../../Common/BasicTextField";
 import { messageMap } from "../../Common/Constant";
 
 function CardDrawer({ open, close, currentUser, stageId }) {
-  const currentDate = new Date();
   const users = useSelector((store) => store?.userStore.users);
   const editCardData = useSelector((store) => store?.trelloStage?.editCardData);
   const isEditMode = editCardData !== null;
+
   const dispatch = useDispatch();
   const theme = useTheme();
   const { id: userId, username } = currentUser;
@@ -46,6 +47,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       userId,
       username,
       commentText: "",
+      isDelete: false,
     },
     comments: [],
     type: "",
@@ -73,6 +75,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     comments,
     comment,
   } = card;
+
   useEffect(() => {
     if (isEditMode) {
       setCard((prv) => ({
@@ -93,7 +96,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         modifiedAt: editCardData?.modifiedAt || "",
       }));
     }
-  }, [editCardData]);
+  }, [editCardData, editCardData?.comments]);
+
   const handleCloseSnackbar = () => {
     setCard({
       ...card,
@@ -117,6 +121,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         userId,
         username,
         commentText: "",
+        isDelete: false,
       },
       comments: [],
       type: "",
@@ -150,7 +155,11 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   };
   const handleCheckDueDate = () => {
     const enteredDate = new Date(dueDate);
-    const currentDate = new Date();
+    let currentDate = new Date();
+    const editDueDate = new Date(editCardData?.dueDate);
+    if (isEditMode && currentDate > editDueDate) {
+      currentDate = editDueDate;
+    }
     return (
       Date.parse(enteredDate.toString().slice(0, 10)) >=
       Date.parse(currentDate.toString().slice(0, 10))
@@ -199,6 +208,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           userId,
           username,
           commentText: "",
+          isDelete: false,
         },
       }));
     }
@@ -210,6 +220,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           userId,
           username,
           commentText: "",
+          isDelete: false,
         },
       }));
     }
@@ -225,6 +236,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           userId,
           username,
           commentText: "",
+          isDelete: false,
         },
       }));
     } else {
@@ -236,12 +248,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     }
   };
 
-  const handleCancel = () => {
-    setCard((prevCard) => ({
-      ...prevCard,
-      comment: { ...comment, commentText: "" },
-    }));
-  };
   return (
     <Drawer
       key={stageId}
@@ -262,6 +268,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       <Divider />
       <Card className="drawerCard" elevation={0}>
         <BasicTextField
+          id="title"
+          key="title"
           color="secondary"
           className="cardDrawerTextField"
           value={title}
@@ -271,6 +279,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           variant="standard"
         />
         <BasicTextField
+          id="title"
+          key="description"
           color="secondary"
           className="cardDrawerTextField"
           value={description}
@@ -280,6 +290,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           variant="standard"
         />
         <BasicTextField
+          id="dueDate"
+          key="dueDate"
           color="secondary"
           className="cardDrawerTextField"
           value={dueDate}
@@ -298,6 +310,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         />
         {users.length > 1 ? (
           <TextField
+            id="assignTo"
+            key="assignTo"
             color="secondary"
             className="cardDrawerTextField"
             select
@@ -322,6 +336,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           <>
             <div className="commentTextFieldBox">
               <BasicTextField
+                id="comment"
+                key="comment"
                 label="Comment"
                 value={comment.commentText}
                 name="comment"
@@ -342,13 +358,23 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         ) : null}
         <div className="commentSection">
           {editCardData?.comments?.map((comment) => {
-            return (
+            return !comment?.isDelete ? (
               <BasicTextField
                 className="commentTextField"
-                value={comment.commentText || comment}
-                readonly
+                value={comment?.commentText}
+                readOnly
+                InputProps={{
+                  endAdornment: (
+                    <DeleteIcon
+                      onClick={() =>
+                        dispatch(deleteComment(comment.id, editCardData.id))
+                      }
+                      className="commentDeleteIcon"
+                    />
+                  ),
+                }}
               />
-            );
+            ) : null;
           })}
         </div>
         <ButtonGroup className="drawerButtonGroup">
