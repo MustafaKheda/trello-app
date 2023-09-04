@@ -1,4 +1,3 @@
-import { act } from "@testing-library/react";
 import { Actiontypes } from "./ActionTypes";
 import { combineReducers } from "redux";
 const initialState = {
@@ -138,12 +137,15 @@ const stageReducer = (state = trelloState, action) => {
       };
     }
     case EDIT_CARD: {
+      const { obj, type } = action.payload;
+
       return {
         ...state,
-        editCardData: action.payload,
+        editCardData: { ...obj, type },
       };
     }
     case UPDATE_CARD: {
+      console.log(action.payload);
       const { obj, username } = action.payload;
       obj.modifiedAt = new Date();
       obj.modifiedBy = username;
@@ -206,7 +208,7 @@ const stageReducer = (state = trelloState, action) => {
 
       return {
         ...state,
-        editCardData: updatedCard.find((card) => card.id === cardId) || null,
+        editCardData: updatedCard.find((card) => card.id === cardId),
         card: updatedCard,
       };
     }

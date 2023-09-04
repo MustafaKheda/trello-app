@@ -6,16 +6,20 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteCard, deleteStage, deleteUser } from "../../Store/Action";
 function List() {
+  const currentUser = useSelector((store) => store?.userStore?.currentUser);
   const cards = useSelector((store) => store?.trelloStage?.card);
   const stages = useSelector((state) => state.trelloStage?.stages);
   const users = useSelector((store) => store?.userStore?.users);
   const dispatch = useDispatch();
-  return (
+  const navigate = useNavigate();
+
+  return currentUser.id === "1ad771c6-a29c-df48" ? (
     <div className="list">
       <div className="listItem" style={{ border: "1px solid black" }}>
         <Typography>User's</Typography>
@@ -34,10 +38,11 @@ function List() {
             {users &&
               users.map((user) => (
                 <TableRow>
-                  <TableCell variant="th">{user.id.slice(0, 6)}</TableCell>
+                  <TableCell variant="th">{user.id}</TableCell>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{user.mobileNumber}</TableCell>
                   <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.password}</TableCell>
                   <TableCell>
                     <DeleteIcon onClick={() => dispatch(deleteUser(user.id))} />
                   </TableCell>
@@ -60,14 +65,14 @@ function List() {
           <TableBody>
             {cards.map((card) => {
               let count = 0;
-              console.log(card);
+
               return !card.isDelete ? (
                 <TableRow>
                   <TableCell component="th" scope="row">
-                    {card.id.slice(0, 6)}
+                    {card.id?.slice(0, 6)}
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {card.stageId.slice(0, 6)}
+                    {card.stageId?.slice(0, 6)}
                   </TableCell>
                   <TableCell align="right">{card.title}</TableCell>{" "}
                   <TableCell align="right">{card.createdBy}</TableCell>
@@ -94,14 +99,14 @@ function List() {
           <TableBody>
             {cards.map((card) => {
               let count = 0;
-              console.log(card);
+
               return card.isDelete ? (
                 <TableRow>
                   <TableCell component="th" scope="row">
-                    {card.id.slice(0, 6)}
+                    {card.id?.slice(0, 6)}
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {card.stageId.slice(0, 6)}
+                    {card.stageId?.slice(0, 6)}
                   </TableCell>
                   <TableCell align="right">{card.title}</TableCell>{" "}
                   <TableCell align="right">{card.createdBy}</TableCell>
@@ -129,7 +134,6 @@ function List() {
           <TableBody>
             {stages &&
               stages.map((stage) => {
-                console.log(stage);
                 return stage.isDelete ? (
                   <TableRow>
                     <TableCell component="th" scope="row">
@@ -167,7 +171,6 @@ function List() {
           <TableBody>
             {stages &&
               stages.map((stage) => {
-                console.log(stage);
                 return !stage.isDelete ? (
                   <TableRow>
                     <TableCell component="th" scope="row">
@@ -193,6 +196,8 @@ function List() {
         </Table>
       </div>
     </div>
+  ) : (
+    () => navigate("/")
   );
 }
 

@@ -26,17 +26,19 @@ import BasicTextField from "../../Common/BasicTextField";
 import { messageMap } from "../../Common/Constant";
 
 function CardDrawer({ open, close, currentUser, stageId }) {
-  const users = useSelector((store) => store?.userStore.users);
-  const editCardData = useSelector((store) => store?.trelloStage?.editCardData);
-  const isEditMode = editCardData !== null;
-
   const dispatch = useDispatch();
   const theme = useTheme();
+  const users = useSelector((store) => store?.userStore.users);
+  const editCardData = useSelector((store) => store?.trelloStage?.editCardData);
+  let isCommentMode = false;
+  const isEditMode = editCardData?.type === "editMode";
+  isCommentMode = editCardData?.type === "commentMode";
+
   const { id: userId, username } = currentUser;
   const [card, setCard] = useState({
     id: uuid().slice(0, 18),
     userId,
-    stageId,
+    stageId: "",
     assignBy: username,
     assignTo: "",
     title: "",
@@ -58,6 +60,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     modifiedBy: "",
     modifiedAt: "",
   });
+
   const {
     title,
     description,
@@ -77,7 +80,9 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   } = card;
 
   useEffect(() => {
-    if (isEditMode) {
+    console.log(editCardData, card);
+    if (editCardData !== null) {
+      console.log(editCardData, card);
       setCard((prv) => ({
         ...prv,
         id: editCardData?.id,
@@ -88,7 +93,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         title: editCardData?.title,
         description: editCardData?.description,
         dueDate: editCardData?.dueDate,
-        comments: editCardData?.comments,
+        comments: [...editCardData?.comments],
         isDelete: editCardData?.isDelete,
         createdBy: editCardData?.createdBy || "",
         createdAt: new Date(editCardData?.createdAt) || "",
@@ -105,7 +110,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       type: "",
     });
   };
-
+  // Reset to initial state
   const resetCard = () => {
     setCard((prevCard) => ({
       ...prevCard,
@@ -133,17 +138,20 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       modifiedAt: "",
     }));
   };
+  // To close drawer
   const handleClose = () => {
     dispatch(handleUnsetEditCard());
     resetCard();
     close();
   };
+
   const handleChange = (e) => {
     setCard((prevCard) => ({
       ...prevCard,
       [e.target.name]: e.target.value,
     }));
   };
+  //Set comment to state
   const handleComment = (e) => {
     setCard((prevCard) => ({
       ...prevCard,
@@ -153,41 +161,66 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       },
     }));
   };
+
+  // Check due date
   const handleCheckDueDate = () => {
     const enteredDate = new Date(dueDate);
     let currentDate = new Date();
     const editDueDate = new Date(editCardData?.dueDate);
+    //to change atleast due date
     if (isEditMode && currentDate > editDueDate) {
       currentDate = editDueDate;
     }
     return (
-      Date.parse(enteredDate.toString().slice(0, 10)) >=
-      Date.parse(currentDate.toString().slice(0, 10))
+      Date.parse(enteredDate.toString().slice(0, 16)) >=
+      Date.parse(currentDate.toString().slice(0, 16))
     );
   };
 
   const handleFormSubmit = (isUpdate = false) => {
-    if (title.trim() !== "" && description !== "" && dueDate !== "") {
+    console.log(card);
+    if (title.trim() !== "" && description !== "") {
       if (handleCheckDueDate()) {
+        // select action function
         const actionFunction = isUpdate ? handleUpdateCard : handleSetCard;
-        dispatch(actionFunction(card, username));
+
+        dispatch(
+          actionFunction(
+            {
+              assignTo,
+              assignBy,
+              comments,
+              createdAt,
+              createdBy,
+              description,
+              dueDate,
+              id,
+              isDelete,
+              modifiedAt,
+              modifiedBy,
+              stageId: card.stageId || stageId,
+              title,
+              userId,
+            },
+            username
+          )
+        );
         handleClose();
       } else {
-        setCard((prevCard) => ({
-          ...prevCard,
-          openBar: true,
-          type: "invalidDueDate",
-        }));
+        handleAlertMessage("invalidDueDate");
       }
     } else {
-      setCard((prevCard) => ({
-        ...prevCard,
-        openBar: true,
-        type: "emptyCardForm",
-      }));
+      handleAlertMessage("emptyCardForm");
     }
   };
 
+  const handleAlertMessage = (message) => {
+    setCard((prevCard) => ({
+      ...prevCard,
+      openBar: true,
+      type: message,
+    }));
+  };
   const handleSubmit = (e) => {
     handleFormSubmit();
   };
@@ -195,9 +228,9 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   const handleUpdate = (e) => {
     handleFormSubmit(true);
   };
-
+  // To bind user and stage id
   useEffect(() => {
-    if (editCardData === null) {
+    if (!isEditMode && !isCommentMode) {
       setCard((prevCard) => ({
         ...prevCard,
         assignBy: username,
@@ -212,7 +245,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         },
       }));
     }
-    if (isEditMode) {
+    if (isEditMode || isCommentMode) {
       setCard((prevCard) => ({
         ...prevCard,
         comment: {
@@ -240,11 +273,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         },
       }));
     } else {
-      setCard((prevCard) => ({
-        ...prevCard,
-        openBar: true,
-        type: "emptyComment",
-      }));
+      handleAlertMessage("emptyComment");
     }
   };
 
@@ -268,6 +297,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       <Divider />
       <Card className="drawerCard" elevation={0}>
         <BasicTextField
+          readOnly={isCommentMode}
           id="title"
           key="title"
           color="secondary"
@@ -279,6 +309,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           variant="standard"
         />
         <BasicTextField
+          readOnly={isCommentMode}
           id="title"
           key="description"
           color="secondary"
@@ -288,8 +319,11 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           label="Description"
           onChange={handleChange}
           variant="standard"
+          multiline
+          minRows={2}
         />
         <BasicTextField
+          readOnly={isCommentMode}
           id="dueDate"
           key="dueDate"
           color="secondary"
@@ -301,7 +335,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           variant="standard"
           inputProps={{
             min: new Date().toISOString().slice(0, 16),
-            // disableUnderline: true,
           }}
           InputLabelProps={{
             shrink: true,
@@ -310,6 +343,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         />
         {users.length > 1 ? (
           <TextField
+            readOnly={isCommentMode}
             id="assignTo"
             key="assignTo"
             color="secondary"
@@ -336,6 +370,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           <>
             <div className="commentTextFieldBox">
               <BasicTextField
+                readOnly={isCommentMode}
                 id="comment"
                 key="comment"
                 label="Comment"
@@ -344,9 +379,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
                 onChange={handleComment}
                 variant="standard"
                 className="cardDrawerTextField"
-                inputProps={{
-                  disableUnderline: true,
-                }}
               />
               <BasicButton
                 className="drawerButton"
@@ -360,6 +392,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           {editCardData?.comments?.map((comment) => {
             return !comment?.isDelete ? (
               <BasicTextField
+                key={comment?.id}
                 className="commentTextField"
                 value={comment?.commentText}
                 readOnly
@@ -390,12 +423,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           />
         </ButtonGroup>
       </Card>
-      {/*
-        <Card className="commentCard" elevation={0}>
-          
-        </Card>
-      ) : null} */}
-
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={openBar}

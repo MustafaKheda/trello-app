@@ -1,4 +1,4 @@
-import react, { useState, forwardRef, useEffect } from "react";
+import React, { useState, forwardRef, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -50,16 +50,28 @@ function Model({ close, open, currentUser }) {
         id: editStageData?.id,
         name: editStageData?.name || "",
         color: editStageData?.color || "#000",
-        openBar: false,
-        type: "",
         userId: editStageData?.userId,
         isDelete: editStageData?.isDelete || false,
         createdBy: editStageData?.createdBy,
         createdAt: editStageData?.createdAt,
+        modifiedAt: editStageData?.modifiedAt,
+        modifiedBy: editStageData?.modifiedBy,
       }));
     }
   }, [editStageData]);
-  const { id, color, name, openBar, type } = stage;
+
+  const {
+    id,
+    color,
+    name,
+    openBar,
+    type,
+    isDelete,
+    createdAt,
+    createdBy,
+    modifiedAt,
+    modifiedBy,
+  } = stage;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,11 +80,13 @@ function Model({ close, open, currentUser }) {
       [name]: value,
     }));
   };
+  // Close Dialog Box
   const handleClose = () => {
     dispatch(unSetEditStage());
     resetStage();
     close();
   };
+
   const handleCloseSnackbar = () => {
     setStage((prevStage) => ({
       ...prevStage,
@@ -81,19 +95,79 @@ function Model({ close, open, currentUser }) {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleFormSubmission = (event, isUpdate = false) => {
     event.preventDefault();
+
     if (name !== "") {
-      dispatch(handleSetStage(stage, username));
+      const actionFunction = isUpdate ? handleUpdateStage : handleSetStage;
+
+      dispatch(
+        actionFunction(
+          {
+            id,
+            color,
+            name,
+            isDelete,
+            createdAt,
+            createdBy,
+            modifiedAt,
+            modifiedBy,
+            userId: isUpdate ? stage.userId : userId,
+          },
+          username
+        )
+      );
+
       handleClose();
     } else {
-      setStage((prvStage) => ({
-        ...prvStage,
+      setStage((prevStage) => ({
+        ...prevStage,
         openBar: true,
         type: "emptyModel",
       }));
     }
   };
+
+  const handleSubmit = (event) => {
+    handleFormSubmission(event);
+  };
+
+  const handleUpdate = (event) => {
+    handleFormSubmission(event, true);
+  };
+  // const handleSubmit = (event) => {
+  //   event.preventDefault();
+  //   if (name !== "") {
+  //     dispatch(
+  //       handleSetStage(
+  //         {
+  //           id,
+  //           color,
+  //           name,
+  //           isDelete,
+  //           createdAt,
+  //           createdBy,
+  //           modifiedAt,
+  //           modifiedBy,
+  //           userId: stage.userId,
+  //         },
+  //         username
+  //       )
+  //     );
+  //     handleClose();
+  //   } else {
+  //     setStage((prvStage) => ({
+  //       ...prvStage,
+  //       openBar: true,
+  //       type: "emptyModel",
+  //     }));
+  //   }
+  // };
+  // const handleUpdate = (event) => {
+  //   event.preventDefault();
+  //   dispatch(handleUpdateStage(stage, username));
+  //   handleClose();
+  // };
 
   const resetStage = () => {
     setStage((prevStage) => ({
@@ -109,12 +183,6 @@ function Model({ close, open, currentUser }) {
       modifiedBy: "",
       modifiedAt: "",
     }));
-  };
-
-  const handleUpdate = (event) => {
-    event.preventDefault();
-    dispatch(handleUpdateStage(stage, username));
-    handleClose();
   };
 
   useEffect(() => {
@@ -151,7 +219,6 @@ function Model({ close, open, currentUser }) {
             fullWidth
             name="name"
             label="Title"
-            placeholder="Title"
             onChange={handleChange}
           />
           <SwatchesPicker color={color} onChange={setStage} />

@@ -115,7 +115,6 @@ function Login() {
           }));
         }
       } else {
-        console.log("Number");
         if (loginEmail.trim().length < 10) {
           return setAuth((prvAuth) => ({
             ...prvAuth,
@@ -164,6 +163,7 @@ function Login() {
           open: true,
           type: "login",
         }));
+        resetLogin();
       } else {
         // Invalid credentials for login
         setAuth((prvAuth) => ({
@@ -247,13 +247,10 @@ function Login() {
         dispatch(setUser({ id, username, email, mobileNumber, password }));
         setAuth((prvAuth) => ({
           ...prvAuth,
-          password: "",
-          username: "",
-          email: "",
-          mobileNumber: "",
           open: true,
           type: "signup",
         }));
+        resetLogin();
       }
     } else {
       // Empty Form Msg
@@ -264,10 +261,22 @@ function Login() {
       }));
     }
   };
-
+  const resetLogin = () => {
+    setAuth((prvAuth) => ({
+      ...prvAuth,
+      id: shortUUID,
+      password: "",
+      username: "",
+      email: "",
+      mobileNumber: "",
+      loginEmail: "",
+      loginPassword: "",
+    }));
+  };
   // Function to toggle between login and signup views
   const toggleView = () => {
     setAuth((prvAuth) => ({ ...prvAuth, show: !show }));
+    resetLogin();
   };
 
   // Function to handle input change

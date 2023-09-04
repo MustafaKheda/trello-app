@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import Card from "@mui/material/Card";
-import { styled, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import "../../assest/Css/Trello.scss";
 import Header from "../Header";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import EditIcon from "@mui/icons-material/Edit";
+
 import {
   editStage,
   handleChangeCard,
@@ -21,7 +21,6 @@ import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import IconButton from "@mui/material/IconButton";
-import Grid from "@mui/material/Grid";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogContent from "@mui/material/DialogContent";
@@ -91,31 +90,34 @@ function Trello() {
     }));
   };
   const handleDragDrop = (result) => {
-    const { source, destination, type, draggableId } = result;
+    const { source, destination, type } = result;
     if (!destination) return;
     if (
       source.droppableId === destination.droppableId &&
       source.index === destination.index
-    )
+    ) {
       return;
-
+    }
     if (type === "group") {
       // Handle Stage drag-and-drop
-      const reorderedStores = [...stages];
+      const reorderedStage = [...stages];
       const sourceIndex = source.index;
       const destinationIndex = destination.index;
-      const [removedStore] = reorderedStores.splice(sourceIndex, 1);
-      reorderedStores.splice(destinationIndex, 0, removedStore);
+      const [removedStage] = reorderedStage.splice(sourceIndex, 1);
+      reorderedStage.splice(destinationIndex, 0, removedStage);
 
-      return dispatch(handleChangeStage(reorderedStores));
+      return dispatch(handleChangeStage(reorderedStage));
     }
 
     if (type === "card") {
       // Handle card drag-and-drop
       const newCards = [...cards];
-      const [draggedCard] = newCards.splice(source.index, 1);
+      const sourceIndex = source.index;
+      const destinationIndex = destination.index;
+      const [draggedCard] = newCards.splice(sourceIndex, 1);
       draggedCard.stageId = destination.droppableId;
-      newCards.splice(destination.index, 0, draggedCard);
+      newCards.splice(destinationIndex, 0, draggedCard);
+
       return dispatch(handleChangeCard(newCards));
     }
   };
@@ -185,18 +187,6 @@ function Trello() {
           >
             <MoreHoriz />
           </IconButton>
-          <Menu
-            id={`basic-menu`}
-            anchorEl={anchorEl}
-            open={openMenu}
-            onClose={handleCloseMenu}
-            MenuListProps={{
-              "aria-labelledby": "basic-button",
-            }}
-          >
-            <MenuItem onClick={() => handleEditStage(tempStage)}>Edit</MenuItem>
-            <MenuItem onClick={handelOpenDeleteDailogBox}>Delete</MenuItem>
-          </Menu>
         </div>
         <Card elevation={0} className="trelloCard size">
           <StageList
@@ -290,6 +280,18 @@ function Trello() {
           />
         </DialogActions>
       </Dialog>
+      <Menu
+        id={`basic-menu`}
+        anchorEl={anchorEl}
+        open={openMenu}
+        onClose={handleCloseMenu}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
+        }}
+      >
+        <MenuItem onClick={() => handleEditStage(tempStage)}>Edit</MenuItem>
+        <MenuItem onClick={handelOpenDeleteDailogBox}>Delete</MenuItem>
+      </Menu>
     </>
   ) : null;
 }

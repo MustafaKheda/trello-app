@@ -29,11 +29,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { monthNames } from "../../Common/Constant";
 import { handleDeleteCard, handleEditCard } from "../../Store/Action";
 import BasicButton from "../../Common/BasicButton";
-import { Chip } from "@mui/material";
-function StageList(props) {
+
+function StageList({ id, openDrawerById }) {
   const dispatch = useDispatch();
   const cards = useSelector((store) => store.trelloStage.card);
-  const { id, openDrawerById } = props;
   const [open, setOpen] = useState({
     tempData: null,
     anchorEl: null,
@@ -52,9 +51,9 @@ function StageList(props) {
     }));
   };
 
-  const handleEditStage = (data) => {
-    openDrawerById();
-    dispatch(handleEditCard(data));
+  const handleEditStage = (data, type) => {
+    openDrawerById(id);
+    dispatch(handleEditCard(data, type));
     handleCloseMenu();
   };
 
@@ -73,6 +72,7 @@ function StageList(props) {
       tempData: null,
     }));
   };
+
   const handelOpenDailogBox = () => {
     handleCloseMenu();
     setOpen((prevOpen) => ({
@@ -80,21 +80,26 @@ function StageList(props) {
       openDailog: true,
     }));
   };
+
   const handleDelete = () => {
     handleCloseMenu();
     dispatch(handleDeleteCard(tempData.id));
     handleCloseDialogBox();
   };
-  function cardComponent(provided, card) {
+
+  function CardComponent(provided, card) {
     const { title, description, assignTo, assignBy, dueDate, comments, id } =
       card;
+
     const date = new Date(dueDate);
-    const dDate = date.getDate();
+    const dueDay = date.getDate();
     const dueMonth = date.getMonth();
     const stringDate = date.toString().slice(0, 25);
+
     const undeletedCommetsCount = comments.filter(
       (comment) => !comment.isDelete
     ).length;
+
     return (
       <Card
         {...provided.dragHandleProps}
@@ -114,25 +119,12 @@ function StageList(props) {
             </IconButton>
           }
         />
-        <Menu
-          id={`basic-menu-${card.id}`}
-          anchorEl={anchorEl}
-          open={openMenu}
-          onClose={handleCloseMenu}
-          MenuListProps={{
-            "aria-labelledby": "basic-button",
-          }}
-        >
-          <MenuItem key={"edit"} onClick={() => handleEditStage(tempData)}>
-            Edit
-          </MenuItem>
-          <MenuItem key={"delete"} onClick={handelOpenDailogBox}>
-            Delete
-          </MenuItem>
-        </Menu>
+
         <Divider />
         <CardContent className="innerCardContent">
-          <Typography variant="body2">{description}</Typography>
+          <Typography variant="body2" textAlign={"left"}>
+            {description}
+          </Typography>
         </CardContent>
 
         <CardActions className="innerCardActions">
@@ -160,7 +152,7 @@ function StageList(props) {
               <Tooltip title={stringDate}>
                 <Typography component={"div"} className="actionStackDueDate">
                   <AccessTimeIcon />
-                  {monthNames[dueMonth]} {dDate}
+                  {monthNames[dueMonth]} {dueDay}
                 </Typography>
               </Tooltip>
             ) : null}
@@ -168,7 +160,7 @@ function StageList(props) {
             <IconButton
               aria-label="cart"
               className="innerActionIconButton"
-              onClick={() => handleEditStage(card)}
+              onClick={() => handleEditStage(card, "commentMode")}
             >
               <Badge
                 className="innerActionBadge"
@@ -184,17 +176,17 @@ function StageList(props) {
       </Card>
     );
   }
+
   return (
     <>
       <CardActions disableSpacing className="trelloAction">
-        <Button
+        <BasicButton
           variant="contained"
           className="trelloButton"
           startIcon={<AddIcon />}
           onClick={() => openDrawerById(id)}
-        >
-          Add Card
-        </Button>
+          name="Add card"
+        />
       </CardActions>
       <Droppable droppableId={id} key={id} type="card">
         {(provided) => (
@@ -207,7 +199,7 @@ function StageList(props) {
               cards?.map((card, index) => {
                 return id === card.stageId && !card.isDelete ? (
                   <Draggable draggableId={card.id} key={card.id} index={index}>
-                    {(provided) => cardComponent(provided, card)}
+                    {(provided) => CardComponent(provided, card)}
                   </Draggable>
                 ) : null;
               })}
@@ -245,6 +237,20 @@ function StageList(props) {
           />
         </DialogActions>
       </Dialog>
+      <Menu
+        id={`basic-menu`}
+        anchorEl={anchorEl}
+        open={openMenu}
+        onClose={handleCloseMenu}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
+        }}
+      >
+        <MenuItem onClick={() => handleEditStage(tempData, "editMode")}>
+          Edit
+        </MenuItem>
+        <MenuItem onClick={handelOpenDailogBox}>Delete</MenuItem>
+      </Menu>
     </>
   );
 }
