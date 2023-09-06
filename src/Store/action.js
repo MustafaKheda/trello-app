@@ -1,11 +1,12 @@
 import { Actiontypes } from "./ActionTypes";
+
 export const setUser = (data) => {
-  console.log(data);
   return {
     type: Actiontypes.SET_USER,
     payload: data,
   };
 };
+
 export const setCurrentUser = (id, username) => {
   return {
     type: Actiontypes.SET_CURRENT_USER,
@@ -30,7 +31,6 @@ export const handleChangeStage = (obj) => {
 };
 
 export const handleSetStage = (obj, username) => {
-  console.log(obj, username);
   return {
     type: Actiontypes.SET_STAGE,
     payload: {
@@ -40,12 +40,6 @@ export const handleSetStage = (obj, username) => {
   };
 };
 
-export const handleSetCard = (obj) => {
-  return {
-    type: Actiontypes.SET_CARD,
-    payload: obj,
-  };
-};
 export const handleChangeCard = (obj) => {
   return {
     type: Actiontypes.CHANGE_CARD,
@@ -53,14 +47,12 @@ export const handleChangeCard = (obj) => {
   };
 };
 export const editStage = (obj) => {
-  console.log(obj);
   return {
     type: Actiontypes.EDIT_STAGE,
     payload: obj,
   };
 };
 export const handleUpdateStage = (obj, username) => {
-  console.log(obj);
   return {
     type: Actiontypes.UPDATE_STAGE,
     payload: {
@@ -70,7 +62,6 @@ export const handleUpdateStage = (obj, username) => {
   };
 };
 export const handleDeleteStage = (obj) => {
-  console.log(obj);
   return {
     type: Actiontypes.DELETE_STAGE,
     payload: obj,
@@ -81,23 +72,25 @@ export const unSetEditStage = () => {
     type: Actiontypes.UNSET_EDIT_STAGE,
   };
 };
-
+export const handleSetCard = (obj) => {
+  return {
+    type: Actiontypes.SET_CARD,
+    payload: obj,
+  };
+};
 export const handleDeleteCard = (id) => {
-  console.log(id);
   return {
     type: Actiontypes.DELETE_CARD,
     payload: id,
   };
 };
-export const handleEditCard = (obj) => {
-  console.log(obj);
+export const handleEditCard = (obj, type) => {
   return {
     type: Actiontypes.EDIT_CARD,
-    payload: obj,
+    payload: { obj, type },
   };
 };
 export const handleUpdateCard = (obj, username) => {
-  console.log(obj, username);
   return {
     type: Actiontypes.UPDATE_CARD,
     payload: {
@@ -111,10 +104,38 @@ export const handleUnsetEditCard = () => {
     type: Actiontypes.UNSET_EDIT_CARD,
   };
 };
-export const handleUpdateComment = (obj) => {
-  console.log(obj);
+export const handleUpdateComment = (obj, type) => {
   return {
     type: Actiontypes.UPDATE_COMMENT,
     payload: obj,
+  };
+};
+
+export const deleteCard = (id) => {
+  return {
+    type: Actiontypes.LIST_DELETE_CARD,
+    payload: id,
+  };
+};
+export const deleteStage = (id) => {
+  return {
+    type: Actiontypes.LIST_DELETE_STAGE,
+    payload: id,
+  };
+};
+export const deleteUser = (id) => {
+  return {
+    type: Actiontypes.LIST_DELETE_USER,
+    payload: id,
+  };
+};
+
+export const deleteComment = (id, cardId) => {
+  return {
+    type: Actiontypes.DELETE_COMMENT,
+    payload: {
+      id,
+      cardId,
+    },
   };
 };

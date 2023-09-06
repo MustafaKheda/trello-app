@@ -11,10 +11,11 @@ import Card from "@mui/material/Card";
 import MenuItem from "@mui/material/MenuItem";
 import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import DeleteIcon from "@mui/icons-material/Close";
 import uuid from "react-uuid";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  deleteComment,
   handleSetCard,
   handleUnsetEditCard,
   handleUpdateCard,
@@ -25,16 +26,19 @@ import BasicTextField from "../../Common/BasicTextField";
 import { messageMap } from "../../Common/Constant";
 
 function CardDrawer({ open, close, currentUser, stageId }) {
-  const currentDate = new Date();
-  const users = useSelector((store) => store?.userStore.users);
-  const editCardData = useSelector((store) => store?.trelloStage?.editCardData);
   const dispatch = useDispatch();
   const theme = useTheme();
+  const users = useSelector((store) => store?.userStore.users);
+  const editCardData = useSelector((store) => store?.trelloStage?.editCardData);
+  let isCommentMode = false;
+  const isEditMode = editCardData?.type === "editMode";
+  isCommentMode = editCardData?.type === "commentMode";
+
   const { id: userId, username } = currentUser;
   const [card, setCard] = useState({
     id: uuid().slice(0, 18),
     userId,
-    stageId,
+    stageId: "",
     assignBy: username,
     assignTo: "",
     title: "",
@@ -45,6 +49,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       userId,
       username,
       commentText: "",
+      isDelete: false,
     },
     comments: [],
     type: "",
@@ -55,6 +60,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     modifiedBy: "",
     modifiedAt: "",
   });
+
   const {
     title,
     description,
@@ -72,8 +78,11 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     comments,
     comment,
   } = card;
+
   useEffect(() => {
+    console.log(editCardData, card);
     if (editCardData !== null) {
+      console.log(editCardData, card);
       setCard((prv) => ({
         ...prv,
         id: editCardData?.id,
@@ -84,7 +93,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         title: editCardData?.title,
         description: editCardData?.description,
         dueDate: editCardData?.dueDate,
-        comments: editCardData?.comments,
+        comments: [...editCardData?.comments],
         isDelete: editCardData?.isDelete,
         createdBy: editCardData?.createdBy || "",
         createdAt: new Date(editCardData?.createdAt) || "",
@@ -92,7 +101,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         modifiedAt: editCardData?.modifiedAt || "",
       }));
     }
-  }, [editCardData]);
+  }, [editCardData, editCardData?.comments]);
+
   const handleCloseSnackbar = () => {
     setCard({
       ...card,
@@ -100,9 +110,10 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       type: "",
     });
   };
-
+  // Reset to initial state
   const resetCard = () => {
-    setCard({
+    setCard((prevCard) => ({
+      ...prevCard,
       id: uuid().slice(0, 18),
       userId,
       stageId,
@@ -115,6 +126,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         userId,
         username,
         commentText: "",
+        isDelete: false,
       },
       comments: [],
       type: "",
@@ -124,54 +136,103 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       createdAt: "",
       modifiedBy: "",
       modifiedAt: "",
-    });
+    }));
   };
+  // To close drawer
   const handleClose = () => {
     dispatch(handleUnsetEditCard());
     resetCard();
     close();
   };
+
   const handleChange = (e) => {
-    setCard((prvCard) => ({
-      ...prvCard,
+    setCard((prevCard) => ({
+      ...prevCard,
       [e.target.name]: e.target.value,
     }));
   };
+  //Set comment to state
   const handleComment = (e) => {
-    setCard((prvCard) => ({
-      ...prvCard,
+    setCard((prevCard) => ({
+      ...prevCard,
       comment: {
         ...comment,
         commentText: e.target.value,
       },
     }));
   };
-  const handleSubmit = (e) => {
-    if (
-      title.trim() !== "" &&
-      assignTo !== "" &&
-      description !== "" &&
-      dueDate !== ""
-    ) {
-      dispatch(handleSetCard(card));
-      handleClose();
-    } else {
-      setCard((prevStage) => ({
-        ...prevStage,
-        openBar: true,
-        type: "emptyCardForm",
-      }));
+
+  // Check due date
+  const handleCheckDueDate = () => {
+    const enteredDate = new Date(dueDate);
+    let currentDate = new Date();
+    const editDueDate = new Date(editCardData?.dueDate);
+    //to change atleast due date
+    if (isEditMode && currentDate > editDueDate) {
+      currentDate = editDueDate;
     }
-  };
-  const handleUpdate = (e) => {
-    dispatch(handleUpdateCard(card, username));
-    handleClose();
+    return (
+      Date.parse(enteredDate.toString().slice(0, 16)) >=
+      Date.parse(currentDate.toString().slice(0, 16))
+    );
   };
 
+  const handleFormSubmit = (isUpdate = false) => {
+    console.log(card);
+    if (title.trim() !== "" && description !== "") {
+      if (handleCheckDueDate()) {
+        // select action function
+        const actionFunction = isUpdate ? handleUpdateCard : handleSetCard;
+
+        dispatch(
+          actionFunction(
+            {
+              assignTo,
+              assignBy,
+              comments,
+              createdAt,
+              createdBy,
+              description,
+              dueDate,
+              id,
+              isDelete,
+              modifiedAt,
+              modifiedBy,
+              stageId: card.stageId || stageId,
+              title,
+              userId,
+            },
+            username
+          )
+        );
+        handleClose();
+      } else {
+        handleAlertMessage("invalidDueDate");
+      }
+    } else {
+      handleAlertMessage("emptyCardForm");
+    }
+  };
+
+  const handleAlertMessage = (message) => {
+    setCard((prevCard) => ({
+      ...prevCard,
+      openBar: true,
+      type: message,
+    }));
+  };
+  const handleSubmit = (e) => {
+    handleFormSubmit();
+  };
+
+  const handleUpdate = (e) => {
+    handleFormSubmit(true);
+  };
+  // To bind user and stage id
   useEffect(() => {
-    if (editCardData === null) {
-      setCard((prevStage) => ({
-        ...prevStage,
+    if (!isEditMode && !isCommentMode) {
+      setCard((prevCard) => ({
+        ...prevCard,
         assignBy: username,
         userId,
         stageId,
@@ -180,49 +241,42 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           userId,
           username,
           commentText: "",
+          isDelete: false,
         },
       }));
     }
-    if (editCardData !== null) {
-      setCard((prevStage) => ({
-        ...prevStage,
+    if (isEditMode || isCommentMode) {
+      setCard((prevCard) => ({
+        ...prevCard,
         comment: {
           id: uuid().slice(0, 18),
           userId,
           username,
           commentText: "",
+          isDelete: false,
         },
       }));
     }
   }, [stageId, userId, editCardData]);
 
   const handleUpdateComments = () => {
-    if (comment !== "") {
+    if (comment.commentText !== "") {
       dispatch(handleUpdateComment({ id, comment }));
-      setCard((prvCard) => ({
-        ...prvCard,
+      setCard((prevCard) => ({
+        ...prevCard,
         comment: {
           id: uuid().slice(0, 18),
           userId,
           username,
           commentText: "",
+          isDelete: false,
         },
       }));
     } else {
-      setCard((prevStage) => ({
-        ...prevStage,
-        openBar: true,
-        type: "emptyComment",
-      }));
+      handleAlertMessage("emptyComment");
     }
   };
 
-  const handleCancel = () => {
-    setCard((prvCard) => ({
-      ...prvCard,
-      comment: "",
-    }));
-  };
   return (
     <Drawer
       key={stageId}
@@ -243,6 +297,9 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       <Divider />
       <Card className="drawerCard" elevation={0}>
         <BasicTextField
+          readOnly={isCommentMode}
+          id="title"
+          key="title"
           color="secondary"
           className="cardDrawerTextField"
           value={title}
@@ -250,11 +307,11 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           label="Title"
           onChange={handleChange}
           variant="standard"
-          InputProps={{
-            disableUnderline: true,
-          }}
         />
         <BasicTextField
+          readOnly={isCommentMode}
+          id="title"
+          key="description"
           color="secondary"
           className="cardDrawerTextField"
           value={description}
@@ -262,11 +319,13 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           label="Description"
           onChange={handleChange}
           variant="standard"
-          InputProps={{
-            disableUnderline: true,
-          }}
+          multiline
+          minRows={2}
         />
         <BasicTextField
+          readOnly={isCommentMode}
+          id="dueDate"
+          key="dueDate"
           color="secondary"
           className="cardDrawerTextField"
           value={dueDate}
@@ -276,35 +335,81 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           variant="standard"
           inputProps={{
             min: new Date().toISOString().slice(0, 16),
-            // disableUnderline: true,
           }}
           InputLabelProps={{
             shrink: true,
           }}
           onChange={handleChange}
         />
-        <TextField
-          color="secondary"
-          className="cardDrawerTextField"
-          select
-          name="assignTo"
-          label="Assign To"
-          value={assignTo}
-          onChange={handleChange}
-          variant="standard"
-          inputProps={{
-            disableUnderline: true,
-          }}
-        >
-          {users &&
-            users.map((user) =>
-              userId !== user.id ? (
-                <MenuItem key={user.id} value={user.username}>
-                  {user.username}
-                </MenuItem>
-              ) : null
-            )}
-        </TextField>
+        {users.length > 1 ? (
+          <TextField
+            readOnly={isCommentMode}
+            id="assignTo"
+            key="assignTo"
+            color="secondary"
+            className="cardDrawerTextField"
+            select
+            name="assignTo"
+            label="Assign To"
+            value={assignTo}
+            onChange={handleChange}
+            variant="standard"
+          >
+            {users &&
+              users.map((user) =>
+                userId !== user.id ? (
+                  <MenuItem key={user.id} value={user.username}>
+                    {user.username}
+                  </MenuItem>
+                ) : null
+              )}
+          </TextField>
+        ) : null}
+
+        {editCardData ? (
+          <>
+            <div className="commentTextFieldBox">
+              <BasicTextField
+                readOnly={isCommentMode}
+                id="comment"
+                key="comment"
+                label="Comment"
+                value={comment.commentText}
+                name="comment"
+                onChange={handleComment}
+                variant="standard"
+                className="cardDrawerTextField"
+              />
+              <BasicButton
+                className="drawerButton"
+                onClick={handleUpdateComments}
+                name="Save"
+              />
+            </div>
+          </>
+        ) : null}
+        <div className="commentSection">
+          {editCardData?.comments?.map((comment) => {
+            return !comment?.isDelete ? (
+              <BasicTextField
+                key={comment?.id}
+                className="commentTextField"
+                value={comment?.commentText}
+                readOnly
+                InputProps={{
+                  endAdornment: (
+                    <DeleteIcon
+                      onClick={() =>
+                        dispatch(deleteComment(comment.id, editCardData.id))
+                      }
+                      className="commentDeleteIcon"
+                    />
+                  ),
+                }}
+              />
+            ) : null;
+          })}
+        </div>
         <ButtonGroup className="drawerButtonGroup">
           <BasicButton
             onClick={editCardData ? handleUpdate : handleSubmit}
@@ -314,50 +419,10 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           <BasicButton
             className="drawerButton"
             onClick={handleClose}
-            name={"Close"}
+            name={"cancel"}
           />
         </ButtonGroup>
       </Card>
-      {editCardData ? (
-        <Card className="commentCard" elevation={0}>
-          <Typography variant="h6" className="commentHeading" fontWeight={600}>
-            Comment Section
-          </Typography>
-          <BasicTextField
-            value={comment.commentText}
-            name="comment"
-            onChange={handleComment}
-            variant="standard"
-            className="commentTextField"
-          />
-          <ButtonGroup className="commentButtonGroup">
-            <BasicButton
-              className="drawerButton"
-              onClick={handleUpdateComments}
-              name="Save"
-            />
-            <BasicButton
-              className="drawerButton"
-              onClick={comment ? handleCancel : handleClose}
-              name={comment ? "Cancle" : "Close"}
-            />
-          </ButtonGroup>
-
-          <div className="commentSection">
-            {editCardData?.comments?.map((comment) => {
-              console.log(comment.commentText);
-              return (
-                <BasicTextField
-                  className="commentTextField"
-                  value={comment.commentText || comment}
-                  readonly
-                />
-              );
-            })}
-          </div>
-        </Card>
-      ) : null}
-
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={openBar}

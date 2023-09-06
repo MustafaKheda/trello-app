@@ -10,6 +10,12 @@ export const messageMap = {
   userNotFound: "User not found. Please sign up.",
   emptyCardForm: "Please fill the form, to create the card",
   emptyModel: "Please enter the title of the Stage",
+  emptyComment: "Please enter the comment",
+  invalidDueDate:
+    "Please choose a due date and time that is today or later. Thank you.",
+  invaildEmail: "Invaild Email",
+  invaildPassword:
+    "password should contain atleast one number,one letter and one special character",
 };
 export const DATA = [
   {
@@ -47,13 +53,36 @@ export const DATA = [
   },
 ];
 export const presetColors = [
-  "#cd9323",
-  "#1a53d8",
-  "#9a2151",
-  "#0d6416",
-  "#8d2808",
-  "#ffb20a",
-  "#77a4ff",
+  "#8E44AD", // Deep Purple
+  // "#C39BD3", // Lavender
+  "#7FB3D5", // Light Blue
+  "#52BE80", // Green
+  // "#D5DBDB", // Gray
+  "#F5B041", // Orange
+  "#F39C12", // Yellow
+  "#34495E", // Dark Blue
+  "#E74C3C", // Coral
+  "#1E8449", // Dark Green
+  "#FF6B6B", // Rose Pink
+  "#9B59B6", // Lavender Purple
+  "#A3D9A5", // Mint Green
+  "#3498DB", // Sky Blue
+  "#FF5733", // Sunset Orange
+  "#228B22", // Forest Green
+  "#1ABC9C", // Turquoise
+  "#FF6F61", // Coral
+  "#FFD700", // Lemon Yellow
+  "#C8A2C8", // Lilac
+  "#FFCC99", // Peach
+  "#4169E1", // Royal Blue
+  "#0A74DA", // Sapphire Blue
+  "#FFC0CB", // Pastel Pink
+  "#008080", // Teal
+  "#DAA520", // Goldenrod
+  "#8B4513", // Chocolate Brown
+  "#708090", // Slate Gray
+  "#DC143C", // Crimson
+  "#00CED1", // Turquoise Blue
 ];
 export const monthNames = [
   "Jan",

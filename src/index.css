@@ -53,3 +53,12 @@
   cursor: pointer;
   outline: none;
 }
+.listItem {
+  margin: 20px;
+  padding: 10px;
+  height: fit-content;
+}
+.list {
+  display: flex;
+  gap: 10px;
+}

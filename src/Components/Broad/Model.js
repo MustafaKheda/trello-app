@@ -1,4 +1,4 @@
-import react, { useState, forwardRef, useEffect } from "react";
+import React, { useState, forwardRef, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -15,25 +15,26 @@ import {
 } from "../../Store/Action";
 import { SwatchesPicker } from "./SwatchesPicker";
 import { messageMap } from "../../Common/Constant";
+import BasicTextField from "../../Common/BasicTextField";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 function Model({ close, open, currentUser }) {
-  const { id: userId, username } = currentUser;
+  const dispatch = useDispatch();
   const editStageData = useSelector(
     (store) => store?.trelloStage?.editStageData
   );
 
-  const dispatch = useDispatch();
+  const { id: userId, username } = currentUser;
 
   const [stage, setStage] = useState({
     id: uuid().slice(0, 18),
     userId,
     name: "",
     color: "#000",
-    isDeleted: false,
+    isDelete: false,
     openBar: false,
     type: "",
     createdBy: "",
@@ -44,78 +45,146 @@ function Model({ close, open, currentUser }) {
 
   useEffect(() => {
     if (editStageData !== null) {
-      setStage((prv) => ({
-        ...prv,
-        id: editStageData?.id || uuid().slice(0, 18),
+      setStage((prevStage) => ({
+        ...prevStage,
+        id: editStageData?.id,
         name: editStageData?.name || "",
         color: editStageData?.color || "#000",
-        openBar: false,
-        type: "",
         userId: editStageData?.userId,
-        isDeleted: editStageData?.isDeleted || false,
+        isDelete: editStageData?.isDelete || false,
         createdBy: editStageData?.createdBy,
         createdAt: editStageData?.createdAt,
+        modifiedAt: editStageData?.modifiedAt,
+        modifiedBy: editStageData?.modifiedBy,
       }));
     }
   }, [editStageData]);
-  const { id, color, name, openBar, type, createdAt, modifiedAt } = stage;
+
+  const {
+    id,
+    color,
+    name,
+    openBar,
+    type,
+    isDelete,
+    createdAt,
+    createdBy,
+    modifiedAt,
+    modifiedBy,
+  } = stage;
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setStage((prevStage) => ({
       ...prevStage,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
   };
+  // Close Dialog Box
   const handleClose = () => {
     dispatch(unSetEditStage());
     resetStage();
     close();
   };
+
   const handleCloseSnackbar = () => {
-    setStage((prvstage) => ({
-      ...prvstage,
+    setStage((prevStage) => ({
+      ...prevStage,
       openBar: false,
       type: "",
     }));
   };
 
-  const handleSubmit = () => {
+  const handleFormSubmission = (event, isUpdate = false) => {
+    event.preventDefault();
+
     if (name !== "") {
-      // console.log(sta);
-      dispatch(handleSetStage(stage, username));
-      setStage((prevStage) => ({
-        ...prevStage,
-        id: uuid().slice(0, 18),
-      }));
+      const actionFunction = isUpdate ? handleUpdateStage : handleSetStage;
+
+      dispatch(
+        actionFunction(
+          {
+            id,
+            color,
+            name,
+            isDelete,
+            createdAt,
+            createdBy,
+            modifiedAt,
+            modifiedBy,
+            userId: isUpdate ? stage.userId : userId,
+          },
+          username
+        )
+      );
+
       handleClose();
     } else {
-      setStage((prvStage) => ({
-        ...prvStage,
+      setStage((prevStage) => ({
+        ...prevStage,
         openBar: true,
         type: "emptyModel",
       }));
     }
   };
+
+  const handleSubmit = (event) => {
+    handleFormSubmission(event);
+  };
+
+  const handleUpdate = (event) => {
+    handleFormSubmission(event, true);
+  };
+  // const handleSubmit = (event) => {
+  //   event.preventDefault();
+  //   if (name !== "") {
+  //     dispatch(
+  //       handleSetStage(
+  //         {
+  //           id,
+  //           color,
+  //           name,
+  //           isDelete,
+  //           createdAt,
+  //           createdBy,
+  //           modifiedAt,
+  //           modifiedBy,
+  //           userId: stage.userId,
+  //         },
+  //         username
+  //       )
+  //     );
+  //     handleClose();
+  //   } else {
+  //     setStage((prvStage) => ({
+  //       ...prvStage,
+  //       openBar: true,
+  //       type: "emptyModel",
+  //     }));
+  //   }
+  // };
+  // const handleUpdate = (event) => {
+  //   event.preventDefault();
+  //   dispatch(handleUpdateStage(stage, username));
+  //   handleClose();
+  // };
+
   const resetStage = () => {
-    setStage({
+    setStage((prevStage) => ({
+      ...prevStage,
       id: uuid().slice(0, 18),
-      userId: "",
       name: "",
       color: "#000",
-      isDeleted: false,
+      isDelete: false,
       openBar: false,
       type: "",
       createdBy: "",
       createdAt: "",
       modifiedBy: "",
       modifiedAt: "",
-    });
+    }));
   };
-  const handleUpdate = () => {
-    console.log(stage);
-    dispatch(handleUpdateStage(stage, username));
-    handleClose();
-  };
+
   useEffect(() => {
     if (editStageData === null) {
       setStage((prevStage) => ({
@@ -124,6 +193,9 @@ function Model({ close, open, currentUser }) {
       }));
     }
   }, [userId]);
+
+  const isEditMode = editStageData !== null;
+
   return (
     <>
       <Dialog
@@ -137,17 +209,16 @@ function Model({ close, open, currentUser }) {
       >
         <DialogTitle>
           <Typography fontWeight={"600"} textTransform={"uppercase"}>
-            Create Stage
+            {isEditMode ? "Edit Stage" : "Create Stage"}
           </Typography>
         </DialogTitle>
         <Divider />
         <DialogContent className="dialogBoxContent">
-          <TextField
+          <BasicTextField
             value={name}
             fullWidth
             name="name"
             label="Title"
-            placeholder="Title"
             onChange={handleChange}
           />
           <SwatchesPicker color={color} onChange={setStage} />
