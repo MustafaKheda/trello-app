@@ -9,15 +9,23 @@ $buttonBg: #f1f2f4;
 $buttonText: rgb(0, 0, 0);
 
 .trelloBody {
-  // background: url("../Image/BG5.jpg") no-repeat;
   background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
-  background-size: fill;
-  min-height: 100vh;
+  min-height: 97.6vh;
   max-height: 100vh;
   padding: 85px 50px 0;
   column-gap: 20px;
   min-width: 100vw;
   width: fit-content !important;
+}
+
+.carousel .thumb img {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.carousel .slide img {
+  // height: 800px; /* change this to whatever you want */
+  width: auto;
 }
 .commentDeleteIcon {
   cursor: pointer;
@@ -340,7 +348,7 @@ $buttonText: rgb(0, 0, 0);
 }
 
 ::-webkit-scrollbar-track {
-  background-color: transparent; /* Color of the track */
+  background-color: transparent !important; /* Color of the track */
   width: 120%;
 }
 

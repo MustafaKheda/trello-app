@@ -93,12 +93,26 @@ const stageReducer = (state = trelloState, action) => {
         editStageData: null,
       };
     case DELETE_STAGE: {
-      let indexValue = stages.findIndex((item) => item.id === action.payload);
-      const newStages = [...stages];
-      newStages[indexValue].isDelete = true;
+      const deleteStages = stages.map((stage) =>
+        stage.id === action.payload
+          ? {
+              ...stage,
+              isDelete: true,
+            }
+          : stage
+      );
+      const deleteStageCard = card.map((card) =>
+        card.stageId === action.payload
+          ? {
+              ...card,
+              isDelete: true,
+            }
+          : card
+      );
       return {
         ...state,
-        stages: [...newStages],
+        card: [...deleteStageCard],
+        stages: [...deleteStages],
       };
     }
     case UPDATE_STAGE:

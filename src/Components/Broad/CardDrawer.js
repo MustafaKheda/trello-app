@@ -80,9 +80,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   } = card;
 
   useEffect(() => {
-    console.log(editCardData, card);
     if (editCardData !== null) {
-      console.log(editCardData, card);
       setCard((prv) => ({
         ...prv,
         id: editCardData?.id,
@@ -110,6 +108,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       type: "",
     });
   };
+
   // Reset to initial state
   const resetCard = () => {
     setCard((prevCard) => ({
@@ -138,6 +137,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       modifiedAt: "",
     }));
   };
+
   // To close drawer
   const handleClose = () => {
     dispatch(handleUnsetEditCard());
@@ -151,6 +151,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       [e.target.name]: e.target.value,
     }));
   };
+
   //Set comment to state
   const handleComment = (e) => {
     setCard((prevCard) => ({
@@ -167,10 +168,12 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     const enteredDate = new Date(dueDate);
     let currentDate = new Date();
     const editDueDate = new Date(editCardData?.dueDate);
-    //to change atleast due date
+
+    //to change lowest due date
     if (isEditMode && currentDate > editDueDate) {
       currentDate = editDueDate;
     }
+
     return (
       Date.parse(enteredDate.toString().slice(0, 16)) >=
       Date.parse(currentDate.toString().slice(0, 16))
@@ -178,12 +181,10 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   };
 
   const handleFormSubmit = (isUpdate = false) => {
-    console.log(card);
     if (title.trim() !== "" && description !== "") {
       if (handleCheckDueDate()) {
         // select action function
         const actionFunction = isUpdate ? handleUpdateCard : handleSetCard;
-
         dispatch(
           actionFunction(
             {
@@ -221,6 +222,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       type: message,
     }));
   };
+
   const handleSubmit = (e) => {
     handleFormSubmit();
   };
@@ -297,7 +299,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       <Divider />
       <Card className="drawerCard" elevation={0}>
         <BasicTextField
-          readOnly={isCommentMode}
           id="title"
           key="title"
           color="secondary"
@@ -309,7 +310,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           variant="standard"
         />
         <BasicTextField
-          readOnly={isCommentMode}
           id="title"
           key="description"
           color="secondary"
@@ -320,10 +320,9 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           onChange={handleChange}
           variant="standard"
           multiline
-          minRows={2}
+          minRows={1}
         />
         <BasicTextField
-          readOnly={isCommentMode}
           id="dueDate"
           key="dueDate"
           color="secondary"
@@ -343,7 +342,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         />
         {users.length > 1 ? (
           <TextField
-            readOnly={isCommentMode}
             id="assignTo"
             key="assignTo"
             color="secondary"
@@ -370,7 +368,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           <>
             <div className="commentTextFieldBox">
               <BasicTextField
-                readOnly={isCommentMode}
                 id="comment"
                 key="comment"
                 label="Comment"

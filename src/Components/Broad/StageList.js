@@ -41,7 +41,7 @@ function StageList({ id, openDrawerById }) {
   });
   const { tempData, anchorEl, openDailog, openMenu } = open;
 
-  const handleClick = (event, cardId) => {
+  const handleOpenMenu = (event, cardId) => {
     const temp = cards.find((card) => card.id === cardId);
     setOpen((prevOpen) => ({
       ...prevOpen,
@@ -87,7 +87,7 @@ function StageList({ id, openDrawerById }) {
     handleCloseDialogBox();
   };
 
-  function CardComponent(provided, card) {
+  const cardComponent = (provided, card, index) => {
     const { title, description, assignTo, assignBy, dueDate, comments, id } =
       card;
 
@@ -112,8 +112,8 @@ function StageList({ id, openDrawerById }) {
           className="innerCardTitle"
           action={
             <IconButton
-              id={`setting`}
-              onClick={(event) => handleClick(event, id)}
+              id="setting"
+              onClick={(event) => handleOpenMenu(event, id)}
             >
               <MoreHoriz className="cardHeaderIconButton" />
             </IconButton>
@@ -123,7 +123,7 @@ function StageList({ id, openDrawerById }) {
         <Divider />
         <CardContent className="innerCardContent">
           <Typography variant="body2" textAlign={"left"}>
-            {description}
+            {description} ({index})
           </Typography>
         </CardContent>
 
@@ -175,7 +175,7 @@ function StageList({ id, openDrawerById }) {
         </CardActions>
       </Card>
     );
-  }
+  };
 
   return (
     <>
@@ -199,7 +199,7 @@ function StageList({ id, openDrawerById }) {
               cards?.map((card, index) => {
                 return id === card.stageId && !card.isDelete ? (
                   <Draggable draggableId={card.id} key={card.id} index={index}>
-                    {(provided) => CardComponent(provided, card)}
+                    {(provided) => cardComponent(provided, card, index)}
                   </Draggable>
                 ) : null;
               })}
@@ -237,6 +237,7 @@ function StageList({ id, openDrawerById }) {
           />
         </DialogActions>
       </Dialog>
+
       <Menu
         id={`basic-menu`}
         anchorEl={anchorEl}

@@ -5,7 +5,9 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
-import { Divider, Snackbar, TextField, Typography } from "@mui/material";
+import Divider from "@mui/material/Divider";
+import Snackbar from "@mui/material/Snackbar";
+import Typography from "@mui/material/Typography";
 import uuid from "react-uuid";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -135,39 +137,6 @@ function Model({ close, open, currentUser }) {
   const handleUpdate = (event) => {
     handleFormSubmission(event, true);
   };
-  // const handleSubmit = (event) => {
-  //   event.preventDefault();
-  //   if (name !== "") {
-  //     dispatch(
-  //       handleSetStage(
-  //         {
-  //           id,
-  //           color,
-  //           name,
-  //           isDelete,
-  //           createdAt,
-  //           createdBy,
-  //           modifiedAt,
-  //           modifiedBy,
-  //           userId: stage.userId,
-  //         },
-  //         username
-  //       )
-  //     );
-  //     handleClose();
-  //   } else {
-  //     setStage((prvStage) => ({
-  //       ...prvStage,
-  //       openBar: true,
-  //       type: "emptyModel",
-  //     }));
-  //   }
-  // };
-  // const handleUpdate = (event) => {
-  //   event.preventDefault();
-  //   dispatch(handleUpdateStage(stage, username));
-  //   handleClose();
-  // };
 
   const resetStage = () => {
     setStage((prevStage) => ({

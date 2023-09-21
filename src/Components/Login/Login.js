@@ -1,28 +1,3 @@
-// import Box from "@mui/material/Box";
-// import Card from "@mui/material/Card";
-// import Snackbar from "@mui/material/Snackbar";
-// import Typography from "@mui/material/Typography";
-// import InputAdornment from "@mui/material/InputAdornment";
-// import Person2Icon from "@mui/icons-material/Person2";
-// import KeyIcon from "@mui/icons-material/Key";
-// import DialpadIcon from "@mui/icons-material/Dialpad";
-// import BadgeIcon from "@mui/icons-material/Badge";
-// import FormControl from "@mui/material/FormControl";
-// import React, { useEffect, useId, useState } from "react";
-// import "react-responsive-carousel/lib/styles/carousel.min.css";
-// import { Carousel } from "react-responsive-carousel";
-// import { useNavigate } from "react-router";
-// import { useDispatch, useSelector } from "react-redux";
-// import BasicTextField from "../../Common/BasicTextField";
-// import { messageMap } from "../../Common/Constant";
-// import uuid from "react-uuid";
-// import { setCurrentUser, setUser } from "../../Store/Action";
-// import "../../assest/Css/Login.scss";
-// import img3 from "../../assest/Image/rafay-ansari-qKoEIBZ4lLM-unsplash.jpg";
-// import img2 from "../../assest/Image/reinhart-julian-d4ZYpoGjUXo-unsplash.jpg";
-// import img1 from "../../assest/Image/larissa-cardoso-zHUHeNT_UtE-unsplash.jpg";
-// import BasicButton from "../../Common/BasicButton";
-
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -46,7 +21,7 @@ import uuid from "react-uuid";
 
 import img1 from "../../assest/Image/larissa-cardoso-zHUHeNT_UtE-unsplash.jpg";
 import img2 from "../../assest/Image/reinhart-julian-d4ZYpoGjUXo-unsplash.jpg";
-import img3 from "../../assest/Image/rafay-ansari-qKoEIBZ4lLM-unsplash.jpg";
+import img7 from "../../assest/Image/ryan-ancill-aJYO8JmVodY-unsplash.jpg";
 
 import "../../assest/Css/Login.scss";
 function Login() {
@@ -87,7 +62,9 @@ function Login() {
   // Effect to handle navigation based on 'type'
   useEffect(() => {
     if (type === "login") {
-      navigate("/Trello");
+      setTimeout(() => {
+        navigate("/Trello");
+      }, 600);
     }
     if (type === "signup") {
       toggleView();
@@ -282,8 +259,35 @@ function Login() {
   // Function to handle input change
   const handleChange = (e) => {
     e.preventDefault();
-    setAuth({ ...auth, [e.target.name]: e.target.value.trim() });
+    setAuth({ ...auth, [e.target.name]: e.target.value });
   };
+  // function CommonCarousel() {
+  //   return (
+  //     <Carousel
+  //       autoPlay={true}
+  //       interval={5000}
+  //       autoFocus={true}
+  //       infiniteLoop={true}
+  //       showStatus={false}
+  //       showThumbs={false}
+  //       className="cardMedia"
+  //     >
+  //       <div>
+  //         <img src={img2} alt="Image 1" />
+  //         <p className="legend">Legend 1</p>
+  //       </div>
+  //       <div>
+  //         <img src={img1} alt="Image 2" />
+  //         <p className="legend">Legend 2</p>
+  //       </div>
+  //       <div>
+  //         <img src={img3} alt="Image 3" />
+  //         <p className="legend">Legend 3</p>
+  //       </div>
+  //     </Carousel>
+  //   );
+  // }
+
   return (
     <div className="container">
       <Card
@@ -346,16 +350,13 @@ function Login() {
               className={`cardMedia ${show ? "login" : "signup"}`}
             >
               <div>
+                <img src={img7} />
+              </div>
+              <div>
                 <img src={img2} />
-                <p className="legend">Legend 1</p>
               </div>
               <div>
                 <img src={img1} />
-                <p className="legend">Legend 2</p>
-              </div>
-              <div>
-                <img src={img3} />
-                <p className="legend">Legend 3</p>
               </div>
             </Carousel>
           </>
@@ -368,9 +369,10 @@ function Login() {
               <Typography className="cardHeading">Trello</Typography>
               <FormControl className="cardInputs">
                 <BasicTextField
+                  fullWidth
+                  type="text"
                   value={username}
                   name="username"
-                  fullWidth
                   placeholder="Username"
                   onChange={handleChange}
                   InputProps={{
@@ -456,16 +458,13 @@ function Login() {
               className={`cardMedia ${show ? "login" : "signup"}`}
             >
               <div>
+                <img src={img7} />
+              </div>
+              <div>
                 <img src={img2} />
-                <p className="legend">Legend 1</p>
               </div>
               <div>
                 <img src={img1} />
-                <p className="legend">Legend 2</p>
-              </div>
-              <div>
-                <img src={img3} />
-                <p className="legend">Legend 3</p>
               </div>
             </Carousel>
           </>

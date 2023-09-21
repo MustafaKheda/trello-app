@@ -1,18 +1,17 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import React, { useEffect } from "react";
+import React from "react";
+import Typography from "@mui/material/Typography";
+import TableRow from "@mui/material/TableRow";
+import TableHead from "@mui/material/TableHead";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import Table from "@mui/material/Table";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteCard, deleteStage, deleteUser } from "../../Store/Action";
 function List() {
   const currentUser = useSelector((store) => store?.userStore?.currentUser);
+  console.log(currentUser);
   const cards = useSelector((store) => store?.trelloStage?.card);
   const stages = useSelector((state) => state.trelloStage?.stages);
   const users = useSelector((store) => store?.userStore?.users);

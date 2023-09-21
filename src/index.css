@@ -7,6 +7,10 @@
   font-family: "Poppins", sans-serif !important;
 }
 
+body {
+  overflow-x: scroll;
+  /* overflow-y: hidden; */
+}
 .navBar {
   background-color: transparent !important;
   height: 60px;

@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import Card from "@mui/material/Card";
-import { useTheme } from "@mui/material/styles";
 import "../../assest/Css/Trello.scss";
 import Header from "../Header";
 import { useSelector } from "react-redux";
@@ -28,7 +27,6 @@ import Dialog from "@mui/material/Dialog";
 import BasicButton from "../../Common/BasicButton";
 import { useNavigate } from "react-router";
 function Trello() {
-  const theme = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -61,12 +59,28 @@ function Trello() {
       navigate("/");
     }
   }, [currentUser]);
-  const handleClickOpen = () => {
+
+  // useEffect(() => {
+  //   const scrollBarExists =
+  //     window.getComputedStyle(document.documentElement).scrollbarWidth !==
+  //     "none";
+  //   // Get the .trelloBody element
+  //   const trelloBody = document.querySelector("#trelloBody");
+  //   // Add or remove the 'scrollbar-exists' class based on scrollbar existence
+  //   if (scrollBarExists) {
+  //     trelloBody?.classList.add("scrollbar-exists");
+  //   } else {
+  //     trelloBody?.classList.remove("scrollbar-exists");
+  //   }
+  // }, [stages]);
+
+  const handleClickOpenModel = () => {
     setOpen((prevOpen) => ({
       ...prevOpen,
       openModel: true,
     }));
   };
+
   const handleClose = () => {
     setOpen((prevOpen) => ({
       ...prevOpen,
@@ -88,6 +102,7 @@ function Trello() {
       openDrawer: false,
     }));
   };
+
   const handleDragDrop = (result) => {
     const { source, destination, type } = result;
     if (!destination) return;
@@ -99,40 +114,55 @@ function Trello() {
     }
     if (type === "group") {
       // Handle Stage drag-and-drop
-      const reorderedStage = [...stages];
+      const newStages = [...stages];
       const sourceIndex = source.index;
       const destinationIndex = destination.index;
-      const [removedStage] = reorderedStage.splice(sourceIndex, 1);
-      reorderedStage.splice(destinationIndex, 0, removedStage);
-
-      return dispatch(handleChangeStage(reorderedStage));
+      const [removedStage] = newStages.splice(sourceIndex, 1);
+      newStages.splice(destinationIndex, 0, removedStage);
+      return dispatch(handleChangeStage(newStages));
     }
 
     if (type === "card") {
-      // Handle card drag-and-drop
       const newCards = [...cards];
       const sourceIndex = source.index;
       const destinationIndex = destination.index;
-      const [draggedCard] = newCards.splice(sourceIndex, 1);
-      draggedCard.stageId = destination.droppableId;
-      newCards.splice(destinationIndex, 0, draggedCard);
 
-      return dispatch(handleChangeCard(newCards));
+      // Remove the dragged card from its source position
+      const [draggedCard] = newCards.splice(sourceIndex, 1);
+
+      // Set the new stageId for the dragged card
+      draggedCard.stageId = destination.droppableId;
+
+      if (source.droppableId === destination.droppableId) {
+        newCards.splice(destinationIndex, 0, draggedCard);
+        return dispatch(handleChangeCard(newCards));
+      }
+
+      // Calculate the insertion index
+      let insertionIndex =
+        sourceIndex >= destinationIndex
+          ? destinationIndex
+          : destinationIndex - 1;
+
+      // Insert the dragged card at the calculated index
+      newCards.splice(insertionIndex, 0, draggedCard);
+      // Dispatch the updated card list
+      dispatch(handleChangeCard(newCards));
     }
   };
 
   const handleEditStage = (stage) => {
-    handleClickOpen();
+    handleClickOpenModel();
     dispatch(editStage(stage));
     handleCloseMenu();
   };
 
-  const handleClick = (event, stageId) => {
-    const temp = stages.find((stage) => stage.id === stageId);
+  const handleOpenMenu = (event, stageId) => {
+    const tempData = stages.find((stage) => stage.id === stageId);
     setOpen((prevOpen) => ({
       ...prevOpen,
       anchorEl: event.currentTarget,
-      tempStage: temp,
+      tempStage: tempData,
       openMenu: true,
     }));
   };
@@ -167,7 +197,7 @@ function Trello() {
     handleCloseDialogBox();
   };
 
-  function renderStage(provided, stages, index) {
+  const renderStage = (provided, stages, index) => {
     const cardCount = cards.filter(
       (card) => card?.stageId === stages?.id && !card.isDelete
     ).length;
@@ -184,12 +214,12 @@ function Trello() {
           style={{ backgroundColor: `${stages?.color}` }}
         >
           <Typography textTransform={"uppercase"} fontWeight={600}>
-            {stages.name} ({cardCount})
+            {stages.name} ({cardCount}) ({index})
           </Typography>
           <IconButton
             key={index}
             id={`setting-${stages?.id}`}
-            onClick={(event) => handleClick(event, stages.id)}
+            onClick={(event) => handleOpenMenu(event, stages.id)}
           >
             <MoreHoriz />
           </IconButton>
@@ -203,15 +233,15 @@ function Trello() {
         </Card>
       </div>
     );
-  }
+  };
   return Object.keys(currentUser).length > 0 ? (
     <>
-      <div className="trelloBody">
+      <div id="trelloBody" className="trelloBody">
         <Header />
         <BasicButton
           className="trelloStageButton"
           variant="outlined"
-          onClick={handleClickOpen}
+          onClick={handleClickOpenModel}
           name="Create Stage"
         />
 
@@ -295,7 +325,6 @@ function Trello() {
           "aria-labelledby": "basic-button",
         }}
       >
-        {console.log(anchorEl)}
         <MenuItem onClick={() => handleEditStage(tempStage)}>Edit</MenuItem>
         <MenuItem onClick={handelOpenDeleteDailogBox}>Delete</MenuItem>
       </Menu>
