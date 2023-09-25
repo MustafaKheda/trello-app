@@ -1,34 +1,21 @@
 import React, { useState } from "react";
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
 import AddIcon from "@mui/icons-material/Add";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import CommentIcon from "@mui/icons-material/ChatBubbleOutline";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import MoreHoriz from "@mui/icons-material/MoreHoriz";
-import "../../assest/Css/Trello.scss";
-import Tooltip from "@mui/material/Tooltip";
-import Stack from "@mui/material/Stack";
+import "../../assest/Css/TaskHub.scss";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import IconButton from "@mui/material/IconButton";
-import Divider from "@mui/material/Divider";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Dialog from "@mui/material/Dialog";
-import CardHeader from "@mui/material/CardHeader";
-import Badge from "@mui/material/Badge";
-import Avatar from "@mui/material/Avatar";
 import { useDispatch, useSelector } from "react-redux";
-import { monthNames } from "../../Common/Constant";
 import { handleDeleteCard, handleEditCard } from "../../Store/Action";
 import BasicButton from "../../Common/BasicButton";
+import CardComponent from "./CardComponent";
 
 function StageList({ id, openDrawerById }) {
   const dispatch = useDispatch();
@@ -87,98 +74,8 @@ function StageList({ id, openDrawerById }) {
     handleCloseDialogBox();
   };
 
-  const cardComponent = (provided, card, index) => {
-    const { title, description, assignTo, assignBy, dueDate, comments, id } =
-      card;
-
-    const date = new Date(dueDate);
-    const dueDay = date.getDate();
-    const dueMonth = date.getMonth();
-    const stringDate = date.toString().slice(0, 25);
-
-    const undeletedCommetsCount = comments.filter(
-      (comment) => !comment.isDelete
-    ).length;
-
-    return (
-      <Card
-        {...provided.dragHandleProps}
-        {...provided.draggableProps}
-        ref={provided.innerRef}
-        className="trelloInnerCard"
-      >
-        <CardHeader
-          title={title}
-          className="innerCardTitle"
-          action={
-            <IconButton
-              id="setting"
-              onClick={(event) => handleOpenMenu(event, id)}
-            >
-              <MoreHoriz className="cardHeaderIconButton" />
-            </IconButton>
-          }
-        />
-
-        <Divider />
-        <CardContent className="innerCardContent">
-          <Typography variant="body2" textAlign={"left"}>
-            {description} ({index})
-          </Typography>
-        </CardContent>
-
-        <CardActions className="innerCardActions">
-          <Stack direction={"row"} className="actionStack">
-            <Tooltip title={assignBy?.toUpperCase()}>
-              <Avatar className="innerCardAvatar">
-                {assignBy?.slice(0, 1)?.toUpperCase()}
-              </Avatar>
-            </Tooltip>
-
-            {assignTo ? (
-              <>
-                <ArrowForwardIosIcon />
-                <Tooltip title={assignTo?.toUpperCase()}>
-                  <Avatar className="innerCardAvatar">
-                    {assignTo?.slice(0, 1)?.toUpperCase()}
-                  </Avatar>
-                </Tooltip>
-              </>
-            ) : null}
-          </Stack>
-
-          <Stack className="actionIconStack">
-            {dueDate ? (
-              <Tooltip title={stringDate}>
-                <Typography component={"div"} className="actionStackDueDate">
-                  <AccessTimeIcon />
-                  {monthNames[dueMonth]} {dueDay}
-                </Typography>
-              </Tooltip>
-            ) : null}
-
-            <IconButton
-              aria-label="cart"
-              className="innerActionIconButton"
-              onClick={() => handleEditStage(card, "commentMode")}
-            >
-              <Badge
-                className="innerActionBadge"
-                badgeContent={undeletedCommetsCount}
-                color="secondary"
-                showZero
-              >
-                <CommentIcon />
-              </Badge>
-            </IconButton>
-          </Stack>
-        </CardActions>
-      </Card>
-    );
-  };
-
   return (
-    <>
+    <Card elevation={0} className="trelloCard size">
       <CardActions disableSpacing className="trelloAction">
         <BasicButton
           variant="contained"
@@ -199,7 +96,14 @@ function StageList({ id, openDrawerById }) {
               cards?.map((card, index) => {
                 return id === card.stageId && !card.isDelete ? (
                   <Draggable draggableId={card.id} key={card.id} index={index}>
-                    {(provided) => cardComponent(provided, card, index)}
+                    {(provided) => (
+                      <CardComponent
+                        provided={provided}
+                        card={card}
+                        handleOpenMenu={handleOpenMenu}
+                        handleEditStage={handleEditStage}
+                      />
+                    )}
                   </Draggable>
                 ) : null;
               })}
@@ -252,7 +156,7 @@ function StageList({ id, openDrawerById }) {
         </MenuItem>
         <MenuItem onClick={handelOpenDailogBox}>Delete</MenuItem>
       </Menu>
-    </>
+    </Card>
   );
 }
 

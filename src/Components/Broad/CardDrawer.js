@@ -4,7 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Drawer from "@mui/material/Drawer";
-import "../../assest/Css/Trello.scss";
+import "../../assest/Css/TaskHub.scss";
 import { useTheme } from "@emotion/react";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Card from "@mui/material/Card";
@@ -12,6 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
 import DeleteIcon from "@mui/icons-material/Close";
+// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import uuid from "react-uuid";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -169,15 +170,23 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     let currentDate = new Date();
     const editDueDate = new Date(editCardData?.dueDate);
 
-    //to change lowest due date
+    //to change least due date
     if (isEditMode && currentDate > editDueDate) {
       currentDate = editDueDate;
     }
-
-    return (
-      Date.parse(enteredDate.toString().slice(0, 16)) >=
+    if (
+      Date.parse(enteredDate.toString().slice(0, 16)) <
       Date.parse(currentDate.toString().slice(0, 16))
-    );
+    ) {
+      handleAlertMessage("invalidDueDate");
+      return false;
+    } else if (enteredDate < currentDate) {
+      handleAlertMessage("invalidTime");
+    } else {
+      return enteredDate >= currentDate;
+    }
+
+    // return true;
   };
 
   const handleFormSubmit = (isUpdate = false) => {
@@ -207,8 +216,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           )
         );
         handleClose();
-      } else {
-        handleAlertMessage("invalidDueDate");
       }
     } else {
       handleAlertMessage("emptyCardForm");
@@ -340,6 +347,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           }}
           onChange={handleChange}
         />
+        {console.log(new Date().toISOString().slice(0, 16))}
         {users.length > 1 ? (
           <TextField
             id="assignTo"

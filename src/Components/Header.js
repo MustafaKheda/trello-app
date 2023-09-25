@@ -1,4 +1,11 @@
-import { AppBar, Avatar, Container, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Avatar,
+  Container,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import React from "react";
 import "../assest/Css/Login.scss";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,14 +20,16 @@ export default function Header() {
   return (
     <AppBar position="fixed" className="navBar" elevation={0}>
       <Toolbar disableGutters className="navToolBar">
-        <Typography className="cardHeading">Trello</Typography>
+        <Typography className="cardHeading">TaskHub</Typography>
         <div>
           <BasicButton
             className="trelloStageButton"
             onClick={() => dispatch(unSetCurrentUser())}
             name="sign out"
           />
-          <Avatar className="headerAvatar">{letter}</Avatar>
+          <Tooltip title={user?.username}>
+            <Avatar className="headerAvatar">{letter}</Avatar>
+          </Tooltip>
         </div>
       </Toolbar>
     </AppBar>

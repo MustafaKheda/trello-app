@@ -25,8 +25,10 @@ const {
   LIST_DELETE_STAGE,
   LIST_DELETE_USER,
   DELETE_COMMENT,
+  FORGET_PASSWORD,
 } = Actiontypes;
 const userReducer = (state = initialState, action) => {
+  const { users, currentUser } = state;
   switch (action.type) {
     case SET_USER:
       return {
@@ -37,6 +39,19 @@ const userReducer = (state = initialState, action) => {
         },
         users: [...state.users, action.payload],
       };
+    case FORGET_PASSWORD: {
+      const newUser = users.map((user) =>
+        user?.email.toLowerCase() === action.payload.email.toLowerCase()
+          ? { ...user, password: action.payload.password }
+          : user
+      );
+      console.log(newUser);
+      return {
+        ...state,
+        users: [...newUser],
+      };
+    }
+
     case SET_CURRENT_USER:
       return {
         ...state,

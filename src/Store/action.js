@@ -139,3 +139,10 @@ export const deleteComment = (id, cardId) => {
     },
   };
 };
+export const handleForgetPasswordAction = (obj) => {
+  console.log(obj);
+  return {
+    type: Actiontypes.FORGET_PASSWORD,
+    payload: obj,
+  };
+};

@@ -8,8 +8,12 @@
 }
 
 body {
-  overflow-x: scroll;
   /* overflow-y: hidden; */
+}
+@supports (overflow-y: clip) {
+  body {
+    /* overflow-y: clip; */
+  }
 }
 .navBar {
   background-color: transparent !important;

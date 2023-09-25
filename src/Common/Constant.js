@@ -11,11 +11,17 @@ export const messageMap = {
   emptyCardForm: "Please fill the form, to create the card",
   emptyModel: "Please enter the title of the Stage",
   emptyComment: "Please enter the comment",
-  invalidDueDate:
-    "Please choose a due date and time that is today or later. Thank you.",
+  invalidDueDate: "Please choose a due date that is today or later. Thank you.",
   invaildEmail: "Invaild Email",
   invaildPassword:
     "password should contain atleast one number,one letter and one special character",
+  passNotMatch: "The Confirmation Password Does Not Match.",
+  fillForgetPasswordForm: "Please fill the form, to create a new password",
+  userNotFoundForgetPassword:
+    "This Email not exist in our system. Please Signup",
+  passwordChanged: "Password Changed Successfully",
+  acceptEmail: "This field only accepts input in the email format.",
+  invalidTime: "Please choose a time that is later than the current time.",
 };
 export const DATA = [
   {

@@ -1,29 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setUser, setCurrentUser } from "../../Store/Action";
+import {
+  setUser,
+  setCurrentUser,
+  handleForgetPasswordAction,
+  unSetCurrentUser,
+} from "../../Store/Action";
 import BasicTextField from "../../Common/BasicTextField";
 import BasicButton from "../../Common/BasicButton";
-import Snackbar from "@mui/material/Snackbar";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
-import Person2Icon from "@mui/icons-material/Person2";
-import KeyIcon from "@mui/icons-material/Key";
-import DialpadIcon from "@mui/icons-material/Dialpad";
-import BadgeIcon from "@mui/icons-material/Badge";
-import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { messageMap } from "../../Common/Constant";
 import uuid from "react-uuid";
-
-import img1 from "../../assest/Image/larissa-cardoso-zHUHeNT_UtE-unsplash.jpg";
-import img2 from "../../assest/Image/reinhart-julian-d4ZYpoGjUXo-unsplash.jpg";
-import img7 from "../../assest/Image/ryan-ancill-aJYO8JmVodY-unsplash.jpg";
-
 import "../../assest/Css/Login.scss";
+import Dialog from "@mui/material/Dialog";
+import IconButton from "@mui/material/IconButton";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import SignIn from "./SignIn";
+import SignUp from "./SignUp";
+import BasicSnackBar from "../../Common/BasicSnackBar";
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -34,12 +34,18 @@ function Login() {
     username: "",
     mobileNumber: "",
     password: "",
+    confirmPassword: "",
     email: "",
     loginPassword: "",
     loginEmail: "",
     open: false,
     type: "",
     show: true,
+    showPassword: false,
+    showForgetPassword: false,
+    showForgetPasswordConfirm: false,
+    showForgetPasswordDialog: false,
+    openDialog: false,
   });
   // Destructuring properties from the 'auth' object
   const {
@@ -50,17 +56,24 @@ function Login() {
     email,
     loginEmail,
     loginPassword,
-    open,
+    openDialog,
     type,
     show,
+    confirmPassword,
+    showPassword,
+    showForgetPassword,
+    showForgetPasswordDialog,
+    showForgetPasswordConfirm,
   } = auth;
 
   // Regular expression for email validation
   const regEx = /[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,8}(.[a-z{2,8}])?/;
   const passwordRegEx =
     /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
+
   // Effect to handle navigation based on 'type'
   useEffect(() => {
+    console.log(type);
     if (type === "login") {
       setTimeout(() => {
         navigate("/Trello");
@@ -71,17 +84,115 @@ function Login() {
     }
   }, [type]);
 
+  useEffect(() => {
+    dispatch(unSetCurrentUser());
+  }, []);
   // Function to close the Snackbar
   const handleClose = () => {
     setAuth((prvAuth) => ({
       ...prvAuth,
       open: false,
-      type: "",
+      openDialog: false,
     }));
   };
 
+  const handleCloseDialogBox = () => {
+    setAuth((prvAuth) => ({ ...prvAuth, showForgetPasswordDialog: false }));
+    resetLogin("forgetPassword");
+  };
+
+  const handleOpenDialogBox = (e, forgetPasswordEmail) => {
+    if (isNaN(forgetPasswordEmail)) {
+      setAuth((prvAuth) => ({
+        ...prvAuth,
+        email: forgetPasswordEmail,
+        showForgetPasswordDialog: true,
+      }));
+      return;
+    }
+    setAuth((prvAuth) => ({ ...prvAuth, showForgetPasswordDialog: true }));
+  };
+  const handleShowPassword = () => {
+    setAuth((prvAuth) => ({ ...prvAuth, showPassword: !showPassword }));
+  };
+  const handleShowForgetPassword = () => {
+    setAuth((prvAuth) => ({
+      ...prvAuth,
+      showForgetPassword: !showForgetPassword,
+    }));
+  };
+
+  const handleShowForgetPasswordConfirm = () => {
+    setAuth((prvAuth) => ({
+      ...prvAuth,
+      showForgetPasswordConfirm: !showForgetPasswordConfirm,
+    }));
+  };
+
+  const handleForgetPassword = () => {
+    if (
+      password.trim() !== "" &&
+      confirmPassword.trim() !== "" &&
+      email.trim() !== ""
+    ) {
+      if (isNaN(email)) {
+        const emailExist = user?.some(
+          (user) => user?.email.toLowerCase() === email.toLowerCase()
+        );
+        if (emailExist) {
+          if (password.trim().length < 8) {
+            return setAuth((prvAuth) => ({
+              ...prvAuth,
+              openDialog: true,
+              type: "passwordContain",
+            }));
+          }
+          if (!passwordRegEx.test(password)) {
+            return setAuth((prvAuth) => ({
+              ...prvAuth,
+              openDialog: true,
+              type: "invaildPassword",
+            }));
+          }
+          if (password.trim() !== confirmPassword.trim()) {
+            return setAuth((prvAuth) => ({
+              ...prvAuth,
+              openDialog: true,
+              type: "passNotMatch",
+            }));
+          }
+          dispatch(handleForgetPasswordAction({ email, password }));
+          setAuth((prvAuth) => ({
+            ...prvAuth,
+            openDialog: true,
+            type: "passwordChanged",
+          }));
+          resetLogin();
+        } else {
+          setAuth((prvAuth) => ({
+            ...prvAuth,
+            openDialog: true,
+            type: "userNotFoundForgetPassword",
+          }));
+        }
+      } else {
+        setAuth((prvAuth) => ({
+          ...prvAuth,
+          openDialog: true,
+          type: "acceptEmail",
+        }));
+      }
+    } else {
+      setAuth((prvAuth) => ({
+        ...prvAuth,
+        openDialog: true,
+        type: "fillForgetPasswordForm",
+      }));
+    }
+  };
+
   // Function to handle login
-  const handleLogin = () => {
+  const handleSignin = () => {
     if (loginPassword.trim() !== "" && loginEmail.trim() !== "") {
       if (isNaN(loginEmail)) {
         if (!regEx.test(loginEmail)) {
@@ -165,6 +276,7 @@ function Login() {
       username.trim() !== "" &&
       mobileNumber.trim() !== "" &&
       password.trim() !== "" &&
+      confirmPassword.trim() !== "" &&
       email.trim() !== ""
     ) {
       if (mobileNumber.trim().length !== 10) {
@@ -238,22 +350,40 @@ function Login() {
       }));
     }
   };
-  const resetLogin = () => {
+
+  const resetLogin = (variable) => {
+    if (variable === "forgetPassword") {
+      setAuth((prvAuth) => ({
+        ...prvAuth,
+        username: "",
+        mobileNumber: "",
+        password: "",
+        confirmPassword: "",
+        email: "",
+        showForgetPassword: false,
+      }));
+      return;
+    }
     setAuth((prvAuth) => ({
       ...prvAuth,
       id: shortUUID,
-      password: "",
       username: "",
-      email: "",
       mobileNumber: "",
-      loginEmail: "",
+      password: "",
+      confirmPassword: "",
+      email: "",
       loginPassword: "",
+      loginEmail: "",
+      showPassword: false,
+      showForgetPassword: false,
+      showForgetPasswordDialog: false,
     }));
   };
   // Function to toggle between login and signup views
   const toggleView = () => {
     setAuth((prvAuth) => ({ ...prvAuth, show: !show }));
     resetLogin();
+    if (type !== "signup") handleClose();
   };
 
   // Function to handle input change
@@ -261,32 +391,6 @@ function Login() {
     e.preventDefault();
     setAuth({ ...auth, [e.target.name]: e.target.value });
   };
-  // function CommonCarousel() {
-  //   return (
-  //     <Carousel
-  //       autoPlay={true}
-  //       interval={5000}
-  //       autoFocus={true}
-  //       infiniteLoop={true}
-  //       showStatus={false}
-  //       showThumbs={false}
-  //       className="cardMedia"
-  //     >
-  //       <div>
-  //         <img src={img2} alt="Image 1" />
-  //         <p className="legend">Legend 1</p>
-  //       </div>
-  //       <div>
-  //         <img src={img1} alt="Image 2" />
-  //         <p className="legend">Legend 2</p>
-  //       </div>
-  //       <div>
-  //         <img src={img3} alt="Image 3" />
-  //         <p className="legend">Legend 3</p>
-  //       </div>
-  //     </Carousel>
-  //   );
-  // }
 
   return (
     <div className="container">
@@ -295,184 +399,107 @@ function Login() {
         className={`loginCard ${show ? "login " : "signup"} `}
       >
         {show ? (
-          <>
-            <Box className={`cardBox ${show ? "login" : "signup"} `}>
-              <Typography className="cardHeading">Trello</Typography>
-              <FormControl className="cardInputs">
-                <BasicTextField
-                  fullWidth
-                  name="loginEmail"
-                  value={loginEmail}
-                  placeholder="Email or Mobile Number"
-                  onChange={handleChange}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment className="inputIcon" position="start">
-                        <Person2Icon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <BasicTextField
-                  fullWidth
-                  name="loginPassword"
-                  value={loginPassword}
-                  placeholder="Password"
-                  onChange={handleChange}
-                  type="password"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment className="inputIcon" position="start">
-                        <KeyIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <BasicButton
-                  elevation={3}
-                  className="cardButton"
-                  onClick={handleLogin}
-                  name="Sign IN"
-                />
-                <Typography onClick={toggleView} className="login_link">
-                  Don't have an account?
-                  <Typography className="link" variant="subtitle">
-                    {" "}
-                    Signup
-                  </Typography>
-                </Typography>
-              </FormControl>
-            </Box>
-            <Carousel
-              infiniteLoop={true}
-              showStatus={false}
-              showThumbs={false}
-              className={`cardMedia ${show ? "login" : "signup"}`}
-            >
-              <div>
-                <img src={img7} />
-              </div>
-              <div>
-                <img src={img2} />
-              </div>
-              <div>
-                <img src={img1} />
-              </div>
-            </Carousel>
-          </>
+          <SignIn
+            auth={auth}
+            handleChange={handleChange}
+            toggleView={toggleView}
+            handleSignin={handleSignin}
+            handleOpenDialogBox={handleOpenDialogBox}
+            handleClose={handleClose}
+            handleShowPassword={handleShowPassword}
+            messageMap={messageMap}
+          />
         ) : (
-          <>
-            <Box
-              elevation={3}
-              className={`cardBox ${show ? "login" : "signup"}`}
-            >
-              <Typography className="cardHeading">Trello</Typography>
-              <FormControl className="cardInputs">
-                <BasicTextField
-                  fullWidth
-                  type="text"
-                  value={username}
-                  name="username"
-                  placeholder="Username"
-                  onChange={handleChange}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment className="inputIcon" position="start">
-                        <BadgeIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <BasicTextField
-                  value={email}
-                  name="email"
-                  fullWidth
-                  placeholder="Email"
-                  type="email"
-                  onChange={handleChange}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment className="inputIcon" position="start">
-                        <Person2Icon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                <BasicTextField
-                  value={mobileNumber}
-                  name="mobileNumber"
-                  fullWidth
-                  type="number"
-                  placeholder="Mobile Number"
-                  onChange={handleChange}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment className="inputIcon" position="start">
-                        <DialpadIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                <BasicTextField
-                  value={password}
-                  name="password"
-                  fullWidth
-                  placeholder="Password"
-                  onChange={handleChange}
-                  type="password"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment className="inputIcon" position="start">
-                        <KeyIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                <BasicButton
-                  elevation={3}
-                  className="cardButton"
-                  onClick={handleSignUp}
-                  name="sign up"
-                />
-
-                <Typography onClick={toggleView} className="login_link">
-                  Already have an Account!
-                  <Typography className="link" variant="subtitle">
-                    {" "}
-                    Signin
-                  </Typography>
-                </Typography>
-              </FormControl>
-            </Box>
-
-            <Carousel
-              autoPlay={true}
-              interval={5000}
-              autoFocus={true}
-              infiniteLoop={true}
-              showStatus={false}
-              showThumbs={false}
-              className={`cardMedia ${show ? "login" : "signup"}`}
-            >
-              <div>
-                <img src={img7} />
-              </div>
-              <div>
-                <img src={img2} />
-              </div>
-              <div>
-                <img src={img1} />
-              </div>
-            </Carousel>
-          </>
+          <SignUp
+            auth={auth}
+            handleChange={handleChange}
+            toggleView={toggleView}
+            handleSignUp={handleSignUp}
+            handleClose={handleClose}
+            handleShowPassword={handleShowPassword}
+            messageMap={messageMap}
+            handleShowForgetPassword={handleShowForgetPassword}
+          />
         )}
       </Card>
-      <Snackbar
+
+      <Dialog
+        open={showForgetPasswordDialog}
+        onClose={handleCloseDialogBox}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Entered the New Password"}
+        </DialogTitle>
+        <DialogContent className="signinDailogBox">
+          <BasicTextField
+            className="basicTextField"
+            value={email}
+            fullWidth
+            name="email"
+            placeholder="Email"
+            onChange={handleChange}
+          />
+          <BasicTextField
+            className="basicTextField"
+            value={password}
+            fullWidth
+            type={showForgetPassword ? "text" : "password"}
+            name="password"
+            placeholder="New Password"
+            onChange={handleChange}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleShowForgetPassword}>
+                    {showForgetPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <BasicTextField
+            fullWidth
+            className="basicTextField"
+            value={confirmPassword}
+            name="confirmPassword"
+            type={showForgetPasswordConfirm ? "text" : "password"}
+            placeholder="New Confirm Password"
+            onChange={handleChange}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleShowForgetPasswordConfirm}>
+                    {showForgetPasswordConfirm ? (
+                      <Visibility />
+                    ) : (
+                      <VisibilityOff />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <BasicButton
+            className="cardButton"
+            onClick={handleCloseDialogBox}
+            name="Cancel"
+          />
+          <BasicButton
+            className="cardButton"
+            onClick={handleForgetPassword}
+            autoFocus
+            name="Submit"
+          />
+        </DialogActions>
+      </Dialog>
+      <BasicSnackBar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={open}
+        open={openDialog}
         onClose={handleClose}
         // The message map is an object that contains types of messages, and the type variable will determine which type of message needs to be shown.
         message={messageMap[type]}
