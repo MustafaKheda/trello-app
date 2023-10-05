@@ -9,6 +9,8 @@ import {
   handleChangeCard,
   handleChangeStage,
   handleDeleteStage,
+  handleEditUser,
+  unSetCurrentUser,
 } from "../../Store/Action";
 import CardDrawer from "./CardDrawer";
 import Model from "./Model";
@@ -38,6 +40,8 @@ function TaskHub() {
     tempStage: null,
     anchorEl: null,
     openMenu: false,
+    anchorProfile: null,
+    openProfile: false,
   });
 
   const {
@@ -48,6 +52,8 @@ function TaskHub() {
     openDailog,
     anchorEl,
     openMenu,
+    anchorProfile,
+    openProfile,
   } = open;
 
   useEffect(() => {
@@ -55,20 +61,6 @@ function TaskHub() {
       navigate("/");
     }
   }, [currentUser]);
-
-  // useEffect(() => {
-  //   const scrollBarExists =
-  //     window.getComputedStyle(document.documentElement).scrollbarWidth !==
-  //     "none";
-  //   // Get the .trelloBody element
-  //   const trelloBody = document.querySelector("#trelloBody");
-  //   // Add or remove the 'scrollbar-exists' class based on scrollbar existence
-  //   if (scrollBarExists) {
-  //     trelloBody?.classList.add("scrollbar-exists");
-  //   } else {
-  //     trelloBody?.classList.remove("scrollbar-exists");
-  //   }
-  // }, [stages]);
 
   const handleClickOpenModel = () => {
     setOpen((prevOpen) => ({
@@ -162,13 +154,28 @@ function TaskHub() {
       openMenu: true,
     }));
   };
-
   const handleCloseMenu = () => {
     setOpen((prevOpen) => ({
       ...prevOpen,
       anchorEl: null,
       openMenu: false,
+      anchorProfile: null,
+      openProfile: false,
     }));
+  };
+
+  const handleOpenProfileMenu = (event) => {
+    console.log("Profile");
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      anchorProfile: event.currentTarget,
+      openProfile: true,
+    }));
+  };
+
+  const handleOpenProfilePage = () => {
+    dispatch(handleEditUser(currentUser.id));
+    navigate("/profile");
   };
 
   const handelOpenDeleteDailogBox = () => {
@@ -196,7 +203,7 @@ function TaskHub() {
   return Object.keys(currentUser).length > 0 ? (
     <>
       <div id="trelloBody" className="trelloBody">
-        <Header />
+        <Header handleOpenProfileMenu={handleOpenProfileMenu} />
         <BasicButton
           className="trelloStageButton"
           variant="outlined"
@@ -280,6 +287,20 @@ function TaskHub() {
           />
         </DialogActions>
       </Dialog>
+      <Menu
+        id={`profile-menu`}
+        anchorEl={anchorProfile}
+        open={openProfile}
+        onClose={handleCloseMenu}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
+        }}
+      >
+        <MenuItem onClick={handleOpenProfilePage}>Profile</MenuItem>
+        <MenuItem onClick={() => dispatch(unSetCurrentUser())}>
+          Sign Out
+        </MenuItem>
+      </Menu>
       <Menu
         id={`basic-menu`}
         anchorEl={anchorEl}

@@ -1,0 +1,80 @@
+.profilePage {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+  align-items: center;
+  justify-content: center;
+}
+.profileCard {
+  position: relative !important;
+  display: flex;
+  flex-direction: column;
+  row-gap: 15px;
+  padding: 0px 15px 0px 10px;
+  border-radius: 8px !important;
+  width: 600px;
+  height: 430px;
+  // backdrop-filter: blur(120px);
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  margin-top: 50px;
+}
+.profileCard .MuiCardActions-root {
+  margin-top: auto;
+}
+.profileIcon {
+  width: 30px;
+  height: 30px;
+  margin-left: -15px !important;
+  margin-top: -45px !important;
+  border-radius: 35px !important;
+  border: 1px solid blueviolet !important;
+  align-items: center !important ;
+  justify-content: center;
+}
+.cardButton {
+  margin-top: 0 !important;
+  width: 90px;
+  color: #f6f7fb !important;
+  font-weight: 500 !important;
+  background-color: #715e9b !important;
+}
+.profileCardAction {
+  justify-content: right;
+}
+.position {
+  position: relative;
+  left: 30%;
+  // top: -10px;
+  padding-top: 10px;
+}
+.profileLogo {
+  position: relative;
+  width: 135px !important;
+  height: 135px !important;
+  border-radius: 180px;
+  font-size: 64px !important;
+  color: #f3f3f3 !important;
+  background-color: #000000dc !important;
+  top: -10px;
+}
+.cardHeader {
+  padding: 20px 10px 10px !important;
+  font-weight: 600 !important;
+}
+.editButton {
+  width: 110px;
+  color: #f6f7fb !important;
+  font-weight: 500 !important;
+  background-color: #715e9b !important;
+}
+.message {
+  position: absolute;
+  bottom: 13%;
+  left: 4%;
+  font-weight: 600 !important;
+}
+.message .MuiTypography-root .basicTextField {
+  padding-top: 2px !important;
+}

@@ -3,6 +3,7 @@ import { combineReducers } from "redux";
 const initialState = {
   currentUser: {},
   users: [],
+  editUserData: null,
 };
 const {
   SET_USER,
@@ -26,9 +27,13 @@ const {
   LIST_DELETE_USER,
   DELETE_COMMENT,
   FORGET_PASSWORD,
+  EDIT_USER,
+  UNSET_EDIT_USER,
+  UPDATE_USER,
+  UPDATE_PASSWORD,
 } = Actiontypes;
 const userReducer = (state = initialState, action) => {
-  const { users, currentUser } = state;
+  const { users } = state;
   switch (action.type) {
     case SET_USER:
       return {
@@ -39,16 +44,41 @@ const userReducer = (state = initialState, action) => {
         },
         users: [...state.users, action.payload],
       };
+    case EDIT_USER: {
+      const editUser = users.find((user) => user.id === action.payload);
+
+      return { ...state, editUserData: editUser };
+    }
+    case UNSET_EDIT_USER:
+      return {
+        ...state,
+        editUserData: {},
+      };
+    case UPDATE_PASSWORD: {
+      const updatedUser = users.map((user) =>
+        user.id === action.payload.editId
+          ? { ...user, password: action.payload.newPassword }
+          : user
+      );
+
+      return {
+        ...state,
+        users: [...updatedUser],
+        editUserData: {
+          ...state.editUserData,
+          password: action.payload.newPassword,
+        },
+      };
+    }
     case FORGET_PASSWORD: {
-      const newUser = users.map((user) =>
-        user?.email.toLowerCase() === action.payload.email.toLowerCase()
+      const passwordChangedUsers = users.map((user) =>
+        user?.email.toLowerCase() === action.payload?.email?.toLowerCase()
           ? { ...user, password: action.payload.password }
           : user
       );
-      console.log(newUser);
       return {
         ...state,
-        users: [...newUser],
+        users: [...passwordChangedUsers],
       };
     }
 
@@ -62,6 +92,22 @@ const userReducer = (state = initialState, action) => {
         ...state,
         currentUser: {},
       };
+    case UPDATE_USER: {
+      const updatedUsers = users.map((user) =>
+        user.id === action.payload.id ? action.payload : user
+      );
+      return {
+        ...state,
+        users: [...updatedUsers],
+        editUserData: action.payload,
+        currentUser: {
+          ...state.currentUser,
+          firstName: action.payload.firstName,
+          lastName: action.payload.lastName,
+        },
+      };
+    }
+
     case LIST_DELETE_USER: {
       return {
         ...state,
@@ -174,7 +220,6 @@ const stageReducer = (state = trelloState, action) => {
       };
     }
     case UPDATE_CARD: {
-      console.log(action.payload);
       const { obj, username } = action.payload;
       obj.modifiedAt = new Date();
       obj.modifiedBy = username;

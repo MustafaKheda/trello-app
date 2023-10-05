@@ -12,7 +12,6 @@ import BasicButton from "../../Common/BasicButton";
 import Card from "@mui/material/Card";
 import InputAdornment from "@mui/material/InputAdornment";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { messageMap } from "../../Common/Constant";
 import uuid from "react-uuid";
 import "../../assest/Css/Login.scss";
 import Dialog from "@mui/material/Dialog";
@@ -23,7 +22,9 @@ import DialogActions from "@mui/material/DialogActions";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
+import { messageMap } from "../../Common/Constant";
 import BasicSnackBar from "../../Common/BasicSnackBar";
+import { Typography } from "@mui/material";
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -31,7 +32,8 @@ function Login() {
   const shortUUID = uuid().slice(0, 18);
   const [auth, setAuth] = useState({
     id: shortUUID,
-    username: "",
+    firstName: "",
+    lastName: "",
     mobileNumber: "",
     password: "",
     confirmPassword: "",
@@ -50,7 +52,8 @@ function Login() {
   // Destructuring properties from the 'auth' object
   const {
     id,
-    username,
+    firstName,
+    lastName,
     mobileNumber,
     password,
     email,
@@ -73,15 +76,26 @@ function Login() {
 
   // Effect to handle navigation based on 'type'
   useEffect(() => {
-    console.log(type);
+    let timeOut;
+    clearTimeout(timeOut);
     if (type === "login") {
       setTimeout(() => {
-        navigate("/Trello");
+        navigate("/task-hub");
       }, 600);
     }
     if (type === "signup") {
       toggleView();
     }
+    timeOut = setTimeout(() => {
+      setAuth((prvAuth) => ({
+        ...prvAuth,
+        open: false,
+        type: "",
+      }));
+    }, 3000);
+    return () => {
+      clearTimeout(timeOut);
+    };
   }, [type]);
 
   useEffect(() => {
@@ -93,22 +107,25 @@ function Login() {
       ...prvAuth,
       open: false,
       openDialog: false,
+      type: "",
     }));
   };
-
   const handleCloseDialogBox = () => {
-    setAuth((prvAuth) => ({ ...prvAuth, showForgetPasswordDialog: false }));
+    setAuth((prvAuth) => ({
+      ...prvAuth,
+      showForgetPasswordDialog: false,
+      type: "",
+    }));
     resetLogin("forgetPassword");
   };
 
   const handleOpenDialogBox = (e, forgetPasswordEmail) => {
     if (isNaN(forgetPasswordEmail)) {
-      setAuth((prvAuth) => ({
+      return setAuth((prvAuth) => ({
         ...prvAuth,
         email: forgetPasswordEmail,
         showForgetPasswordDialog: true,
       }));
-      return;
     }
     setAuth((prvAuth) => ({ ...prvAuth, showForgetPasswordDialog: true }));
   };
@@ -131,16 +148,16 @@ function Login() {
 
   const handleForgetPassword = () => {
     if (
-      password.trim() !== "" &&
-      confirmPassword.trim() !== "" &&
-      email.trim() !== ""
+      password?.trim() !== "" &&
+      confirmPassword?.trim() !== "" &&
+      email?.trim() !== ""
     ) {
       if (isNaN(email)) {
         const emailExist = user?.some(
-          (user) => user?.email.toLowerCase() === email.toLowerCase()
+          (user) => user?.email.toLowerCase() === email?.toLowerCase()
         );
         if (emailExist) {
-          if (password.trim().length < 8) {
+          if (password?.trim().length < 8) {
             return setAuth((prvAuth) => ({
               ...prvAuth,
               openDialog: true,
@@ -167,7 +184,9 @@ function Login() {
             openDialog: true,
             type: "passwordChanged",
           }));
-          resetLogin();
+          setTimeout(() => {
+            resetLogin();
+          }, 800);
         } else {
           setAuth((prvAuth) => ({
             ...prvAuth,
@@ -212,7 +231,7 @@ function Login() {
         }
       }
 
-      if (loginPassword.trim().length < 8) {
+      if (loginPassword.trim()?.length < 8) {
         return setAuth((prvAuth) => ({
           ...prvAuth,
           open: true,
@@ -234,18 +253,18 @@ function Login() {
         }));
       }
 
-      const userFound = user?.filter(
+      const [userFound] = user?.filter(
         (user) =>
           (user.mobileNumber === loginEmail ||
             user?.email.trim().toLowerCase() ===
               loginEmail.toLowerCase().trim()) &&
-          user.password === loginPassword
+          user?.password === loginPassword
       );
-      if (userFound.length > 0) {
+      if (userFound) {
         // Successful login
-        const { username, id } = userFound[0];
+        const { firstName, lastName, id } = userFound;
 
-        dispatch(setCurrentUser(id, username));
+        dispatch(setCurrentUser({ id, firstName, lastName }));
         setAuth((prvAuth) => ({
           ...prvAuth,
           open: true,
@@ -273,7 +292,8 @@ function Login() {
   const handleSignUp = (e) => {
     e.preventDefault();
     if (
-      username.trim() !== "" &&
+      firstName.trim() !== "" &&
+      lastName.trim() !== "" &&
       mobileNumber.trim() !== "" &&
       password.trim() !== "" &&
       confirmPassword.trim() !== "" &&
@@ -300,7 +320,7 @@ function Login() {
           type: "invaildPassword",
         }));
       }
-      // Check if username already exists
+      // Check the email already exists
       const emailExist = user?.some(
         (user) => user?.email.toLowerCase() === email.toLowerCase()
       );
@@ -318,6 +338,7 @@ function Login() {
           type: "invaildEmail",
         }));
       }
+
       // Attempting to sign up
       if (emailExist) {
         setAuth((prvAuth) => ({
@@ -332,8 +353,17 @@ function Login() {
           type: "numberExist",
         }));
       } else {
+        if (password.trim() !== confirmPassword.trim()) {
+          return setAuth((prvAuth) => ({
+            ...prvAuth,
+            openDialog: true,
+            type: "passNotMatch",
+          }));
+        }
         // Create new user
-        dispatch(setUser({ id, username, email, mobileNumber, password }));
+        dispatch(
+          setUser({ id, firstName, lastName, email, mobileNumber, password })
+        );
         setAuth((prvAuth) => ({
           ...prvAuth,
           open: true,
@@ -351,23 +381,21 @@ function Login() {
     }
   };
 
-  const resetLogin = (variable) => {
-    if (variable === "forgetPassword") {
-      setAuth((prvAuth) => ({
+  const resetLogin = (check) => {
+    if (check === "forgetPassword") {
+      return setAuth((prvAuth) => ({
         ...prvAuth,
-        username: "",
-        mobileNumber: "",
         password: "",
         confirmPassword: "",
         email: "",
         showForgetPassword: false,
       }));
-      return;
     }
     setAuth((prvAuth) => ({
       ...prvAuth,
       id: shortUUID,
-      username: "",
+      firstName: "",
+      lastName: "",
       mobileNumber: "",
       password: "",
       confirmPassword: "",
@@ -424,14 +452,13 @@ function Login() {
       </Card>
 
       <Dialog
+        cl
         open={showForgetPasswordDialog}
         onClose={handleCloseDialogBox}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {"Entered the New Password"}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Change Password"}</DialogTitle>
         <DialogContent className="signinDailogBox">
           <BasicTextField
             className="basicTextField"
@@ -466,7 +493,7 @@ function Login() {
             value={confirmPassword}
             name="confirmPassword"
             type={showForgetPasswordConfirm ? "text" : "password"}
-            placeholder="New Confirm Password"
+            placeholder="Confirm Password"
             onChange={handleChange}
             InputProps={{
               endAdornment: (
@@ -482,6 +509,7 @@ function Login() {
               ),
             }}
           />
+          <Typography>{messageMap[type]}</Typography>
         </DialogContent>
         <DialogActions>
           <BasicButton
@@ -493,17 +521,18 @@ function Login() {
             className="cardButton"
             onClick={handleForgetPassword}
             autoFocus
-            name="Submit"
+            name="save"
           />
         </DialogActions>
       </Dialog>
-      <BasicSnackBar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      {/* <BasicSnackBar
+        // anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        className="snackBar"
         open={openDialog}
         onClose={handleClose}
         // The message map is an object that contains types of messages, and the type variable will determine which type of message needs to be shown.
         message={messageMap[type]}
-      />
+      /> */}
     </div>
   );
 }

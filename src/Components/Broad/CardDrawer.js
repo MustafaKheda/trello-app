@@ -347,7 +347,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           }}
           onChange={handleChange}
         />
-        {console.log(new Date().toISOString().slice(0, 16))}
+
         {users.length > 1 ? (
           <TextField
             id="assignTo"

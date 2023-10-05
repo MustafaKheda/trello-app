@@ -184,6 +184,9 @@ function Model({ close, open, currentUser }) {
         <Divider />
         <DialogContent className="dialogBoxContent">
           <BasicTextField
+            InputLabelProps={{
+              shrink: true,
+            }}
             value={name}
             fullWidth
             name="name"

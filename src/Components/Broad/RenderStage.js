@@ -28,7 +28,7 @@ const RenderStage = ({
         style={{ backgroundColor: `${stage?.color}` }}
       >
         <Typography textTransform={"uppercase"} fontWeight={600}>
-          {stage.name} ({cardCount})
+          {stage?.name} ({cardCount})
         </Typography>
         <IconButton
           key={index}

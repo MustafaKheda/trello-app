@@ -7,13 +7,10 @@ export const setUser = (data) => {
   };
 };
 
-export const setCurrentUser = (id, username) => {
+export const setCurrentUser = (obj) => {
   return {
     type: Actiontypes.SET_CURRENT_USER,
-    payload: {
-      id,
-      username,
-    },
+    payload: obj,
   };
 };
 
@@ -46,12 +43,14 @@ export const handleChangeCard = (obj) => {
     payload: obj,
   };
 };
+
 export const editStage = (obj) => {
   return {
     type: Actiontypes.EDIT_STAGE,
     payload: obj,
   };
 };
+
 export const handleUpdateStage = (obj, username) => {
   return {
     type: Actiontypes.UPDATE_STAGE,
@@ -61,35 +60,41 @@ export const handleUpdateStage = (obj, username) => {
     },
   };
 };
+
 export const handleDeleteStage = (obj) => {
   return {
     type: Actiontypes.DELETE_STAGE,
     payload: obj,
   };
 };
+
 export const unSetEditStage = () => {
   return {
     type: Actiontypes.UNSET_EDIT_STAGE,
   };
 };
+
 export const handleSetCard = (obj) => {
   return {
     type: Actiontypes.SET_CARD,
     payload: obj,
   };
 };
+
 export const handleDeleteCard = (id) => {
   return {
     type: Actiontypes.DELETE_CARD,
     payload: id,
   };
 };
+
 export const handleEditCard = (obj, type) => {
   return {
     type: Actiontypes.EDIT_CARD,
     payload: { obj, type },
   };
 };
+
 export const handleUpdateCard = (obj, username) => {
   return {
     type: Actiontypes.UPDATE_CARD,
@@ -99,11 +104,13 @@ export const handleUpdateCard = (obj, username) => {
     },
   };
 };
+
 export const handleUnsetEditCard = () => {
   return {
     type: Actiontypes.UNSET_EDIT_CARD,
   };
 };
+
 export const handleUpdateComment = (obj, type) => {
   return {
     type: Actiontypes.UPDATE_COMMENT,
@@ -117,12 +124,14 @@ export const deleteCard = (id) => {
     payload: id,
   };
 };
+
 export const deleteStage = (id) => {
   return {
     type: Actiontypes.LIST_DELETE_STAGE,
     payload: id,
   };
 };
+
 export const deleteUser = (id) => {
   return {
     type: Actiontypes.LIST_DELETE_USER,
@@ -139,10 +148,36 @@ export const deleteComment = (id, cardId) => {
     },
   };
 };
+
 export const handleForgetPasswordAction = (obj) => {
-  console.log(obj);
   return {
     type: Actiontypes.FORGET_PASSWORD,
+    payload: obj,
+  };
+};
+
+export const handleEditUser = (id) => {
+  return {
+    type: Actiontypes.EDIT_USER,
+    payload: id,
+  };
+};
+export const handleUnsetEditUser = () => {
+  return {
+    type: Actiontypes.UNSET_EDIT_USER,
+  };
+};
+
+export const handleUpdateUserAction = (obj) => {
+  return {
+    type: Actiontypes.UPDATE_USER,
+    payload: obj,
+  };
+};
+
+export const handleUpdatePasswordAction = (obj) => {
+  return {
+    type: Actiontypes.UPDATE_PASSWORD,
     payload: obj,
   };
 };

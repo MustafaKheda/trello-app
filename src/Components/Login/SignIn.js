@@ -1,23 +1,18 @@
 import React from "react";
 import BasicTextField from "../../Common/BasicTextField";
 import BasicButton from "../../Common/BasicButton";
-import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
 import Person2Icon from "@mui/icons-material/Person2";
 import KeyIcon from "@mui/icons-material/Key";
-import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import img1 from "../../assest/Image/larissa-cardoso-zHUHeNT_UtE-unsplash.jpg";
-import img2 from "../../assest/Image/reinhart-julian-d4ZYpoGjUXo-unsplash.jpg";
-import img7 from "../../assest/Image/ryan-ancill-aJYO8JmVodY-unsplash.jpg";
-
 import "../../assest/Css/Login.scss";
 import { IconButton } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CommonCarousel from "./CommonCarousel";
+import BasicSnackBar from "../../Common/BasicSnackBar";
 
 function SignIn({
   auth,
@@ -105,7 +100,8 @@ function SignIn({
         </FormControl>
       </Box>
       <CommonCarousel auth={auth} />
-      <Snackbar
+      <BasicSnackBar
+        key={messageMap[type]}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         open={open}
         onClose={handleClose}

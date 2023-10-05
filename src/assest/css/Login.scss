@@ -6,19 +6,10 @@ $cardCarosual: 100vh;
   src: url(../Font/RoosterPersonalUse-3z8d8.ttf);
 }
 
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  max-height: 120vh;
-  background-color: $bgcolor;
-}
-
 .loginCard {
   display: flex;
   width: 100%;
-  min-height: 70vh;
+  min-height: 100vh;
   height: $cardCarosual;
   background-color: white;
   margin: 0 auto;
@@ -52,6 +43,8 @@ $cardCarosual: 100vh;
   animation-name: cardSignup;
   animation-duration: 1s;
   transform: translate(0);
+  padding: 0px !important;
+  padding-top: 20px !important;
 }
 .loginCard .cardBox.signup {
   transform: translateX(233%);
@@ -69,10 +62,11 @@ $cardCarosual: 100vh;
   animation-name: cardLogin;
   animation-duration: 1s;
   transition: transform 1s ease-in-out;
-  transform: translate(150%);
+  // transform: translate(150%);
 }
 .loginCard .cardBox.login {
   transform: translateX(0%);
+  padding-top: 100px;
 }
 @keyframes cardLogin {
   from {
@@ -82,11 +76,13 @@ $cardCarosual: 100vh;
     transform: translateX(0%);
   }
 }
-
+// .snackBar {
+//   position: absolute !important;
+//   bottom: 20% !important;
+//   left: 38% !important;
+// }
 .cardMedia {
   min-width: 70%;
-  // background: url(../Image/autumn.jpg);
-  background-size: cover;
 }
 
 //signup animation
@@ -134,26 +130,28 @@ $cardCarosual: 100vh;
   gap: 20px;
   align-items: center;
   justify-content: center;
-  margin: 45px auto !important;
+  margin: 15px auto !important;
 }
-
-.cardButton {
+.signup .cardInputs {
+  gap: 15px;
+}
+.forgetPassword {
+  margin-top: -10px !important;
+  margin-left: 2px !important;
+  align-self: flex-start;
+  cursor: pointer;
+  color: #9f88d4;
+}
+.cardBox .cardButton {
+  margin-top: 10px !important;
   width: 90px;
   color: #f6f7fb !important;
   font-weight: 500 !important;
   background-color: #715e9b !important;
 }
-
-// .cardInputs .MuiInputBase-adornedStart {
-//   padding-left: 0px !important;
-//   margin: 0px !important;
-//   height: 40px;
-// }
-
-// .cardInputs .MuiInputBase-adornedStart input {
-//   border-left: 0.1px solid rgba($color: #000000, $alpha: 0.2) !important;
-//   padding-left: 10px !important;
-// }
+.cardBox.login .cardButton {
+  margin-top: 0 !important;
+}
 .basicTextField .MuiInputBase-adornedStart {
   padding-left: 0px !important;
   margin: 0px !important;
@@ -187,14 +185,17 @@ $cardCarosual: 100vh;
     .cardBox.signup {
       min-width: 400px;
       transition: transform 1s ease-in-out;
-      transform: translate(60%, 7%) !important;
+      transform: translate(60%, 3%) !important;
     }
 
     .cardBox.login {
       min-width: 400px;
       transition: transform 1s ease-in-out;
-      transform: translate(60%, 15%) !important;
+      transform: translate(60%, 10%) !important;
     }
+  }
+  .signup .cardInputs {
+    gap: 8px;
   }
 }
 @media only screen and (max-width: 768px) {
@@ -209,14 +210,17 @@ $cardCarosual: 100vh;
     .cardBox.signup {
       min-width: 400px;
       transition: transform 1s ease-in-out;
-      transform: translate(40%, 7%) !important;
+      transform: translate(40%, 3%) !important;
     }
 
     .cardBox.login {
       min-width: 400px;
       transition: transform 1s ease-in-out;
-      transform: translate(40%, 15%) !important;
+      transform: translate(40%, 10%) !important;
     }
+  }
+  .signup .cardInputs {
+    gap: 5px;
   }
 }
 @media only screen and (max-width: 600px) {
@@ -231,14 +235,17 @@ $cardCarosual: 100vh;
     .cardBox.signup {
       min-width: 400px;
       transition: transform 1s ease-in-out;
-      transform: translate(30%, 7%) !important;
+      transform: translate(25%, 3%) !important;
     }
 
     .cardBox.login {
       min-width: 400px;
       transition: transform 1s ease-in-out;
-      transform: translate(27%, 15%) !important;
+      transform: translate(27%, 10%) !important;
     }
+  }
+  .signup .cardInputs {
+    gap: 5px;
   }
 }
 .signinDailogBox {
@@ -246,4 +253,7 @@ $cardCarosual: 100vh;
   display: flex;
   gap: 10px;
   flex-direction: column;
+}
+.snackbar {
+  width: 100px !important;
 }

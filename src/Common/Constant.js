@@ -3,7 +3,7 @@ export const messageMap = {
   login: "Login Successful",
   emailExist: "This email already exists!",
   loginFailed: "Wrong Password",
-  numberExist: "Someone is already registered with this number",
+  numberExist: "This mobile number already exists!",
   empty: "Please fill the form",
   lessNumber: "Please enter a 10-digit mobile number.",
   passwordContain: "Password must have at least 8 characters.",
@@ -15,13 +15,19 @@ export const messageMap = {
   invaildEmail: "Invaild Email",
   invaildPassword:
     "password should contain atleast one number,one letter and one special character",
-  passNotMatch: "The Confirmation Password Does Not Match.",
-  fillForgetPasswordForm: "Please fill the form, to create a new password",
+  passNotMatch: "Password's do not match.",
+  fillForgetPasswordForm: "Please fill the form",
   userNotFoundForgetPassword:
-    "This Email not exist in our system. Please Signup",
+    "This Email does not exist. Please Enter Correct Email",
   passwordChanged: "Password Changed Successfully",
   acceptEmail: "This field only accepts input in the email format.",
   invalidTime: "Please choose a time that is later than the current time.",
+  userUpdated: "User updated successFully",
+  passwordNotCorrect: "Old password not correct",
+  notChange: "Please change the user detail to update the profile",
+  passwordSame: "old password and new password cannot be the same.",
+  msgTooltip:
+    "Password must be 8+ characters and include at least one number, one letter, and one special character.",
 };
 export const DATA = [
   {

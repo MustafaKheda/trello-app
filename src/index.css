@@ -8,11 +8,11 @@
 }
 
 body {
-  /* overflow-y: hidden; */
+  overflow-y: hidden;
 }
 @supports (overflow-y: clip) {
   body {
-    /* overflow-y: clip; */
+    overflow-y: clip;
   }
 }
 .navBar {
@@ -25,7 +25,7 @@ body {
 }
 
 .navToolBar .cardHeading {
-  cursor: default;
+  cursor: pointer;
   font-size: 48px !important;
   color: #715e9b;
 }
@@ -33,6 +33,7 @@ body {
   background-color: #3f1651 !important;
   width: 40px !important;
   height: 40px !important;
+  cursor: pointer;
 }
 .picker {
   margin-top: 20px;
@@ -69,4 +70,12 @@ body {
 .list {
   display: flex;
   gap: 10px;
+}
+.headerName {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  font-style: bold;
+  color: #684f9f;
+  text-align: center;
+  padding-right: 5px;
 }
