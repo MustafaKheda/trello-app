@@ -12,7 +12,7 @@ const RenderStage = ({
   handleDrawerOpen,
   handleOpenMenu,
 }) => {
-  const cardCount = cards.filter(
+  const cardCount = cards().filter(
     (card) => card?.stageId === stage?.id && !card.isDelete
   ).length;
 
@@ -38,7 +38,12 @@ const RenderStage = ({
           <MoreHoriz />
         </IconButton>
       </div>
-      <StageList {...stage} index={index} openDrawerById={handleDrawerOpen} />
+      <StageList
+        cards={cards}
+        {...stage}
+        index={index}
+        openDrawerById={handleDrawerOpen}
+      />
     </div>
   );
 };

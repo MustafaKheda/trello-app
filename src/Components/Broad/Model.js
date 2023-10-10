@@ -44,7 +44,14 @@ function Model({ close, open, currentUser }) {
     modifiedBy: "",
     modifiedAt: "",
   });
-
+  useEffect(() => {
+    setTimeout(() => {
+      setStage((prevStage) => ({
+        ...prevStage,
+        type: "",
+      }));
+    }, 5000);
+  }, [stage.type]);
   useEffect(() => {
     if (editStageData !== null) {
       setStage((prevStage) => ({
@@ -92,7 +99,6 @@ function Model({ close, open, currentUser }) {
   const handleCloseSnackbar = () => {
     setStage((prevStage) => ({
       ...prevStage,
-      openBar: false,
       type: "",
     }));
   };
@@ -197,6 +203,9 @@ function Model({ close, open, currentUser }) {
         </DialogContent>
         <Divider />
         <DialogActions>
+          <Typography color={"red"} className="errorMsgStage">
+            {messageMap[type]}
+          </Typography>
           <Button className="trelloStageButton" onClick={handleClose}>
             cancel
           </Button>
@@ -208,12 +217,6 @@ function Model({ close, open, currentUser }) {
           </Button>
         </DialogActions>
       </Dialog>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={openBar}
-        onClose={handleCloseSnackbar}
-        message={messageMap[type]}
-      />
     </>
   );
 }

@@ -95,12 +95,12 @@ export const handleEditCard = (obj, type) => {
   };
 };
 
-export const handleUpdateCard = (obj, username) => {
+export const handleUpdateCard = (obj, fullName) => {
   return {
     type: Actiontypes.UPDATE_CARD,
     payload: {
       obj,
-      username,
+      fullName,
     },
   };
 };

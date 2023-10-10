@@ -4,7 +4,6 @@ import {
   Menu,
   MenuItem,
   Toolbar,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -39,6 +38,7 @@ export default function Header() {
   }, [currentUser]);
 
   const { anchorProfile, openProfile } = open;
+
   const handleOpenProfilePage = () => {
     dispatch(handleEditUser(currentUser.id));
     navigate("/profile");
@@ -58,6 +58,7 @@ export default function Header() {
       openProfile: true,
     }));
   };
+
   return Object.keys(currentUser).length > 0 ? (
     <>
       <AppBar position="fixed" className="navBar" elevation={0}>
@@ -69,8 +70,8 @@ export default function Header() {
             TaskHub
           </Typography>
           <div>
-            <Typography className="headerName" textTransform={"capitalize"}>
-              {fullName}
+            <Typography className="headerName">
+              {currentUser.firstName}
             </Typography>
             <Avatar onClick={handleOpenProfileMenu} className="headerAvatar">
               {letter || "U"}

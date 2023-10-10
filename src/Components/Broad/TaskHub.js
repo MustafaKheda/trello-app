@@ -24,6 +24,9 @@ import Dialog from "@mui/material/Dialog";
 import BasicButton from "../../Common/BasicButton";
 import { useNavigate } from "react-router";
 import RenderStage from "./RenderStage";
+import { Grid, Typography } from "@mui/material";
+import { messageMap } from "../../Common/Constant";
+import BasicTextField from "../../Common/BasicTextField";
 function TaskHub() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -42,8 +45,10 @@ function TaskHub() {
     openMenu: false,
     anchorProfile: null,
     openProfile: false,
+    title: "",
+    name: "",
+    date: "",
   });
-
   const {
     drawerStageId,
     openModel,
@@ -54,6 +59,7 @@ function TaskHub() {
     openMenu,
     anchorProfile,
     openProfile,
+    title,
   } = open;
 
   useEffect(() => {
@@ -61,6 +67,13 @@ function TaskHub() {
       navigate("/");
     }
   }, [currentUser]);
+
+  const handleChange = (e) => {
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const handleClickOpenModel = () => {
     setOpen((prevOpen) => ({
@@ -111,6 +124,8 @@ function TaskHub() {
     }
 
     if (type === "card") {
+      console.log(cards);
+      console.log(source, destination);
       const newCards = [...cards];
       const sourceIndex = source.index;
       const destinationIndex = destination.index;
@@ -120,7 +135,7 @@ function TaskHub() {
 
       // Set the new stageId for the dragged card
       draggedCard.stageId = destination.droppableId;
-
+      console.log(draggedCard);
       if (source.droppableId === destination.droppableId) {
         newCards.splice(destinationIndex, 0, draggedCard);
         return dispatch(handleChangeCard(newCards));
@@ -135,6 +150,7 @@ function TaskHub() {
       // Insert the dragged card at the calculated index
       newCards.splice(insertionIndex, 0, draggedCard);
       // Dispatch the updated card list
+      console.log(newCards);
       dispatch(handleChangeCard(newCards));
     }
   };
@@ -165,7 +181,6 @@ function TaskHub() {
   };
 
   const handleOpenProfileMenu = (event) => {
-    console.log("Profile");
     setOpen((prevOpen) => ({
       ...prevOpen,
       anchorProfile: event.currentTarget,
@@ -199,17 +214,52 @@ function TaskHub() {
     dispatch(handleDeleteStage(tempStage.id));
     handleCloseDialogBox();
   };
+  const handleClear = () => {
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      title: "",
+    }));
+  };
+
+  const handleFilter = () => {
+    let stateCards = [...cards];
+    if (title !== "") {
+      const filterCards = stateCards.filter((card) =>
+        card.title.toLowerCase().includes(title.toLowerCase()) ? card : null
+      );
+      stateCards = [...filterCards];
+    }
+    return stateCards;
+  };
 
   return Object.keys(currentUser).length > 0 ? (
     <>
       <div id="trelloBody" className="trelloBody">
         <Header handleOpenProfileMenu={handleOpenProfileMenu} />
-        <BasicButton
-          className="trelloStageButton"
-          variant="outlined"
-          onClick={handleClickOpenModel}
-          name="Create Stage"
-        />
+        <Grid container>
+          <Grid item>
+            <BasicButton
+              className="trelloStageButton"
+              variant="outlined"
+              onClick={handleClickOpenModel}
+              name="Create Stage"
+            />
+          </Grid>
+          <Grid item>
+            <BasicTextField
+              onKeyDown={handleFilter}
+              value={title}
+              name="title"
+              label="Card Title"
+              onChange={handleChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <BasicButton onClick={handleFilter} name="Search" />
+            <BasicButton onClick={handleClear} name="Clear" />
+          </Grid>
+        </Grid>
 
         <Model close={handleClose} open={openModel} currentUser={currentUser} />
 
@@ -236,7 +286,7 @@ function TaskHub() {
                               provided={provided}
                               stage={stage}
                               index={index}
-                              cards={cards}
+                              cards={handleFilter}
                               handleOpenMenu={handleOpenMenu}
                               handleDrawerOpen={handleDrawerOpen}
                             />

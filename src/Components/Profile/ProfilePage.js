@@ -24,7 +24,7 @@ import DialogActions from "@mui/material/DialogActions";
 import { messageMap } from "../../Common/Constant";
 import BasicSnackBar from "../../Common/BasicSnackBar";
 import Header from "../Header";
-import { Avatar, CardHeader, Grid, Typography } from "@mui/material";
+import { Avatar, CardHeader, Grid, Tooltip, Typography } from "@mui/material";
 
 function ProfilePage() {
   const editUser = useSelector((store) => store?.userStore?.editUserData);
@@ -38,6 +38,8 @@ function ProfilePage() {
     email: editEmail,
     mobileNumber: editMobileNumber,
     id: editId,
+    lastName: editLastName,
+    firstName: editFirstName,
   } = editUser;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -86,19 +88,22 @@ function ProfilePage() {
       mobileNumber: editMobileNumber,
       email: editEmail,
       password: editUser?.password,
-      firstName: editUser?.firstName,
-      lastName: editUser?.lastName,
+      firstName: editFirstName,
+      lastName: editLastName,
     }));
   }, [editUser]);
 
   useEffect(() => {
-    setTimeout(() => {
+    const timerId = setTimeout(() => {
       setProfile((prvProfile) => ({
         ...prvProfile,
         type: "",
         open: false,
       }));
-    }, 3000);
+    }, 7000);
+    return () => {
+      clearTimeout(timerId);
+    };
   }, [type]);
 
   const regEx = /[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{3,8}(.[a-z{3,8}])?/;
@@ -119,6 +124,7 @@ function ProfilePage() {
     setProfile((prvProfile) => ({
       ...prvProfile,
       editProfile: !editProfile,
+      type: "",
     }));
   };
   const handleOpenDialogBox = (e) => {
@@ -229,7 +235,6 @@ function ProfilePage() {
         );
         setProfile((prvProfile) => ({
           ...prvProfile,
-          open: true,
           type: "userUpdated",
           editProfile: false,
         }));
@@ -239,7 +244,6 @@ function ProfilePage() {
       // Empty Form Msg
       setProfile((prvProfile) => ({
         ...prvProfile,
-        open: true,
         type: "empty",
       }));
     }
@@ -259,19 +263,22 @@ function ProfilePage() {
       openDialog: false,
       newPassword: "",
       oldPassword: "",
+      firstName: "",
+      lastName: "",
     }));
   };
+
   const handleUpdatePassword = () => {
     if (
       newPassword.trim() !== "" &&
       oldPassword.trim() !== "" &&
       confirmPassword.trim() !== ""
     ) {
-      const validPassword = editUser.password === oldPassword;
+      const validPassword = editUser?.password === oldPassword;
+
       if (!validPassword) {
         return setProfile((prvProfile) => ({
           ...prvProfile,
-          open: true,
           type: "passwordNotCorrect",
         }));
       }
@@ -279,172 +286,161 @@ function ProfilePage() {
       if (newPassword.trim().length < 8) {
         return setProfile((prvProfile) => ({
           ...prvProfile,
-          open: true,
-          type: "passwordContain",
+          type: "passwordLength",
         }));
       }
       if (!passwordRegEx.test(newPassword)) {
         return setProfile((prvProfile) => ({
           ...prvProfile,
-          open: true,
           type: "invaildPassword",
         }));
       }
       if (newPassword.trim() !== confirmPassword.trim()) {
         return setProfile((prvProfile) => ({
           ...prvProfile,
-          open: true,
           type: "passNotMatch",
         }));
       }
       if (newPassword.trim() === oldPassword.trim()) {
         return setProfile((prvProfile) => ({
           ...prvProfile,
-          open: true,
           type: "passwordSame",
         }));
       }
       dispatch(handleUpdatePasswordAction({ editId, newPassword }));
       setProfile((prvProfile) => ({
         ...prvProfile,
-        open: true,
-        type: "passwordChanged",
+        type: "passwordUpdated",
       }));
       resetProfile();
     } else {
-      setProfile((prvProfile) => ({
+      return setProfile((prvProfile) => ({
         ...prvProfile,
-        open: true,
         type: "empty",
       }));
     }
   };
+
   return (
     <div className="profilePage">
       <Header />
-      {/* <Typography className="profile" variant="h5">Profile Page</Typography> */}
       <Card className="profileCard">
         <CardHeader
           title={editProfile ? "Edit Profile" : "Profile Page"}
           className="cardHeader"
         />
-        <Grid container columnGap={2}>
+        <Grid container gap={1}>
           <Grid item xs={3} sm={3} md={3} lg={3}>
             <Avatar className="profileLogo">{letter}</Avatar>
           </Grid>
-          <Grid
-            container
-            rowSpacing={editProfile ? 3 : 1}
-            columnSpacing={2}
-            xs={9}
-            sm={9}
-            md={9}
-            lg={9}
-          >
-            {editProfile ? (
-              <>
-                <Grid item xs={3} sm={3} md={3} lg={3}>
-                  <Typography>First Name</Typography>
-                </Grid>
-                <Grid item xs={9} sm={9} md={9} lg={9}>
-                  <BasicTextField
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    className="basicTextField"
-                    name="firstName"
-                    value={firstName}
-                    label="First Name"
-                    onChange={handleChange}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={3} sm={3} md={3} lg={3}>
-                  <Typography>Last Name</Typography>
-                </Grid>
-                <Grid item xs={9} sm={9} md={9} lg={9}>
-                  <BasicTextField
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    name="lastName"
-                    value={lastName}
-                    label="Last Name"
-                    onChange={handleChange}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={3} sm={3} md={3} lg={3}>
-                  <Typography>Email</Typography>
-                </Grid>
-                <Grid item xs={9} sm={9} md={9} lg={9}>
-                  <BasicTextField
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    name="email"
-                    className="basicTextField"
-                    value={email}
-                    label="Email"
-                    onChange={handleChange}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={3} sm={3} md={3} lg={3}>
-                  <Typography>Mobile Number</Typography>
-                </Grid>
-                <Grid item xs={9} sm={9} md={9} lg={9}>
-                  <BasicTextField
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    name="mobileNumber"
-                    className="basicTextField"
-                    value={mobileNumber}
-                    label="Mobile Number"
-                    onChange={handleChange}
-                    fullWidth
-                  />
-                </Grid>
 
+          {editProfile ? (
+            <>
+              <Grid
+                item
+                xs={2.5}
+                sm={2.5}
+                md={2.5}
+                lg={2.5}
+                className="profilePageGridTitle"
+              >
+                <Typography>First Name</Typography>
+                <Typography>Last Name</Typography>
+                <Typography>Email</Typography>
+                <Typography>Mobile Number</Typography>
+              </Grid>
+              <Grid
+                item
+                xs={6}
+                sm={6}
+                md={6}
+                lg={6}
+                className="profilePageGrid"
+              >
+                <BasicTextField
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  className="basicTextField"
+                  name="firstName"
+                  value={firstName}
+                  label="First Name"
+                  onChange={handleChange}
+                  fullWidth
+                />
+                <BasicTextField
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  name="lastName"
+                  value={lastName}
+                  label="Last Name"
+                  onChange={handleChange}
+                  fullWidth
+                />
+                <BasicTextField
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  name="email"
+                  className="basicTextField"
+                  value={email}
+                  label="Email"
+                  onChange={handleChange}
+                  fullWidth
+                />
+                <BasicTextField
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  name="mobileNumber"
+                  className="basicTextField"
+                  value={mobileNumber}
+                  label="Mobile Number"
+                  onChange={handleChange}
+                  fullWidth
+                />
                 <Typography
                   onClick={handleOpenDialogBox}
                   className="link position"
                 >
-                  Change Password
+                  Update Password
                 </Typography>
-
-                <Typography className="message">
-                  {openDialog && type !== "userUpdated"
-                    ? null
-                    : messageMap[type]}
-                </Typography>
-              </>
-            ) : (
-              <>
-                {" "}
-                <Grid item xs={12} sm={12} md={12} lg={12}>
-                  <Typography>First Name</Typography>
-                  <Typography variant="h6">{editUser.firstName}</Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={12}>
-                  <Typography>Last Name</Typography>
-                  <Typography variant="h6">{editUser.lastName}</Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={12}>
-                  <Typography>Email</Typography>
-                  <Typography variant="h6">{editEmail}</Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={12}>
-                  <Typography>Mobile Number</Typography>
-                  <Typography variant="h6">{editMobileNumber}</Typography>
-                </Grid>
-              </>
-            )}
-          </Grid>
+              </Grid>
+            </>
+          ) : (
+            <>
+              <Grid
+                item
+                xs={8}
+                sm={8}
+                md={8}
+                lg={8}
+                className="profileDataSection"
+              >
+                <Typography>First Name</Typography>
+                <Typography variant="h6">{firstName}</Typography>
+                <Typography>Last Name</Typography>
+                <Typography variant="h6">{lastName}</Typography>
+                <Typography>Email</Typography>
+                <Typography variant="h6">{email}</Typography>
+                <Typography>Mobile Number</Typography>
+                <Typography variant="h6">{mobileNumber}</Typography>
+              </Grid>
+            </>
+          )}
         </Grid>
-
         <CardActions className="profileCardAction">
+          <Typography
+            color={
+              type === "userUpdated" || type === "passwordUpdated"
+                ? "green"
+                : "red"
+            }
+            className="message"
+          >
+            {openDialog && type !== "userUpdated" ? null : messageMap[type]}
+          </Typography>
           <BasicButton
             className="cardButton"
             onClick={editProfile ? handleEditProfile : handleBack}
@@ -483,49 +479,53 @@ function ProfilePage() {
               ),
             }}
           />
-
-          <BasicTextField
-            className="basicTextField"
-            value={newPassword}
-            fullWidth
-            type={showForgetPassword ? "text" : "password"}
-            name="newPassword"
-            placeholder="New Password"
-            onChange={handleChange}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleShowForgetPassword}>
-                    {showForgetPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <BasicTextField
-            fullWidth
-            className="basicTextField"
-            value={confirmPassword}
-            name="confirmPassword"
-            type={showForgetPasswordConfirm ? "text" : "password"}
-            placeholder="Confirm Password"
-            onChange={handleChange}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleShowForgetPasswordConfirm}>
-                    {showForgetPasswordConfirm ? (
-                      <Visibility />
-                    ) : (
-                      <VisibilityOff />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Typography>{openDialog ? messageMap[type] : null}</Typography>
+          <Tooltip title={messageMap["msgTooltip"]} placement="top-end" arrow>
+            <BasicTextField
+              className="basicTextField"
+              value={newPassword}
+              fullWidth
+              type={showForgetPassword ? "text" : "password"}
+              name="newPassword"
+              placeholder="New Password"
+              onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleShowForgetPassword}>
+                      {showForgetPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Tooltip>
+          <Tooltip title={messageMap["msgTooltip"]} placement="top-end" arrow>
+            <BasicTextField
+              fullWidth
+              className="basicTextField"
+              value={confirmPassword}
+              name="confirmPassword"
+              type={showForgetPasswordConfirm ? "text" : "password"}
+              placeholder="Confirm Password"
+              onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleShowForgetPasswordConfirm}>
+                      {showForgetPasswordConfirm ? (
+                        <Visibility />
+                      ) : (
+                        <VisibilityOff />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Tooltip>
+          <Typography color={type !== "passwordChanged" ? "red" : "green"}>
+            {openDialog ? messageMap[type] : null}
+          </Typography>
         </DialogContent>
         <DialogActions>
           <BasicButton
@@ -541,13 +541,6 @@ function ProfilePage() {
           />
         </DialogActions>
       </Dialog>
-      <BasicSnackBar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={open}
-        onClose={handleClose}
-        // The message map is an object that contains types of messages, and the type variable will determine which type of message needs to be shown.
-        message={messageMap[type]}
-      />
     </div>
   );
 }

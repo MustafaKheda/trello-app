@@ -16,13 +16,11 @@ function List() {
   const stages = useSelector((state) => state.trelloStage?.stages);
   const users = useSelector((store) => store?.userStore?.users);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  return currentUser.id === "1ad771c6-a29c-df48" ? (
+  return (
     <div className="list">
       <div className="listItem" style={{ border: "1px solid black" }}>
         <Typography>User's</Typography>
-        <Table sx={{ width: 400 }} aria-label="simple table">
+        <Table className="listTable" aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell component="th">ID</TableCell>
@@ -63,8 +61,6 @@ function List() {
           </TableHead>
           <TableBody>
             {cards.map((card) => {
-              let count = 0;
-
               return !card.isDelete ? (
                 <TableRow>
                   <TableCell component="th" scope="row">
@@ -97,8 +93,6 @@ function List() {
           </TableHead>
           <TableBody>
             {cards.map((card) => {
-              let count = 0;
-
               return card.isDelete ? (
                 <TableRow>
                   <TableCell component="th" scope="row">
@@ -195,8 +189,6 @@ function List() {
         </Table>
       </div>
     </div>
-  ) : (
-    () => navigate("/")
   );
 }
 

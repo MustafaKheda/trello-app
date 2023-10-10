@@ -1,3 +1,4 @@
+import { act } from "@testing-library/react";
 import { Actiontypes } from "./ActionTypes";
 import { combineReducers } from "redux";
 const initialState = {
@@ -60,22 +61,32 @@ const userReducer = (state = initialState, action) => {
           ? { ...user, password: action.payload.newPassword }
           : user
       );
-
+      const updateEditUser = {
+        ...state.editUserData,
+        password: action.payload.newPassword,
+      };
+      console.log(updateEditUser);
       return {
         ...state,
         users: [...updatedUser],
-        editUserData: {
-          ...state.editUserData,
-          password: action.payload.newPassword,
-        },
+        editUserData: updateEditUser,
       };
     }
     case FORGET_PASSWORD: {
-      const passwordChangedUsers = users.map((user) =>
-        user?.email.toLowerCase() === action.payload?.email?.toLowerCase()
-          ? { ...user, password: action.payload.password }
-          : user
-      );
+      let passwordChangedUsers = null;
+      if (isNaN(action.payload?.email)) {
+        passwordChangedUsers = users.map((user) =>
+          user?.email.toLowerCase() === action.payload?.email?.toLowerCase()
+            ? { ...user, password: action.payload.password }
+            : user
+        );
+      } else {
+        passwordChangedUsers = users.map((user) =>
+          user?.mobileNumber === action.payload?.email
+            ? { ...user, password: action.payload.password }
+            : user
+        );
+      }
       return {
         ...state,
         users: [...passwordChangedUsers],
@@ -194,7 +205,7 @@ const stageReducer = (state = trelloState, action) => {
       newCard.createdBy = newCard.assignBy;
       return {
         ...state,
-        card: [...state.card, newCard],
+        card: [newCard, ...state.card],
       };
     }
     case CHANGE_CARD:
@@ -220,13 +231,12 @@ const stageReducer = (state = trelloState, action) => {
       };
     }
     case UPDATE_CARD: {
-      const { obj, username } = action.payload;
+      const { obj, fullName } = action.payload;
       obj.modifiedAt = new Date();
-      obj.modifiedBy = username;
+      obj.modifiedBy = fullName;
       const updatedCard = card.map((card) => (card.id === obj.id ? obj : card));
       return {
         ...state,
-        editCardData: null,
         card: [...updatedCard],
       };
     }

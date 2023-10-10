@@ -7,17 +7,15 @@ $buttonBg: #f1f2f4;
   border-radius: 8px !important;
 }
 $buttonText: rgb(0, 0, 0);
-
 .trelloBody {
   background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+  padding: 75px 50px 0;
   min-height: 100vh;
-  max-height: 100vh;
-  padding: 85px 50px 0;
   column-gap: 20px;
+  height: auto;
   min-width: 100vw;
   width: fit-content !important;
 }
-
 .carousel .thumb img {
   width: 100% !important;
   height: 100% !important;
@@ -182,7 +180,7 @@ $buttonText: rgb(0, 0, 0);
   background-color: transparent !important;
   color: #000 !important;
   border: 1px solid black !important;
-  margin: 20px 10px 10px !important;
+  // margin: 20px 10px 10px !important;
 }
 .cardContainer {
   box-sizing: border-box;
@@ -192,7 +190,7 @@ $buttonText: rgb(0, 0, 0);
 }
 //  Drawer
 .trelloDrawer .MuiDrawer-paper {
-  width: 600px !important;
+  width: 500px !important;
 }
 .innerActionBadge span {
   height: 16px !important;
@@ -214,9 +212,9 @@ $buttonText: rgb(0, 0, 0);
 }
 
 .drawerCard {
-  margin: 0px auto 0 !important ;
+  margin: 0px !important ;
   padding-bottom: 10px !important;
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -243,11 +241,9 @@ $buttonText: rgb(0, 0, 0);
 }
 .dialogBoxContent {
   padding: 10px !important;
-  min-height: 130px;
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 .dialogBoxContent input {
@@ -383,4 +379,13 @@ $buttonText: rgb(0, 0, 0);
 .navToolBar div {
   display: flex;
   align-items: center;
+}
+.errorMsg {
+  width: 90% !important;
+  align-self: self-start;
+  margin: 0px auto !important;
+}
+.errorMsgStage {
+  position: relative;
+  left: -110px;
 }

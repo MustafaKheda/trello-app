@@ -17,9 +17,9 @@ import { handleDeleteCard, handleEditCard } from "../../Store/Action";
 import BasicButton from "../../Common/BasicButton";
 import CardComponent from "./CardComponent";
 
-function StageList({ id, openDrawerById }) {
+function StageList({ id, openDrawerById, cards }) {
   const dispatch = useDispatch();
-  const cards = useSelector((store) => store.trelloStage.card);
+  // const cards = useSelector((store) => store.trelloStage.card);
   const [open, setOpen] = useState({
     tempData: null,
     anchorEl: null,
@@ -93,7 +93,7 @@ function StageList({ id, openDrawerById }) {
             className="trelloCardContent"
           >
             {cards &&
-              cards?.map((card, index) => {
+              cards().map((card, index) => {
                 return id === card.stageId && !card.isDelete ? (
                   <Draggable draggableId={card.id} key={card.id} index={index}>
                     {(provided) => (

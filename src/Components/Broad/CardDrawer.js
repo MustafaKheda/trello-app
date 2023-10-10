@@ -25,6 +25,7 @@ import {
 import BasicButton from "../../Common/BasicButton";
 import BasicTextField from "../../Common/BasicTextField";
 import { messageMap } from "../../Common/Constant";
+import { Typography } from "@mui/material";
 
 function CardDrawer({ open, close, currentUser, stageId }) {
   const dispatch = useDispatch();
@@ -35,12 +36,13 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   const isEditMode = editCardData?.type === "editMode";
   isCommentMode = editCardData?.type === "commentMode";
 
-  const { id: userId, username } = currentUser;
+  const { id: userId, firstName, lastName } = currentUser;
+  const fullName = `${firstName} ${lastName}`;
   const [card, setCard] = useState({
     id: uuid().slice(0, 18),
     userId,
     stageId: "",
-    assignBy: username,
+    assignBy: fullName,
     assignTo: "",
     title: "",
     description: "",
@@ -48,7 +50,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     comment: {
       id: uuid().slice(0, 18),
       userId,
-      username,
+      fullName,
       commentText: "",
       isDelete: false,
     },
@@ -79,7 +81,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     comments,
     comment,
   } = card;
-
   useEffect(() => {
     if (editCardData !== null) {
       setCard((prv) => ({
@@ -101,18 +102,29 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       }));
     }
   }, [editCardData, editCardData?.comments]);
+  useEffect(() => {
+    const drawerTimerId = setTimeout(() => {
+      setCard((prevCard) => ({
+        ...prevCard,
+        type: "",
+      }));
+    }, 5000);
+    return () => {
+      clearTimeout(drawerTimerId);
+    };
+  }, [type]);
 
-  const handleCloseSnackbar = () => {
-    setCard({
-      ...card,
-      openBar: false,
-      type: "",
-    });
-  };
+  // const handleCloseSnackbar = () => {
+  //   setCard({
+  //     ...card,
+  //     openBar: false,
+  //     type: "",
+  //   });
+  // };
 
   // Reset to initial state
   const resetCard = () => {
-    setCard((prevCard) => ({
+    return setCard((prevCard) => ({
       ...prevCard,
       id: uuid().slice(0, 18),
       userId,
@@ -124,7 +136,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       comment: {
         id: uuid().slice(0, 18),
         userId,
-        username,
+        fullName,
         commentText: "",
         isDelete: false,
       },
@@ -143,7 +155,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   const handleClose = () => {
     dispatch(handleUnsetEditCard());
     resetCard();
-    close();
+    return close();
   };
 
   const handleChange = (e) => {
@@ -182,17 +194,19 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       return false;
     } else if (enteredDate < currentDate) {
       handleAlertMessage("invalidTime");
+      return false;
     } else {
       return enteredDate >= currentDate;
     }
-
-    // return true;
   };
 
   const handleFormSubmit = (isUpdate = false) => {
     if (title.trim() !== "" && description !== "") {
       if (handleCheckDueDate()) {
         // select action function
+        isUpdate
+          ? handleAlertMessage("cardUpdated")
+          : handleAlertMessage("cardCreated");
         const actionFunction = isUpdate ? handleUpdateCard : handleSetCard;
         dispatch(
           actionFunction(
@@ -212,10 +226,16 @@ function CardDrawer({ open, close, currentUser, stageId }) {
               title,
               userId,
             },
-            username
+            fullName
           )
         );
-        handleClose();
+
+        const drawerTimer = setTimeout(() => {
+          handleClose();
+        }, 1200);
+        return () => {
+          clearTimeout(drawerTimer);
+        };
       }
     } else {
       handleAlertMessage("emptyCardForm");
@@ -223,9 +243,9 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   };
 
   const handleAlertMessage = (message) => {
+    console.log(message);
     setCard((prevCard) => ({
       ...prevCard,
-      openBar: true,
       type: message,
     }));
   };
@@ -242,13 +262,13 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     if (!isEditMode && !isCommentMode) {
       setCard((prevCard) => ({
         ...prevCard,
-        assignBy: username,
+        assignBy: fullName,
         userId,
         stageId,
         comment: {
           id: uuid().slice(0, 18),
           userId,
-          username,
+          fullName,
           commentText: "",
           isDelete: false,
         },
@@ -260,7 +280,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         comment: {
           id: uuid().slice(0, 18),
           userId,
-          username,
+          fullName,
           commentText: "",
           isDelete: false,
         },
@@ -276,7 +296,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         comment: {
           id: uuid().slice(0, 18),
           userId,
-          username,
+          fullName,
           commentText: "",
           isDelete: false,
         },
@@ -306,6 +326,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       <Divider />
       <Card className="drawerCard" elevation={0}>
         <BasicTextField
+          required
           id="title"
           key="title"
           color="secondary"
@@ -317,7 +338,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           variant="standard"
         />
         <BasicTextField
-          id="title"
+          required
+          id="description"
           key="description"
           color="secondary"
           className="cardDrawerTextField"
@@ -330,6 +352,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           minRows={1}
         />
         <BasicTextField
+          required
           id="dueDate"
           key="dueDate"
           color="secondary"
@@ -362,16 +385,26 @@ function CardDrawer({ open, close, currentUser, stageId }) {
             variant="standard"
           >
             {users &&
-              users.map((user) =>
-                userId !== user.id ? (
-                  <MenuItem key={user.id} value={user.username}>
-                    {user.username}
+              users.map((user) => {
+                const fullName = user?.firstName
+                  ? `${user?.firstName} ${user?.lastName}`
+                  : null;
+                return userId !== user.id && fullName !== null ? (
+                  <MenuItem key={user.id} value={fullName}>
+                    {fullName}
                   </MenuItem>
-                ) : null
-              )}
+                ) : null;
+              })}
           </TextField>
         ) : null}
-
+        <Typography
+          className="errorMsg"
+          color={
+            type === "cardCreated" || type === "cardUpdated" ? "green" : "red"
+          }
+        >
+          {messageMap[type]}
+        </Typography>
         {editCardData ? (
           <>
             <div className="commentTextFieldBox">
@@ -428,12 +461,12 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           />
         </ButtonGroup>
       </Card>
-      <Snackbar
+      {/* <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={openBar}
         onClose={handleCloseSnackbar}
         message={messageMap[type]}
-      />
+      /> */}
     </Drawer>
   );
 }

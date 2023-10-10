@@ -45,9 +45,7 @@
 }
 .position {
   position: relative;
-  left: 30%;
-  // top: -10px;
-  padding-top: 10px;
+  top: -5px;
 }
 .profileLogo {
   position: relative;
@@ -71,10 +69,21 @@
 }
 .message {
   position: absolute;
-  bottom: 13%;
-  left: 4%;
-  font-weight: 600 !important;
+  left: 20px;
 }
-.message .MuiTypography-root .basicTextField {
+// .message .MuiTypography-root {
+//   padding-top: 2px !important;
+// }
+.basicTextField {
   padding-top: 2px !important;
+}
+.profilePageGrid {
+  display: flex;
+  flex-direction: column !important;
+  gap: 20px;
+}
+.profilePageGridTitle {
+  display: flex;
+  flex-direction: column !important;
+  gap: 30px;
 }

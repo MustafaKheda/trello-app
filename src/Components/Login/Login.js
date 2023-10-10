@@ -24,7 +24,7 @@ import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import { messageMap } from "../../Common/Constant";
 import BasicSnackBar from "../../Common/BasicSnackBar";
-import { Typography } from "@mui/material";
+import { Tooltip, Typography } from "@mui/material";
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -47,7 +47,6 @@ function Login() {
     showForgetPassword: false,
     showForgetPasswordConfirm: false,
     showForgetPasswordDialog: false,
-    openDialog: false,
   });
   // Destructuring properties from the 'auth' object
   const {
@@ -59,7 +58,6 @@ function Login() {
     email,
     loginEmail,
     loginPassword,
-    openDialog,
     type,
     show,
     confirmPassword,
@@ -152,90 +150,85 @@ function Login() {
       confirmPassword?.trim() !== "" &&
       email?.trim() !== ""
     ) {
+      if (password?.trim().length < 8) {
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
+          type: "passwordLength",
+        }));
+      }
+      if (!passwordRegEx.test(password)) {
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
+
+          type: "invaildPassword",
+        }));
+      }
+      if (password.trim() !== confirmPassword.trim()) {
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
+          type: "passNotMatch",
+        }));
+      }
       if (isNaN(email)) {
         const emailExist = user?.some(
           (user) => user?.email.toLowerCase() === email?.toLowerCase()
         );
-        if (emailExist) {
-          if (password?.trim().length < 8) {
-            return setAuth((prvAuth) => ({
-              ...prvAuth,
-              openDialog: true,
-              type: "passwordContain",
-            }));
-          }
-          if (!passwordRegEx.test(password)) {
-            return setAuth((prvAuth) => ({
-              ...prvAuth,
-              openDialog: true,
-              type: "invaildPassword",
-            }));
-          }
-          if (password.trim() !== confirmPassword.trim()) {
-            return setAuth((prvAuth) => ({
-              ...prvAuth,
-              openDialog: true,
-              type: "passNotMatch",
-            }));
-          }
-          dispatch(handleForgetPasswordAction({ email, password }));
-          setAuth((prvAuth) => ({
+        if (!emailExist) {
+          return setAuth((prvAuth) => ({
             ...prvAuth,
-            openDialog: true,
-            type: "passwordChanged",
-          }));
-          setTimeout(() => {
-            resetLogin();
-          }, 800);
-        } else {
-          setAuth((prvAuth) => ({
-            ...prvAuth,
-            openDialog: true,
             type: "userNotFoundForgetPassword",
           }));
         }
       } else {
-        setAuth((prvAuth) => ({
-          ...prvAuth,
-          openDialog: true,
-          type: "acceptEmail",
-        }));
+        const mobileExist = user.some((user) => user?.mobileNumber === email);
+        if (!mobileExist) {
+          return setAuth((prvAuth) => ({
+            ...prvAuth,
+            type: "userNotFoundForgetPassword",
+          }));
+        }
       }
+      dispatch(handleForgetPasswordAction({ email, password }));
+
+      setAuth((prvAuth) => ({
+        ...prvAuth,
+        type: "passwordChanged",
+      }));
+
+      setTimeout(() => {
+        resetLogin();
+      }, 1200);
     } else {
       setAuth((prvAuth) => ({
         ...prvAuth,
-        openDialog: true,
         type: "fillForgetPasswordForm",
       }));
     }
   };
-
   // Function to handle login
   const handleSignin = () => {
     if (loginPassword.trim() !== "" && loginEmail.trim() !== "") {
-      if (isNaN(loginEmail)) {
-        if (!regEx.test(loginEmail)) {
-          return setAuth((prvAuth) => ({
-            ...prvAuth,
-            open: true,
-            type: "invaildEmail",
-          }));
-        }
-      } else {
-        if (loginEmail.trim().length < 10) {
-          return setAuth((prvAuth) => ({
-            ...prvAuth,
-            open: true,
-            type: "lessNumber",
-          }));
-        }
+      if (!isNaN(loginEmail) && loginEmail.trim().length !== 10) {
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
+          open: true,
+          type: "lessNumber",
+        }));
+      }
+
+      if (isNaN(loginEmail) && !regEx.test(loginEmail)) {
+        return setAuth((prvAuth) => ({
+          ...prvAuth,
+          open: true,
+          type: "invaildEmail",
+        }));
       }
 
       if (loginPassword.trim()?.length < 8) {
         return setAuth((prvAuth) => ({
           ...prvAuth,
           open: true,
-          type: "passwordContain",
+          type: "passwordLength",
         }));
       }
 
@@ -253,7 +246,7 @@ function Login() {
         }));
       }
 
-      const [userFound] = user?.filter(
+      const userFound = user?.find(
         (user) =>
           (user.mobileNumber === loginEmail ||
             user?.email.trim().toLowerCase() ===
@@ -300,25 +293,13 @@ function Login() {
       email.trim() !== ""
     ) {
       if (mobileNumber.trim().length !== 10) {
-        return setAuth((prvAuth) => ({
-          ...prvAuth,
-          open: true,
-          type: "lessNumber",
-        }));
+        return handleAlertMessage("lessNumber");
       }
       if (password.trim().length < 8) {
-        return setAuth((prvAuth) => ({
-          ...prvAuth,
-          open: true,
-          type: "passwordContain",
-        }));
+        return handleAlertMessage("passwordLength");
       }
       if (!passwordRegEx.test(password)) {
-        return setAuth((prvAuth) => ({
-          ...prvAuth,
-          open: true,
-          type: "invaildPassword",
-        }));
+        return handleAlertMessage("invaildPassword");
       }
       // Check the email already exists
       const emailExist = user?.some(
@@ -332,65 +313,39 @@ function Login() {
 
       //validation for email
       if (!regEx.test(email)) {
-        return setAuth((prvAuth) => ({
-          ...prvAuth,
-          open: true,
-          type: "invaildEmail",
-        }));
+        return handleAlertMessage("invaildEmail");
       }
 
       // Attempting to sign up
       if (emailExist) {
-        setAuth((prvAuth) => ({
-          ...prvAuth,
-          open: true,
-          type: "emailExist",
-        }));
+        handleAlertMessage("emailExist");
       } else if (numberExist) {
-        setAuth((prvAuth) => ({
-          ...prvAuth,
-          open: true,
-          type: "numberExist",
-        }));
+        handleAlertMessage("numberExist");
       } else {
         if (password.trim() !== confirmPassword.trim()) {
-          return setAuth((prvAuth) => ({
-            ...prvAuth,
-            openDialog: true,
-            type: "passNotMatch",
-          }));
+          return handleAlertMessage("passNotMatch");
         }
         // Create new user
         dispatch(
           setUser({ id, firstName, lastName, email, mobileNumber, password })
         );
-        setAuth((prvAuth) => ({
-          ...prvAuth,
-          open: true,
-          type: "signup",
-        }));
+        handleAlertMessage("signup");
         resetLogin();
       }
     } else {
       // Empty Form Msg
-      setAuth((prvAuth) => ({
-        ...prvAuth,
-        open: true,
-        type: "empty",
-      }));
+      handleAlertMessage("empty");
     }
   };
 
-  const resetLogin = (check) => {
-    if (check === "forgetPassword") {
-      return setAuth((prvAuth) => ({
-        ...prvAuth,
-        password: "",
-        confirmPassword: "",
-        email: "",
-        showForgetPassword: false,
-      }));
-    }
+  const handleAlertMessage = (message) => {
+    setAuth((prvAuth) => ({
+      ...prvAuth,
+      open: true,
+      type: message,
+    }));
+  };
+  const resetLogin = () => {
     setAuth((prvAuth) => ({
       ...prvAuth,
       id: shortUUID,
@@ -465,51 +420,56 @@ function Login() {
             value={email}
             fullWidth
             name="email"
-            placeholder="Email"
+            placeholder="Email or Mobile Number"
             onChange={handleChange}
           />
-          <BasicTextField
-            className="basicTextField"
-            value={password}
-            fullWidth
-            type={showForgetPassword ? "text" : "password"}
-            name="password"
-            placeholder="New Password"
-            onChange={handleChange}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleShowForgetPassword}>
-                    {showForgetPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <BasicTextField
-            fullWidth
-            className="basicTextField"
-            value={confirmPassword}
-            name="confirmPassword"
-            type={showForgetPasswordConfirm ? "text" : "password"}
-            placeholder="Confirm Password"
-            onChange={handleChange}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleShowForgetPasswordConfirm}>
-                    {showForgetPasswordConfirm ? (
-                      <Visibility />
-                    ) : (
-                      <VisibilityOff />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Typography>{messageMap[type]}</Typography>
+          <Tooltip title={messageMap["msgTooltip"]} placement="top-end" arrow>
+            <BasicTextField
+              className="basicTextField"
+              value={password}
+              fullWidth
+              type={showForgetPassword ? "text" : "password"}
+              name="password"
+              placeholder="New Password"
+              onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleShowForgetPassword}>
+                      {showForgetPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Tooltip>
+          <Tooltip title={messageMap["msgTooltip"]} placement="top-end" arrow>
+            <BasicTextField
+              fullWidth
+              className="basicTextField"
+              value={confirmPassword}
+              name="confirmPassword"
+              type={showForgetPasswordConfirm ? "text" : "password"}
+              placeholder="Confirm Password"
+              onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleShowForgetPasswordConfirm}>
+                      {showForgetPasswordConfirm ? (
+                        <Visibility />
+                      ) : (
+                        <VisibilityOff />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Tooltip>
+          <Typography color={type !== "passwordChanged" ? "red" : "green"}>
+            {messageMap[type]}
+          </Typography>
         </DialogContent>
         <DialogActions>
           <BasicButton
@@ -525,14 +485,6 @@ function Login() {
           />
         </DialogActions>
       </Dialog>
-      {/* <BasicSnackBar
-        // anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        className="snackBar"
-        open={openDialog}
-        onClose={handleClose}
-        // The message map is an object that contains types of messages, and the type variable will determine which type of message needs to be shown.
-        message={messageMap[type]}
-      /> */}
     </div>
   );
 }

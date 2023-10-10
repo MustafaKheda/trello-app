@@ -6,7 +6,6 @@
   box-sizing: border-box !important;
   font-family: "Poppins", sans-serif !important;
 }
-
 body {
   overflow-y: hidden;
 }
@@ -65,17 +64,24 @@ body {
 .listItem {
   margin: 20px;
   padding: 10px;
-  height: fit-content;
+  height: 550px;
+  overflow-y: auto;
+  min-width: fit-content !important;
 }
 .list {
   display: flex;
   gap: 10px;
 }
 .headerName {
-  font-size: 20px !important;
+  font-size: 22px !important;
   font-weight: 600 !important;
   font-style: bold;
   color: #684f9f;
   text-align: center;
   padding-right: 5px;
+  text-transform: capitalize;
+  padding-right: 10px;
+}
+.listTable {
+  height: 300px !important;
 }
