@@ -12,14 +12,15 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Dialog from "@mui/material/Dialog";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { handleDeleteCard, handleEditCard } from "../../Store/Action";
 import BasicButton from "../../Common/BasicButton";
 import CardComponent from "./CardComponent";
+import { Typography } from "@mui/material";
 
-function StageList({ id, openDrawerById, cards }) {
+function StageList({ id, openDrawerById, cards, cardCount, state }) {
+  const { filter } = state;
   const dispatch = useDispatch();
-  // const cards = useSelector((store) => store.trelloStage.card);
   const [open, setOpen] = useState({
     tempData: null,
     anchorEl: null,
@@ -29,7 +30,7 @@ function StageList({ id, openDrawerById, cards }) {
   const { tempData, anchorEl, openDailog, openMenu } = open;
 
   const handleOpenMenu = (event, cardId) => {
-    const temp = cards.find((card) => card.id === cardId);
+    const temp = cards().find((card) => card.id === cardId);
     setOpen((prevOpen) => ({
       ...prevOpen,
       anchorEl: event.currentTarget,
@@ -75,11 +76,11 @@ function StageList({ id, openDrawerById, cards }) {
   };
 
   return (
-    <Card elevation={0} className="trelloCard size">
-      <CardActions disableSpacing className="trelloAction">
+    <Card elevation={0} className="taskHubCard size">
+      <CardActions disableSpacing className="taskHubAction">
         <BasicButton
           variant="contained"
-          className="trelloButton"
+          className="taskHubButton"
           startIcon={<AddIcon />}
           onClick={() => openDrawerById(id)}
           name="Add card"
@@ -90,14 +91,15 @@ function StageList({ id, openDrawerById, cards }) {
           <CardContent
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="trelloCardContent"
+            className="taskHubCardContent"
           >
-            {cards &&
+            {cardCount > 0 ? (
               cards().map((card, index) => {
                 return id === card.stageId && !card.isDelete ? (
                   <Draggable draggableId={card.id} key={card.id} index={index}>
                     {(provided) => (
                       <CardComponent
+                        index={index}
                         provided={provided}
                         card={card}
                         handleOpenMenu={handleOpenMenu}
@@ -106,7 +108,12 @@ function StageList({ id, openDrawerById, cards }) {
                     )}
                   </Draggable>
                 ) : null;
-              })}
+              })
+            ) : filter ? (
+              <Typography textAlign={"center"}>No Card Found</Typography>
+            ) : (
+              <Typography textAlign={"center"}>No card exists!</Typography>
+            )}
             {provided.placeholder}
           </CardContent>
         )}
@@ -128,13 +135,13 @@ function StageList({ id, openDrawerById, cards }) {
         </DialogContent>
         <DialogActions>
           <BasicButton
-            className="trelloStageButton"
+            className="taskHubStageButton"
             onClick={handleCloseDialogBox}
             name="Disagree"
           />
 
           <BasicButton
-            className="trelloStageButton"
+            className="taskHubStageButton"
             name="Agree"
             onClick={handleDelete}
             autoFocus
@@ -146,6 +153,7 @@ function StageList({ id, openDrawerById, cards }) {
         id={`basic-menu`}
         anchorEl={anchorEl}
         open={openMenu}
+        disableScrollLock={true}
         onClose={handleCloseMenu}
         MenuListProps={{
           "aria-labelledby": "basic-button",

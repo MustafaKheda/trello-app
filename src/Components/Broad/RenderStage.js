@@ -11,6 +11,7 @@ const RenderStage = ({
   cards,
   handleDrawerOpen,
   handleOpenMenu,
+  open,
 }) => {
   const cardCount = cards().filter(
     (card) => card?.stageId === stage?.id && !card.isDelete
@@ -18,13 +19,13 @@ const RenderStage = ({
 
   return (
     <div
-      className="trelloStages"
+      className="taskHubStages"
       {...provided.dragHandleProps}
       {...provided.draggableProps}
       ref={provided.innerRef}
     >
       <div
-        className={`trelloCardHeading`}
+        className={`taskHubCardHeading`}
         style={{ backgroundColor: `${stage?.color}` }}
       >
         <Typography textTransform={"uppercase"} fontWeight={600}>
@@ -40,8 +41,10 @@ const RenderStage = ({
       </div>
       <StageList
         cards={cards}
+        state={open}
         {...stage}
         index={index}
+        cardCount={cardCount}
         openDrawerById={handleDrawerOpen}
       />
     </div>

@@ -27,12 +27,13 @@ export const handleChangeStage = (obj) => {
   };
 };
 
-export const handleSetStage = (obj, username) => {
+export const handleSetStage = (obj, firstName) => {
+  console.log(obj, firstName);
   return {
     type: Actiontypes.SET_STAGE,
     payload: {
       obj,
-      username,
+      firstName,
     },
   };
 };

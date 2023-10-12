@@ -12,8 +12,8 @@ import { deleteCard, deleteStage, deleteUser } from "../../Store/Action";
 function List() {
   const currentUser = useSelector((store) => store?.userStore?.currentUser);
   console.log(currentUser);
-  const cards = useSelector((store) => store?.trelloStage?.card);
-  const stages = useSelector((state) => state.trelloStage?.stages);
+  const cards = useSelector((store) => store?.taskhubStage?.card);
+  const stages = useSelector((state) => state.taskhubStage?.stages);
   const users = useSelector((store) => store?.userStore?.users);
   const dispatch = useDispatch();
   return (
@@ -36,7 +36,7 @@ function List() {
               users.map((user) => (
                 <TableRow>
                   <TableCell variant="th">{user.id}</TableCell>
-                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
                   <TableCell>{user.mobileNumber}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.password}</TableCell>

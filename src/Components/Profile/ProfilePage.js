@@ -164,7 +164,7 @@ function ProfilePage() {
     }));
   };
   const handleBack = () => {
-    navigate(-1);
+    navigate("/task-hub");
     setTimeout(() => {
       dispatch(handleUnsetEditUser());
     }, 100);

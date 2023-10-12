@@ -10,7 +10,6 @@ import {
   handleChangeStage,
   handleDeleteStage,
   handleEditUser,
-  unSetCurrentUser,
 } from "../../Store/Action";
 import CardDrawer from "./CardDrawer";
 import Model from "./Model";
@@ -24,16 +23,16 @@ import Dialog from "@mui/material/Dialog";
 import BasicButton from "../../Common/BasicButton";
 import { useNavigate } from "react-router";
 import RenderStage from "./RenderStage";
-import { Grid, Typography } from "@mui/material";
-import { messageMap } from "../../Common/Constant";
+import Grid from "@mui/material/Grid";
 import BasicTextField from "../../Common/BasicTextField";
+import { TextField } from "@mui/material";
 function TaskHub() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const cards = useSelector((store) => store.trelloStage.card);
+  const cards = useSelector((store) => store.taskhubStage.card);
   const currentUser = useSelector((state) => state.userStore.currentUser);
-  const stages = useSelector((state) => state.trelloStage.stages);
+  const stages = useSelector((state) => state.taskhubStage.stages);
 
   const [open, setOpen] = useState({
     openDrawer: false,
@@ -48,6 +47,7 @@ function TaskHub() {
     title: "",
     name: "",
     date: "",
+    filter: false,
   });
   const {
     drawerStageId,
@@ -60,6 +60,9 @@ function TaskHub() {
     anchorProfile,
     openProfile,
     title,
+    name,
+    date,
+    filter,
   } = open;
 
   useEffect(() => {
@@ -67,6 +70,21 @@ function TaskHub() {
       navigate("/");
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    if (title !== "" || name !== "" || date !== "") {
+      setOpen((prevOpen) => ({
+        ...prevOpen,
+        filter: true,
+      }));
+    }
+    if (title === "" && name === "" && date === "") {
+      setOpen((prevOpen) => ({
+        ...prevOpen,
+        filter: false,
+      }));
+    }
+  }, [title, name, date]);
 
   const handleChange = (e) => {
     setOpen((prevOpen) => ({
@@ -105,7 +123,7 @@ function TaskHub() {
   };
 
   const handleDragDrop = (result) => {
-    const { source, destination, type } = result;
+    const { source, destination, type, draggableId } = result;
     if (!destination) return;
     if (
       source.droppableId === destination.droppableId &&
@@ -122,12 +140,9 @@ function TaskHub() {
       newStages.splice(destinationIndex, 0, removedStage);
       return dispatch(handleChangeStage(newStages));
     }
-
     if (type === "card") {
-      console.log(cards);
-      console.log(source, destination);
       const newCards = [...cards];
-      const sourceIndex = source.index;
+      const sourceIndex = newCards.findIndex((card) => card.id === draggableId);
       const destinationIndex = destination.index;
 
       // Remove the dragged card from its source position
@@ -135,7 +150,7 @@ function TaskHub() {
 
       // Set the new stageId for the dragged card
       draggedCard.stageId = destination.droppableId;
-      console.log(draggedCard);
+
       if (source.droppableId === destination.droppableId) {
         newCards.splice(destinationIndex, 0, draggedCard);
         return dispatch(handleChangeCard(newCards));
@@ -150,7 +165,6 @@ function TaskHub() {
       // Insert the dragged card at the calculated index
       newCards.splice(insertionIndex, 0, draggedCard);
       // Dispatch the updated card list
-      console.log(newCards);
       dispatch(handleChangeCard(newCards));
     }
   };
@@ -170,6 +184,7 @@ function TaskHub() {
       openMenu: true,
     }));
   };
+
   const handleCloseMenu = () => {
     setOpen((prevOpen) => ({
       ...prevOpen,
@@ -188,10 +203,10 @@ function TaskHub() {
     }));
   };
 
-  const handleOpenProfilePage = () => {
-    dispatch(handleEditUser(currentUser.id));
-    navigate("/profile");
-  };
+  // const handleOpenProfilePage = () => {
+  //   dispatch(handleEditUser(currentUser.id));
+  //   navigate("/profile");
+  // };
 
   const handelOpenDeleteDailogBox = () => {
     setOpen((prevOpen) => ({
@@ -214,10 +229,13 @@ function TaskHub() {
     dispatch(handleDeleteStage(tempStage.id));
     handleCloseDialogBox();
   };
+
   const handleClear = () => {
     setOpen((prevOpen) => ({
       ...prevOpen,
       title: "",
+      date: "",
+      name: "",
     }));
   };
 
@@ -225,7 +243,19 @@ function TaskHub() {
     let stateCards = [...cards];
     if (title !== "") {
       const filterCards = stateCards.filter((card) =>
-        card.title.toLowerCase().includes(title.toLowerCase()) ? card : null
+        card.title.toLowerCase().includes(title.toLowerCase())
+      );
+      stateCards = [...filterCards];
+    }
+    if (name !== "") {
+      const filterCards = stateCards.filter((card) =>
+        card.assignTo.toLowerCase().includes(name.toLowerCase())
+      );
+      stateCards = [...filterCards];
+    }
+    if (date !== "") {
+      const filterCards = stateCards.filter(
+        (card) => card.dueDate.slice(0, 10) === date
       );
       stateCards = [...filterCards];
     }
@@ -234,20 +264,47 @@ function TaskHub() {
 
   return Object.keys(currentUser).length > 0 ? (
     <>
-      <div id="trelloBody" className="trelloBody">
+      <div id="taskHubBody" className="taskHubBody">
         <Header handleOpenProfileMenu={handleOpenProfileMenu} />
-        <Grid container>
+        <Grid container gap={2} className="taskHubContainerAction">
           <Grid item>
             <BasicButton
-              className="trelloStageButton"
+              className="taskHubStageButton"
               variant="outlined"
               onClick={handleClickOpenModel}
               name="Create Stage"
             />
           </Grid>
-          <Grid item>
+          <Grid item className="taskHubContainerItem">
             <BasicTextField
-              onKeyDown={handleFilter}
+              inputProps={{
+                autoComplete: "off",
+              }}
+              value={date}
+              name="date"
+              type="date"
+              label="Due Date"
+              onChange={handleChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <BasicTextField
+              inputProps={{
+                autocomplete: "off",
+              }}
+              value={name}
+              name="name"
+              label="Assignee Name"
+              onChange={handleChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <BasicTextField
+              inputProps={{
+                autocomplete: "off",
+              }}
               value={title}
               name="title"
               label="Card Title"
@@ -256,8 +313,11 @@ function TaskHub() {
                 shrink: true,
               }}
             />
-            <BasicButton onClick={handleFilter} name="Search" />
-            <BasicButton onClick={handleClear} name="Clear" />
+            <BasicButton
+              className="taskHubStageButton"
+              onClick={handleClear}
+              name="Clear"
+            />
           </Grid>
         </Grid>
 
@@ -286,6 +346,7 @@ function TaskHub() {
                               provided={provided}
                               stage={stage}
                               index={index}
+                              open={open}
                               cards={handleFilter}
                               handleOpenMenu={handleOpenMenu}
                               handleDrawerOpen={handleDrawerOpen}
@@ -325,22 +386,23 @@ function TaskHub() {
         </DialogContent>
         <DialogActions>
           <BasicButton
-            className="trelloStageButton"
+            className="taskHubStageButton"
             onClick={handleCloseDialogBox}
             name="Disagree"
           />
           <BasicButton
-            className="trelloStageButton"
+            className="taskHubStageButton"
             onClick={handleDelete}
             autoFocus
             name="Agree"
           />
         </DialogActions>
       </Dialog>
-      <Menu
+      {/* <Menu
         id={`profile-menu`}
         anchorEl={anchorProfile}
         open={openProfile}
+        disableScrollLock={true}
         onClose={handleCloseMenu}
         MenuListProps={{
           "aria-labelledby": "basic-button",
@@ -350,11 +412,12 @@ function TaskHub() {
         <MenuItem onClick={() => dispatch(unSetCurrentUser())}>
           Sign Out
         </MenuItem>
-      </Menu>
+      </Menu> */}
       <Menu
         id={`basic-menu`}
         anchorEl={anchorEl}
         open={openMenu}
+        disableScrollLock={true}
         onClose={handleCloseMenu}
         MenuListProps={{
           "aria-labelledby": "basic-button",

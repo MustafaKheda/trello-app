@@ -9,7 +9,7 @@ import Person2Icon from "@mui/icons-material/Person2";
 import KeyIcon from "@mui/icons-material/Key";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "../../assest/Css/Login.scss";
-import { Button, IconButton } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CommonCarousel from "./CommonCarousel";
 import BasicSnackBar from "../../Common/BasicSnackBar";
@@ -25,7 +25,6 @@ function SignIn({
   handleShowPassword,
 }) {
   const handleKeyChange = (e) => {
-    console.log(e.keyCode);
     if (e.keyCode === 13) {
       handleSignin();
     }

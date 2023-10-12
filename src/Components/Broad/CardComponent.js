@@ -17,10 +17,16 @@ import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
 import { monthNames } from "../../Common/Constant";
 
-const CardComponent = ({ provided, card, handleOpenMenu, handleEditStage }) => {
+const CardComponent = ({
+  provided,
+  card,
+  handleOpenMenu,
+  handleEditStage,
+  index,
+}) => {
   const { title, description, assignTo, assignBy, dueDate, comments, id } =
     card;
-
+  const currentDate = new Date();
   const date = new Date(dueDate);
   const dueDay = date.getDate();
   const dueMonth = date.getMonth();
@@ -30,20 +36,12 @@ const CardComponent = ({ provided, card, handleOpenMenu, handleEditStage }) => {
     (comment) => !comment.isDelete
   ).length;
 
-  const handleCheckDueDate = () => {
-    const currentDate = new Date();
-    return (
-      Date.parse(date.toString().slice(0, 16)) <
-      Date.parse(currentDate.toString().slice(0, 16))
-    );
-  };
-
   return (
     <Card
       {...provided.dragHandleProps}
       {...provided.draggableProps}
       ref={provided.innerRef}
-      className="trelloInnerCard"
+      className="taskHubInnerCard"
     >
       <CardHeader
         title={title}
@@ -91,7 +89,7 @@ const CardComponent = ({ provided, card, handleOpenMenu, handleEditStage }) => {
               <Typography
                 component={"div"}
                 className={
-                  handleCheckDueDate()
+                  date < currentDate
                     ? `due actionStackDueDate`
                     : "notdue actionStackDueDate"
                 }

@@ -6,6 +6,7 @@ import {
   setCurrentUser,
   handleForgetPasswordAction,
   unSetCurrentUser,
+  handleSetStage,
 } from "../../Store/Action";
 import BasicTextField from "../../Common/BasicTextField";
 import BasicButton from "../../Common/BasicButton";
@@ -23,7 +24,6 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import { messageMap } from "../../Common/Constant";
-import BasicSnackBar from "../../Common/BasicSnackBar";
 import { Tooltip, Typography } from "@mui/material";
 function Login() {
   const navigate = useNavigate();
@@ -325,9 +325,25 @@ function Login() {
         if (password.trim() !== confirmPassword.trim()) {
           return handleAlertMessage("passNotMatch");
         }
+        const fullName = `${firstName} ${lastName}`;
         // Create new user
         dispatch(
           setUser({ id, firstName, lastName, email, mobileNumber, password })
+        );
+        console.log(fullName);
+        dispatch(
+          handleSetStage({
+            id: "",
+            color: "#000",
+            name: "Default stage",
+            isDelete: false,
+            createdBy: fullName,
+            createdAt: "",
+            modifiedBy: "",
+            modifiedAt: "",
+            userId: auth?.id,
+          }),
+          fullName
         );
         handleAlertMessage("signup");
         resetLogin();

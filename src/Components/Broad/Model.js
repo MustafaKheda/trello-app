@@ -25,14 +25,16 @@ const Transition = forwardRef(function Transition(props, ref) {
 
 function Model({ close, open, currentUser }) {
   const dispatch = useDispatch();
+
   const editStageData = useSelector(
-    (store) => store?.trelloStage?.editStageData
+    (store) => store?.taskhubStage?.editStageData
   );
 
-  const { id: userId, username } = currentUser;
+  const { id: userId, firstName, lastName } = currentUser;
+  const fullName = `${firstName} ${lastName}`;
 
   const [stage, setStage] = useState({
-    id: uuid().slice(0, 18),
+    id: "",
     userId,
     name: "",
     color: "#000",
@@ -52,6 +54,7 @@ function Model({ close, open, currentUser }) {
       }));
     }, 5000);
   }, [stage.type]);
+
   useEffect(() => {
     if (editStageData !== null) {
       setStage((prevStage) => ({
@@ -105,25 +108,22 @@ function Model({ close, open, currentUser }) {
 
   const handleFormSubmission = (event, isUpdate = false) => {
     event.preventDefault();
-
+    console.log(fullName);
     if (name !== "") {
       const actionFunction = isUpdate ? handleUpdateStage : handleSetStage;
-
       dispatch(
-        actionFunction(
-          {
-            id,
-            color,
-            name,
-            isDelete,
-            createdAt,
-            createdBy,
-            modifiedAt,
-            modifiedBy,
-            userId: isUpdate ? stage.userId : userId,
-          },
-          username
-        )
+        actionFunction({
+          id,
+          color,
+          name,
+          isDelete,
+          createdAt,
+          createdBy: fullName,
+          modifiedAt,
+          modifiedBy,
+          userId: isUpdate ? stage.userId : userId,
+        }),
+        firstName
       );
 
       handleClose();
@@ -147,7 +147,7 @@ function Model({ close, open, currentUser }) {
   const resetStage = () => {
     setStage((prevStage) => ({
       ...prevStage,
-      id: uuid().slice(0, 18),
+      id: "",
       name: "",
       color: "#000",
       isDelete: false,
@@ -206,11 +206,11 @@ function Model({ close, open, currentUser }) {
           <Typography color={"red"} className="errorMsgStage">
             {messageMap[type]}
           </Typography>
-          <Button className="trelloStageButton" onClick={handleClose}>
+          <Button className="taskHubStageButton" onClick={handleClose}>
             cancel
           </Button>
           <Button
-            className="trelloStageButton"
+            className="taskHubStageButton"
             onClick={editStageData ? handleUpdate : handleSubmit}
           >
             {editStageData ? "Update" : "submit"}

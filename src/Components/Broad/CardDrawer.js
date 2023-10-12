@@ -31,9 +31,11 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   const dispatch = useDispatch();
   const theme = useTheme();
   const users = useSelector((store) => store?.userStore.users);
-  const editCardData = useSelector((store) => store?.trelloStage?.editCardData);
+  const editCardData = useSelector(
+    (store) => store?.taskhubStage?.editCardData
+  );
   let isCommentMode = false;
-  const isEditMode = editCardData?.type === "editMode";
+  const isEditMode = editCardData ? true : false;
   isCommentMode = editCardData?.type === "commentMode";
 
   const { id: userId, firstName, lastName } = currentUser;
@@ -57,7 +59,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     comments: [],
     type: "",
     isDelete: false,
-    openBar: false,
+    isDisable: false,
     createdBy: "",
     createdAt: "",
     modifiedBy: "",
@@ -72,7 +74,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     id,
     assignBy,
     type,
-    openBar,
+    isDisable,
     createdAt,
     modifiedAt,
     createdBy,
@@ -143,7 +145,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       comments: [],
       type: "",
       isDelete: false,
-      openBar: false,
+      isDisable: false,
       createdBy: "",
       createdAt: "",
       modifiedBy: "",
@@ -205,8 +207,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       if (handleCheckDueDate()) {
         // select action function
         isUpdate
-          ? handleAlertMessage("cardUpdated")
-          : handleAlertMessage("cardCreated");
+          ? handleAlertMessage("cardUpdated", true)
+          : handleAlertMessage("cardCreated", true);
         const actionFunction = isUpdate ? handleUpdateCard : handleSetCard;
         dispatch(
           actionFunction(
@@ -242,19 +244,35 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     }
   };
 
-  const handleAlertMessage = (message) => {
-    console.log(message);
+  const handleAlertMessage = (message, disable = false) => {
+    if (disable) {
+      setCard((prevCard) => ({
+        ...prevCard,
+        isDisable: true,
+        type: message,
+      }));
+    }
+
     setCard((prevCard) => ({
       ...prevCard,
       type: message,
     }));
   };
-
   const handleSubmit = (e) => {
     handleFormSubmit();
   };
 
   const handleUpdate = (e) => {
+    console.log(editCardData);
+    if (
+      editCardData.description === description &&
+      editCardData.title === title &&
+      editCardData.assignTo === assignTo &&
+      editCardData.dueDate === dueDate
+    ) {
+      console.log(card);
+      return;
+    }
     handleFormSubmit(true);
   };
   // To bind user and stage id
@@ -309,7 +327,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   return (
     <Drawer
       key={stageId}
-      className="trelloDrawer"
+      className="taskHubDrawer"
       anchor="right"
       open={open}
       onClose={handleClose}
@@ -450,6 +468,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         </div>
         <ButtonGroup className="drawerButtonGroup">
           <BasicButton
+            disabled={isDisable}
             onClick={editCardData ? handleUpdate : handleSubmit}
             name={editCardData ? "update" : "submit"}
             className="drawerButton"
@@ -461,12 +480,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           />
         </ButtonGroup>
       </Card>
-      {/* <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={openBar}
-        onClose={handleCloseSnackbar}
-        message={messageMap[type]}
-      /> */}
     </Drawer>
   );
 }

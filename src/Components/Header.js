@@ -23,9 +23,11 @@ export default function Header() {
         ?.slice(0, 1)
         ?.toUpperCase()}${currentUser?.lastName?.slice(0, 1)?.toUpperCase()}`
     : "U";
-  const fullName = currentUser?.firstName
-    ? `${currentUser.firstName} ${currentUser.lastName}`
-    : "Unknown";
+
+  // const fullName = currentUser?.firstName
+  //   ? `${currentUser.firstName} ${currentUser.lastName}`
+  //   : "Unknown";
+
   const [open, setOpen] = useState({
     anchorProfile: null,
     openProfile: false,
@@ -43,6 +45,7 @@ export default function Header() {
     dispatch(handleEditUser(currentUser.id));
     navigate("/profile");
   };
+
   const handleCloseMenu = () => {
     setOpen((prevOpen) => ({
       ...prevOpen,
@@ -83,6 +86,7 @@ export default function Header() {
         id={`profile-menu`}
         anchorEl={anchorProfile}
         open={openProfile}
+        disableScrollLock={true}
         onClose={handleCloseMenu}
         MenuListProps={{
           "aria-labelledby": "basic-button",

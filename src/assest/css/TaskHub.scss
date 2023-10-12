@@ -7,14 +7,16 @@ $buttonBg: #f1f2f4;
   border-radius: 8px !important;
 }
 $buttonText: rgb(0, 0, 0);
-.trelloBody {
+.taskHubBody {
+  box-sizing: border-box !important;
   background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
-  padding: 75px 50px 0;
+  padding: 75px 0px 0 50px;
   min-height: 100vh;
   column-gap: 20px;
   height: auto;
   min-width: 100vw;
   width: fit-content !important;
+  overflow: hidden !important;
 }
 .carousel .thumb img {
   width: 100% !important;
@@ -28,7 +30,7 @@ $buttonText: rgb(0, 0, 0);
 .commentDeleteIcon {
   cursor: pointer;
 }
-.trelloCard {
+.taskHubCard {
   background-color: $buttonBg !important;
   display: flex;
   flex-direction: column;
@@ -39,23 +41,24 @@ $buttonText: rgb(0, 0, 0);
   padding: 10px !important;
   border-radius: 25px !important;
 }
-.trelloCard:hover {
+.taskHubCard:hover {
   transform: scale(1.01);
 }
-.trelloCardContent {
+.taskHubCardContent {
   margin: 10px 0 !important;
   padding: 0 !important;
   overflow-x: hidden !important;
   overflow-y: auto !important ;
   border-radius: 25px;
 }
-.trelloStages {
+
+.taskHubStages {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 //  Trello Stage inner Card's
-.trelloInnerCard {
+.taskHubInnerCard {
   box-sizing: border-box !important;
   background-color: #fff;
   border-radius: 25px !important;
@@ -104,7 +107,7 @@ $buttonText: rgb(0, 0, 0);
 .actionStack svg {
   font-size: medium;
 }
-.trelloAction {
+.taskHubAction {
   padding: 0px !important;
   margin: 0;
   justify-content: flex-start;
@@ -156,14 +159,14 @@ $buttonText: rgb(0, 0, 0);
   color: green;
 }
 
-.trelloHeader {
+.taskHubHeader {
   align-items: center !important;
 }
-.trelloHeader span {
+.taskHubHeader span {
   font-weight: 600;
   font-size: medium !important;
 }
-.trelloButton {
+.taskHubButton {
   @include button;
   margin-bottom: 0px !important;
   background: transparent !important;
@@ -174,7 +177,7 @@ $buttonText: rgb(0, 0, 0);
   box-shadow: none !important;
   justify-content: flex-start !important;
 }
-.trelloStageButton {
+.taskHubStageButton {
   @include button;
   height: fit-content !important;
   background-color: transparent !important;
@@ -187,9 +190,10 @@ $buttonText: rgb(0, 0, 0);
   width: 100% !important;
   display: flex;
   gap: 10px !important;
+  margin-top: 70px !important;
 }
 //  Drawer
-.trelloDrawer .MuiDrawer-paper {
+.taskHubDrawer .MuiDrawer-paper {
   width: 500px !important;
 }
 .innerActionBadge span {
@@ -249,20 +253,13 @@ $buttonText: rgb(0, 0, 0);
 .dialogBoxContent input {
   height: 40px !important;
 }
-.trelloButton span svg {
+.taskHubButton span svg {
   font-size: 26px !important ;
 }
 #setting svg {
   font-size: 20px !important;
 }
-.trelloContainer {
-  margin: 0 auto;
-  padding: 0 5px;
-  backdrop-filter: blur(10px);
-  border-radius: 25px !important;
-  margin-top: 75px;
-  align-content: flex-start;
-}
+
 .commentHeading {
   position: relative;
   right: 30%;
@@ -309,7 +306,7 @@ $buttonText: rgb(0, 0, 0);
   // margin-top: 50px !important;
 }
 
-.trelloCardHeading {
+.taskHubCardHeading {
   display: flex;
   border-top-right-radius: 100px !important;
   border-bottom-right-radius: 100px !important;
@@ -325,15 +322,15 @@ $buttonText: rgb(0, 0, 0);
   font-weight: 600 !important;
   clip-path: polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%);
 }
-.trelloCardHeading:last-of-type {
+.taskHubCardHeading:last-of-type {
   clip-path: none;
 }
-.trelloCardHeading h4 {
+.taskHubCardHeading h4 {
   align-items: center;
   display: flex;
   gap: 5px;
 }
-.trelloCardHeading svg {
+.taskHubCardHeading svg {
   color: #fff !important;
 }
 @media only screen and (max-width: 400px) {
@@ -345,7 +342,13 @@ $buttonText: rgb(0, 0, 0);
 @media only screen and (min-width: 800px) {
 }
 
-@media only screen and (min-width: 1100px) {
+@media only screen and (max-width: 950px) {
+  .cardContainer {
+    margin-top: 115px !important;
+  }
+  .taskHubCard {
+    max-height: 350px;
+  }
 }
 .size {
   width: 250px;
@@ -355,7 +358,7 @@ $buttonText: rgb(0, 0, 0);
 /* Add custom scroll styling */
 ::-webkit-scrollbar {
   width: 8px;
-  height: 15px;
+  height: 2.5vh;
 }
 
 /* Show scrollbar on hover */
@@ -366,10 +369,10 @@ $buttonText: rgb(0, 0, 0);
 }
 
 ::-webkit-scrollbar-track {
+  // background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
   background-color: transparent !important; /* Color of the track */
   width: 120%;
 }
-
 .fullWidth {
   display: flex;
   flex-direction: column;
@@ -387,5 +390,19 @@ $buttonText: rgb(0, 0, 0);
 }
 .errorMsgStage {
   position: relative;
-  left: -110px;
+  left: -25%;
+}
+.taskHubContainerAction {
+  position: fixed;
+  justify-content: space-between;
+  width: 93vw !important;
+  margin-left: 10px;
+  margin-top: 20px;
+}
+
+.taskHubContainerItem {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-evenly !important;
 }

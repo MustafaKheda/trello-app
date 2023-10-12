@@ -1,6 +1,7 @@
 import { act } from "@testing-library/react";
 import { Actiontypes } from "./ActionTypes";
 import { combineReducers } from "redux";
+import uuid from "react-uuid";
 const initialState = {
   currentUser: {},
   users: [],
@@ -130,14 +131,14 @@ const userReducer = (state = initialState, action) => {
   }
 };
 
-const trelloState = {
+const taskhubState = {
   stages: [],
   card: [],
   editStageData: null,
   editCardData: null,
 };
 
-const stageReducer = (state = trelloState, action) => {
+const stageReducer = (state = taskhubState, action) => {
   const { stages, card } = state;
   switch (action.type) {
     case CHANGE_STAGE:
@@ -146,8 +147,10 @@ const stageReducer = (state = trelloState, action) => {
         stages: [...action.payload],
       };
     case SET_STAGE: {
-      const { obj, username } = action.payload;
-      obj.createdBy = username;
+      const { obj, fullName } = action.payload;
+      console.log(action.payload);
+      obj.id = uuid().slice(0, 18);
+      // obj.createdBy = fullName;
       obj.createdAt = new Date();
       return {
         ...state,
@@ -303,10 +306,10 @@ const stageReducer = (state = trelloState, action) => {
 };
 const rootReducer = combineReducers({
   userStore: userReducer,
-  trelloStage: stageReducer,
+  taskhubStage: stageReducer,
 });
 //  const reducer = combineReducers({
 //   userStore: userReducer,
-//   trelloStage: stageReducer,
+//   taskhubStage: stageReducer,
 // });
 export default rootReducer;
