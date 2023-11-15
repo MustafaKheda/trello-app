@@ -90,7 +90,7 @@ function Login() {
         open: false,
         type: "",
       }));
-    }, 3000);
+    }, 5000);
     return () => {
       clearTimeout(timeOut);
     };
@@ -145,17 +145,20 @@ function Login() {
   };
 
   const handleForgetPassword = () => {
+    // Check if the password, confirmPassword, and email fields are not empty
     if (
       password?.trim() !== "" &&
       confirmPassword?.trim() !== "" &&
       email?.trim() !== ""
     ) {
+      // Check if the password length is less than 8 characters
       if (password?.trim().length < 8) {
         return setAuth((prvAuth) => ({
           ...prvAuth,
           type: "passwordLength",
         }));
       }
+      // Check if the password does not meet the required format
       if (!passwordRegEx.test(password)) {
         return setAuth((prvAuth) => ({
           ...prvAuth,
@@ -184,7 +187,7 @@ function Login() {
         if (!mobileExist) {
           return setAuth((prvAuth) => ({
             ...prvAuth,
-            type: "userNotFoundForgetPassword",
+            type: "userNotFoundForgetPasswordMobile",
           }));
         }
       }
@@ -292,62 +295,62 @@ function Login() {
       confirmPassword.trim() !== "" &&
       email.trim() !== ""
     ) {
+      if (!regEx.test(email)) {
+        return handleAlertMessage("invaildEmail");
+      }
+      // Check the email already exists
+      const emailExist = user?.some(
+        (user) => user?.email.toLowerCase() === email.toLowerCase()
+      );
+      if (emailExist) {
+        return handleAlertMessage("emailExist");
+      }
       if (mobileNumber.trim().length !== 10) {
         return handleAlertMessage("lessNumber");
       }
+      // Check the mobile number already exists
+      const numberExist = user?.some(
+        (user) => user.mobileNumber === mobileNumber
+      );
+      if (numberExist) {
+        return handleAlertMessage("numberExist");
+      }
+
       if (password.trim().length < 8) {
         return handleAlertMessage("passwordLength");
       }
       if (!passwordRegEx.test(password)) {
         return handleAlertMessage("invaildPassword");
       }
-      // Check the email already exists
-      const emailExist = user?.some(
-        (user) => user?.email.toLowerCase() === email.toLowerCase()
-      );
-
-      // Check the mobile number already exists
-      const numberExist = user?.some(
-        (user) => user.mobileNumber === mobileNumber
-      );
+      if (password.trim() !== confirmPassword.trim()) {
+        return handleAlertMessage("passNotMatch");
+      }
 
       //validation for email
-      if (!regEx.test(email)) {
-        return handleAlertMessage("invaildEmail");
-      }
 
       // Attempting to sign up
-      if (emailExist) {
-        handleAlertMessage("emailExist");
-      } else if (numberExist) {
-        handleAlertMessage("numberExist");
-      } else {
-        if (password.trim() !== confirmPassword.trim()) {
-          return handleAlertMessage("passNotMatch");
-        }
-        const fullName = `${firstName} ${lastName}`;
-        // Create new user
-        dispatch(
-          setUser({ id, firstName, lastName, email, mobileNumber, password })
-        );
-        console.log(fullName);
-        dispatch(
-          handleSetStage({
-            id: "",
-            color: "#000",
-            name: "Default stage",
-            isDelete: false,
-            createdBy: fullName,
-            createdAt: "",
-            modifiedBy: "",
-            modifiedAt: "",
-            userId: auth?.id,
-          }),
-          fullName
-        );
-        handleAlertMessage("signup");
-        resetLogin();
-      }
+      const fullName = `${firstName} ${lastName}`;
+      // Create new user
+      dispatch(
+        setUser({ id, firstName, lastName, email, mobileNumber, password })
+      );
+      // Default stage
+      dispatch(
+        handleSetStage({
+          id: "",
+          color: "#000",
+          name: "Default stage",
+          isDelete: false,
+          createdBy: fullName,
+          createdAt: "",
+          modifiedBy: "",
+          modifiedAt: "",
+          userId: auth?.id,
+        }),
+        fullName
+      );
+      handleAlertMessage("signup");
+      resetLogin();
     } else {
       // Empty Form Msg
       handleAlertMessage("empty");

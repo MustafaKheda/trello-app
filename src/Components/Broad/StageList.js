@@ -17,6 +17,7 @@ import { handleDeleteCard, handleEditCard } from "../../Store/Action";
 import BasicButton from "../../Common/BasicButton";
 import CardComponent from "./CardComponent";
 import { Typography } from "@mui/material";
+import { Comment } from "@mui/icons-material";
 
 function StageList({ id, openDrawerById, cards, cardCount, state }) {
   const { filter } = state;
@@ -31,6 +32,7 @@ function StageList({ id, openDrawerById, cards, cardCount, state }) {
 
   const handleOpenMenu = (event, cardId) => {
     const temp = cards().find((card) => card.id === cardId);
+
     setOpen((prevOpen) => ({
       ...prevOpen,
       anchorEl: event.currentTarget,
@@ -39,8 +41,8 @@ function StageList({ id, openDrawerById, cards, cardCount, state }) {
     }));
   };
 
-  const handleEditStage = (data, type) => {
-    openDrawerById(id);
+  const handleEditStage = (data, type, comment = false) => {
+    openDrawerById(id, comment);
     dispatch(handleEditCard(data, type));
     handleCloseMenu();
   };
@@ -110,7 +112,7 @@ function StageList({ id, openDrawerById, cards, cardCount, state }) {
                 ) : null;
               })
             ) : filter ? (
-              <Typography textAlign={"center"}>No Card Found</Typography>
+              <Typography textAlign={"center"}>No card found</Typography>
             ) : (
               <Typography textAlign={"center"}>No card exists!</Typography>
             )}

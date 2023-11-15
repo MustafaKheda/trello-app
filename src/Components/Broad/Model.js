@@ -18,6 +18,7 @@ import {
 import { SwatchesPicker } from "./SwatchesPicker";
 import { messageMap } from "../../Common/Constant";
 import BasicTextField from "../../Common/BasicTextField";
+import { TextField } from "@mui/material";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -108,7 +109,6 @@ function Model({ close, open, currentUser }) {
 
   const handleFormSubmission = (event, isUpdate = false) => {
     event.preventDefault();
-    console.log(fullName);
     if (name !== "") {
       const actionFunction = isUpdate ? handleUpdateStage : handleSetStage;
       dispatch(
@@ -159,7 +159,15 @@ function Model({ close, open, currentUser }) {
       modifiedAt: "",
     }));
   };
-
+  const handleEnter = (e) => {
+    if (e.keyCode === 13) {
+      if (editStageData) {
+        handleUpdate(e);
+      } else {
+        handleSubmit(e);
+      }
+    }
+  };
   useEffect(() => {
     if (editStageData === null) {
       setStage((prevStage) => ({
@@ -197,6 +205,7 @@ function Model({ close, open, currentUser }) {
             fullWidth
             name="name"
             label="Title"
+            onKeyDown={handleEnter}
             onChange={handleChange}
           />
           <SwatchesPicker color={color} onChange={setStage} />

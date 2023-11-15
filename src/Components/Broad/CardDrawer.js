@@ -9,7 +9,6 @@ import { useTheme } from "@emotion/react";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Card from "@mui/material/Card";
 import MenuItem from "@mui/material/MenuItem";
-import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
 import DeleteIcon from "@mui/icons-material/Close";
 // import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
@@ -25,22 +24,32 @@ import {
 import BasicButton from "../../Common/BasicButton";
 import BasicTextField from "../../Common/BasicTextField";
 import { messageMap } from "../../Common/Constant";
-import { Typography } from "@mui/material";
+import { Avatar, Typography } from "@mui/material";
 
-function CardDrawer({ open, close, currentUser, stageId }) {
+function CardDrawer({ open, close, currentUser, stageId, commentSection }) {
+  console.log(commentSection);
   const dispatch = useDispatch();
   const theme = useTheme();
   const users = useSelector((store) => store?.userStore.users);
   const editCardData = useSelector(
     (store) => store?.taskhubStage?.editCardData
   );
+
   let isCommentMode = false;
   const isEditMode = editCardData ? true : false;
   isCommentMode = editCardData?.type === "commentMode";
 
   const { id: userId, firstName, lastName } = currentUser;
   const fullName = `${firstName} ${lastName}`;
+
+  const letter = currentUser?.firstName
+    ? `${currentUser?.firstName
+        ?.slice(0, 1)
+        ?.toUpperCase()}${currentUser?.lastName?.slice(0, 1)?.toUpperCase()}`
+    : "U";
+
   const [card, setCard] = useState({
+    timerId: null,
     id: uuid().slice(0, 18),
     userId,
     stageId: "",
@@ -51,8 +60,6 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     dueDate: "",
     comment: {
       id: uuid().slice(0, 18),
-      userId,
-      fullName,
       commentText: "",
       isDelete: false,
     },
@@ -64,9 +71,24 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     createdAt: "",
     modifiedBy: "",
     modifiedAt: "",
+    history: {
+      id: uuid().slice(0, 18),
+      createdAt: "",
+      desc: "",
+      type: "",
+      title: "",
+    },
+    tempArray: [],
+    historyArray: [],
+    isHistoryShowing: false,
   });
-
+  useEffect(() => {
+    if (commentSection === true) {
+      handleChangeComment();
+    }
+  }, [commentSection]);
   const {
+    timerId,
     title,
     description,
     dueDate,
@@ -82,8 +104,41 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     isDelete,
     comments,
     comment,
+    history,
+    historyArray,
+    tempArray,
+    isHistoryShowing,
   } = card;
+
+  // To bind user and stage id
   useEffect(() => {
+    if (!isEditMode && !isCommentMode) {
+      setCard((prevCard) => ({
+        ...prevCard,
+        assignBy: fullName,
+        userId,
+        stageId,
+        comment: {
+          id: uuid().slice(0, 18),
+          commentText: "",
+          isDelete: false,
+        },
+      }));
+    }
+    if (isEditMode || isCommentMode) {
+      setCard((prevCard) => ({
+        ...prevCard,
+        comment: {
+          id: uuid().slice(0, 18),
+          commentText: "",
+          isDelete: false,
+        },
+      }));
+    }
+  }, [stageId, userId, editCardData]);
+
+  useEffect(() => {
+    console.log("update edit card", editCardData);
     if (editCardData !== null) {
       setCard((prv) => ({
         ...prv,
@@ -101,9 +156,21 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         createdAt: new Date(editCardData?.createdAt) || "",
         modifiedBy: editCardData?.modifiedBy || "",
         modifiedAt: editCardData?.modifiedAt || "",
+        historyArray: editCardData?.historyArray,
       }));
     }
-  }, [editCardData, editCardData?.comments]);
+  }, [editCardData]);
+
+  useEffect(() => {
+    console.log("update comment", editCardData);
+    if (editCardData !== null) {
+      setCard((prv) => ({
+        ...prv,
+        comments: [...editCardData?.comments],
+      }));
+    }
+  }, [editCardData?.comments]);
+
   useEffect(() => {
     const drawerTimerId = setTimeout(() => {
       setCard((prevCard) => ({
@@ -116,13 +183,37 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     };
   }, [type]);
 
-  // const handleCloseSnackbar = () => {
-  //   setCard({
-  //     ...card,
-  //     openBar: false,
-  //     type: "",
-  //   });
-  // };
+  useEffect(() => {
+    if (history?.type === "" || history?.type === "comment") {
+      return;
+    }
+    const isHistoryInTempArray = tempArray?.some(
+      (item) => item?.type === history?.type
+    );
+    if (isHistoryInTempArray) {
+      const updatedTempArray = tempArray?.map((item) => {
+        if (item?.type === history.type) {
+          if (editCardData[history.type]?.trim() !== history?.title?.trim()) {
+            return history;
+          }
+          return;
+        } else {
+          return item;
+        }
+      });
+      console.log("true", history);
+      setCard((prevCard) => ({
+        ...prevCard,
+        tempArray: updatedTempArray?.filter((item) => item !== undefined), // Remove undefined items
+      }));
+    } else {
+      console.log("else", history);
+      setCard((prevCard) => ({
+        ...prevCard,
+        tempArray: [history, ...tempArray],
+      }));
+    }
+  }, [history]);
 
   // Reset to initial state
   const resetCard = () => {
@@ -137,10 +228,14 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       dueDate: "",
       comment: {
         id: uuid().slice(0, 18),
-        userId,
-        fullName,
-        commentText: "",
-        isDelete: false,
+        ...card.comment,
+      },
+      history: {
+        id: uuid().slice(0, 18),
+        title: "",
+        desc: "",
+        createdAt: "",
+        type: "",
       },
       comments: [],
       type: "",
@@ -150,6 +245,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       createdAt: "",
       modifiedBy: "",
       modifiedAt: "",
+      historyArray: [],
+      tempArray: [],
     }));
   };
 
@@ -167,13 +264,80 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     }));
   };
 
+  const handleUpdateChange = (e) => {
+    clearTimeout(timerId);
+    setCard((prevCard) => ({
+      ...prevCard,
+      [e.target.name]: e.target.value,
+    }));
+
+    if (e.target.name === "assignTo" || e.target.name === "dueDate") {
+      handleCreateHistory(e.target);
+      return;
+    }
+    const id = setTimeout(() => {
+      console.log(e.target);
+      handleCreateHistory(e.target);
+    }, 1000);
+    setCard((prevCard) => ({
+      ...prevCard,
+      timerId: id,
+    }));
+  };
+
+  const handleCreateHistory = (target) => {
+    // to handle Assingee
+    if (target.name === "assignTo") {
+      return setCard((prevCard) => ({
+        ...prevCard,
+        history: {
+          id: uuid().slice(0, 18),
+          createdAt: new Date(),
+          type: target.name,
+          desc: target.value,
+          title: `Assignee changed`,
+        },
+      }));
+    } else if (target.name === "dueDate") {
+      return setCard((prevCard) => ({
+        ...prevCard,
+        history: {
+          id: uuid().slice(0, 18),
+          createdAt: new Date(),
+          type: target.name,
+          desc: target.value,
+          title: `Due Date changed`,
+        },
+      }));
+    } else {
+      setCard((prevCard) => ({
+        ...prevCard,
+        history: {
+          id: uuid().slice(0, 18),
+          createdAt: new Date(),
+          type: target.name,
+          desc: target.value,
+          title: `${target.name} changed`,
+        },
+      }));
+    }
+  };
+
   //Set comment to state
   const handleComment = (e) => {
+    const { name, value } = e.target;
     setCard((prevCard) => ({
       ...prevCard,
       comment: {
         ...comment,
-        commentText: e.target.value,
+        commentText: value,
+      },
+      history: {
+        id: uuid().slice(0, 18),
+        createdAt: new Date(),
+        type: name,
+        desc: value,
+        title: `Comment Created`,
       },
     }));
   };
@@ -203,6 +367,8 @@ function CardDrawer({ open, close, currentUser, stageId }) {
   };
 
   const handleFormSubmit = (isUpdate = false) => {
+    console.log("historyArray", historyArray);
+    console.log("tempArray", tempArray);
     if (title.trim() !== "" && description !== "") {
       if (handleCheckDueDate()) {
         // select action function
@@ -227,8 +393,15 @@ function CardDrawer({ open, close, currentUser, stageId }) {
               stageId: card.stageId || stageId,
               title,
               userId,
+              historyArray: [...tempArray, ...historyArray],
             },
-            fullName
+            fullName,
+            {
+              id: uuid().slice(0, 18),
+              createdAt: new Date(),
+              type: "created",
+              title: "Card created SuccessFully",
+            }
           )
         );
 
@@ -258,57 +431,27 @@ function CardDrawer({ open, close, currentUser, stageId }) {
       type: message,
     }));
   };
+
   const handleSubmit = (e) => {
     handleFormSubmit();
   };
 
   const handleUpdate = (e) => {
-    console.log(editCardData);
     if (
       editCardData.description === description &&
       editCardData.title === title &&
       editCardData.assignTo === assignTo &&
       editCardData.dueDate === dueDate
     ) {
-      console.log(card);
       return;
     }
     handleFormSubmit(true);
   };
-  // To bind user and stage id
-  useEffect(() => {
-    if (!isEditMode && !isCommentMode) {
-      setCard((prevCard) => ({
-        ...prevCard,
-        assignBy: fullName,
-        userId,
-        stageId,
-        comment: {
-          id: uuid().slice(0, 18),
-          userId,
-          fullName,
-          commentText: "",
-          isDelete: false,
-        },
-      }));
-    }
-    if (isEditMode || isCommentMode) {
-      setCard((prevCard) => ({
-        ...prevCard,
-        comment: {
-          id: uuid().slice(0, 18),
-          userId,
-          fullName,
-          commentText: "",
-          isDelete: false,
-        },
-      }));
-    }
-  }, [stageId, userId, editCardData]);
 
-  const handleUpdateComments = () => {
-    if (comment.commentText !== "") {
-      dispatch(handleUpdateComment({ id, comment }));
+  const handleUpdateComments = (e, history) => {
+    if (comment.commentText !== "" && history.type !== "") {
+      console.log(history);
+      dispatch(handleUpdateComment({ id, comment }, history));
       setCard((prevCard) => ({
         ...prevCard,
         comment: {
@@ -322,6 +465,20 @@ function CardDrawer({ open, close, currentUser, stageId }) {
     } else {
       handleAlertMessage("emptyComment");
     }
+  };
+
+  const handleChangeHistory = () => {
+    setCard((prevCard) => ({
+      ...prevCard,
+      isHistoryShowing: true,
+    }));
+  };
+
+  const handleChangeComment = () => {
+    setCard((prevCard) => ({
+      ...prevCard,
+      isHistoryShowing: false,
+    }));
   };
 
   return (
@@ -352,7 +509,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           value={title}
           name="title"
           label="Title"
-          onChange={handleChange}
+          onChange={editCardData ? handleUpdateChange : handleChange}
           variant="standard"
         />
         <BasicTextField
@@ -364,10 +521,11 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           value={description}
           name="description"
           label="Description"
-          onChange={handleChange}
+          onChange={editCardData ? handleUpdateChange : handleChange}
           variant="standard"
           multiline
-          minRows={1}
+          minRows={2}
+          maxRows={4}
         />
         <BasicTextField
           required
@@ -386,10 +544,10 @@ function CardDrawer({ open, close, currentUser, stageId }) {
           InputLabelProps={{
             shrink: true,
           }}
-          onChange={handleChange}
+          onChange={editCardData ? handleUpdateChange : handleChange}
         />
 
-        {users.length > 1 ? (
+        {users?.length > 1 ? (
           <TextField
             id="assignTo"
             key="assignTo"
@@ -399,7 +557,7 @@ function CardDrawer({ open, close, currentUser, stageId }) {
             name="assignTo"
             label="Assign To"
             value={assignTo}
-            onChange={handleChange}
+            onChange={editCardData ? handleUpdateChange : handleChange}
             variant="standard"
           >
             {users &&
@@ -423,49 +581,103 @@ function CardDrawer({ open, close, currentUser, stageId }) {
         >
           {messageMap[type]}
         </Typography>
+
         {editCardData ? (
           <>
-            <div className="commentTextFieldBox">
-              <BasicTextField
-                id="comment"
-                key="comment"
-                label="Comment"
-                value={comment.commentText}
-                name="comment"
-                onChange={handleComment}
-                variant="standard"
-                className="cardDrawerTextField"
+            <ButtonGroup className="sectionButtonGroup">
+              <BasicButton
+                className={`${
+                  isHistoryShowing ? null : "borderBottom"
+                } sectionButton`}
+                onClick={handleChangeComment}
+                name={"Comment"}
               />
               <BasicButton
-                className="drawerButton"
-                onClick={handleUpdateComments}
-                name="Save"
+                className={`${
+                  isHistoryShowing ? "borderBottom" : null
+                } sectionButton`}
+                onClick={handleChangeHistory}
+                name={"history"}
               />
-            </div>
+            </ButtonGroup>
+            {isHistoryShowing ? (
+              <div className="historySection">
+                {editCardData?.historyArray?.map((history, index) => {
+                  const { title, createdAt } = history;
+                  const time = new Date(createdAt);
+                  time.setHours(time.getHours() + 5);
+                  time.setMinutes(time.getMinutes() + 30);
+                  const newDate = new Date(time).toISOString();
+                  // const time = new Date(createdAt).toLocaleString(undefined, {
+                  //   timeZone: "Asia/Kolkata",
+                  // });
+                  // console.log(history?.createdAt);
+                  return createdAt ? (
+                    <div className="historyBox">
+                      <Avatar className="headerAvatar">{letter || "U"}</Avatar>
+                      <Typography className="historyTitle">{title}</Typography>
+                      {createdAt && (
+                        <Typography variant="subtitle2">
+                          on {newDate?.slice(0, 10)} at {newDate?.slice(11, 16)}
+                        </Typography>
+                      )}
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            ) : (
+              <>
+                <div className="commentSection">
+                  <div className="commentTextFieldBox">
+                    <BasicTextField
+                      id="comment"
+                      key="comment"
+                      label="Comment"
+                      value={comment.commentText}
+                      name="comment"
+                      onChange={handleComment}
+                      variant="standard"
+                      className="cardDrawerTextField"
+                    />
+                    <BasicButton
+                      className="drawerButton"
+                      onClick={(e) => handleUpdateComments(e, history)}
+                      name="Save"
+                    />
+                  </div>
+                  {editCardData?.comments?.map((comment) => {
+                    return !comment?.isDelete ? (
+                      <BasicTextField
+                        key={comment?.id}
+                        className="commentTextField"
+                        value={comment?.commentText}
+                        readOnly
+                        InputProps={{
+                          endAdornment: (
+                            <DeleteIcon
+                              onClick={() =>
+                                dispatch(
+                                  deleteComment(comment.id, editCardData.id, {
+                                    id: uuid().slice(0, 18),
+                                    createdAt: new Date(),
+                                    type: "comment",
+                                    title: "Comment Deleted",
+                                  })
+                                )
+                              }
+                              className="commentDeleteIcon"
+                            />
+                          ),
+                        }}
+                      />
+                    ) : null;
+                  })}
+                </div>
+              </>
+            )}
           </>
         ) : null}
-        <div className="commentSection">
-          {editCardData?.comments?.map((comment) => {
-            return !comment?.isDelete ? (
-              <BasicTextField
-                key={comment?.id}
-                className="commentTextField"
-                value={comment?.commentText}
-                readOnly
-                InputProps={{
-                  endAdornment: (
-                    <DeleteIcon
-                      onClick={() =>
-                        dispatch(deleteComment(comment.id, editCardData.id))
-                      }
-                      className="commentDeleteIcon"
-                    />
-                  ),
-                }}
-              />
-            ) : null;
-          })}
-        </div>
+
         <ButtonGroup className="drawerButtonGroup">
           <BasicButton
             disabled={isDisable}

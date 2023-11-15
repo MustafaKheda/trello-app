@@ -25,7 +25,6 @@ import { useNavigate } from "react-router";
 import RenderStage from "./RenderStage";
 import Grid from "@mui/material/Grid";
 import BasicTextField from "../../Common/BasicTextField";
-import { TextField } from "@mui/material";
 function TaskHub() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -48,6 +47,7 @@ function TaskHub() {
     name: "",
     date: "",
     filter: false,
+    commentSection: false,
   });
   const {
     drawerStageId,
@@ -63,6 +63,7 @@ function TaskHub() {
     name,
     date,
     filter,
+    commentSection,
   } = open;
 
   useEffect(() => {
@@ -107,11 +108,12 @@ function TaskHub() {
     }));
   };
 
-  const handleDrawerOpen = (stageId) => {
+  const handleDrawerOpen = (stageId, comment = false) => {
     setOpen((prevOpen) => ({
       ...prevOpen,
       openDrawer: true,
       drawerStageId: stageId,
+      commentSection: comment,
     }));
   };
 
@@ -119,6 +121,7 @@ function TaskHub() {
     setOpen((prevOpen) => ({
       ...prevOpen,
       openDrawer: false,
+      commentSection: false,
     }));
   };
 
@@ -195,19 +198,6 @@ function TaskHub() {
     }));
   };
 
-  const handleOpenProfileMenu = (event) => {
-    setOpen((prevOpen) => ({
-      ...prevOpen,
-      anchorProfile: event.currentTarget,
-      openProfile: true,
-    }));
-  };
-
-  // const handleOpenProfilePage = () => {
-  //   dispatch(handleEditUser(currentUser.id));
-  //   navigate("/profile");
-  // };
-
   const handelOpenDeleteDailogBox = () => {
     setOpen((prevOpen) => ({
       ...prevOpen,
@@ -261,11 +251,10 @@ function TaskHub() {
     }
     return stateCards;
   };
-
   return Object.keys(currentUser).length > 0 ? (
     <>
       <div id="taskHubBody" className="taskHubBody">
-        <Header handleOpenProfileMenu={handleOpenProfileMenu} />
+        <Header />
         <Grid container gap={2} className="taskHubContainerAction">
           <Grid item>
             <BasicButton
@@ -291,7 +280,7 @@ function TaskHub() {
             />
             <BasicTextField
               inputProps={{
-                autocomplete: "off",
+                autoComplete: "off",
               }}
               value={name}
               name="name"
@@ -303,7 +292,7 @@ function TaskHub() {
             />
             <BasicTextField
               inputProps={{
-                autocomplete: "off",
+                autoComplete: "off",
               }}
               value={title}
               name="title"
@@ -362,8 +351,10 @@ function TaskHub() {
           </Droppable>
         </DragDropContext>
       </div>
+
       <CardDrawer
         stageId={drawerStageId}
+        commentSection={commentSection}
         currentUser={currentUser}
         open={openDrawer}
         close={handleDrawerClose}
@@ -398,21 +389,7 @@ function TaskHub() {
           />
         </DialogActions>
       </Dialog>
-      {/* <Menu
-        id={`profile-menu`}
-        anchorEl={anchorProfile}
-        open={openProfile}
-        disableScrollLock={true}
-        onClose={handleCloseMenu}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
-        }}
-      >
-        <MenuItem onClick={handleOpenProfilePage}>Profile</MenuItem>
-        <MenuItem onClick={() => dispatch(unSetCurrentUser())}>
-          Sign Out
-        </MenuItem>
-      </Menu> */}
+
       <Menu
         id={`basic-menu`}
         anchorEl={anchorEl}

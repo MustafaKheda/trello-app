@@ -203,7 +203,10 @@ const stageReducer = (state = taskhubState, action) => {
         stages: [...updatedStageList],
       };
     case SET_CARD: {
-      const newCard = action.payload;
+      const newCard = action.payload.obj;
+      const history = action.payload.history;
+      history.createdAt = new Date();
+      newCard.historyArray.push(history);
       newCard.createdAt = new Date();
       newCard.createdBy = newCard.assignBy;
       return {
@@ -238,6 +241,7 @@ const stageReducer = (state = taskhubState, action) => {
       obj.modifiedAt = new Date();
       obj.modifiedBy = fullName;
       const updatedCard = card.map((card) => (card.id === obj.id ? obj : card));
+
       return {
         ...state,
         card: [...updatedCard],
@@ -249,13 +253,11 @@ const stageReducer = (state = taskhubState, action) => {
         editCardData: null,
       };
     case UPDATE_COMMENT: {
-      let indexValue = card.findIndex((item) => item.id === action.payload.id);
+      const { obj, history } = action.payload;
+      let indexValue = card.findIndex((item) => item.id === obj.id);
       const newCards = [...card];
-      newCards[indexValue].comments = [
-        ...newCards[indexValue].comments,
-        action.payload.comment,
-      ];
-
+      newCards[indexValue].comments.unshift(obj.comment);
+      newCards[indexValue].historyArray.unshift(history);
       return {
         ...state,
         editCardData: newCards[indexValue],
@@ -281,14 +283,18 @@ const stageReducer = (state = taskhubState, action) => {
       };
     }
     case DELETE_COMMENT: {
-      const { cardId, id } = action.payload;
+      const { cardId, id, history } = action.payload;
 
       const updatedCard = card.map((card) => {
         if (card.id === cardId) {
           const updatedComments = card.comments.map((comment) =>
             comment.id === id ? { ...comment, isDelete: true } : comment
           );
-          return { ...card, comments: updatedComments };
+          return {
+            ...card,
+            comments: updatedComments,
+            historyArray: [history, ...card.historyArray],
+          };
         }
         return card;
       });

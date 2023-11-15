@@ -75,10 +75,11 @@ export const unSetEditStage = () => {
   };
 };
 
-export const handleSetCard = (obj) => {
+export const handleSetCard = (obj, name, history) => {
+  console.log(history, obj);
   return {
     type: Actiontypes.SET_CARD,
-    payload: obj,
+    payload: { obj, history },
   };
 };
 
@@ -112,10 +113,13 @@ export const handleUnsetEditCard = () => {
   };
 };
 
-export const handleUpdateComment = (obj, type) => {
+export const handleUpdateComment = (obj, history) => {
   return {
     type: Actiontypes.UPDATE_COMMENT,
-    payload: obj,
+    payload: {
+      obj,
+      history,
+    },
   };
 };
 
@@ -140,12 +144,13 @@ export const deleteUser = (id) => {
   };
 };
 
-export const deleteComment = (id, cardId) => {
+export const deleteComment = (id, cardId, history) => {
   return {
     type: Actiontypes.DELETE_COMMENT,
     payload: {
       id,
       cardId,
+      history,
     },
   };
 };

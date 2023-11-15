@@ -34,6 +34,7 @@ const RenderStage = ({
         <IconButton
           key={index}
           id={`setting-${stage?.id}`}
+          className="headerEditIcon"
           onClick={(event) => handleOpenMenu(event, stage.id)}
         >
           <MoreHoriz />

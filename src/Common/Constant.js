@@ -14,11 +14,13 @@ export const messageMap = {
   invalidDueDate: "Enter correct date",
   invaildEmail: "Invaild Email",
   invaildPassword:
-    "password should contain atleast one number,one letter and one special character",
+    "Password should contain atleast one number,one letter and one special character",
   passNotMatch: "Passwords do not match",
   fillForgetPasswordForm: "Please fill the form",
   userNotFoundForgetPassword:
-    "This Email does not exist. Please Enter Correct Email",
+    "This email does not exist. please enter correct email",
+  userNotFoundForgetPasswordMobile:
+    "This mobile number does not exist. Please Enter Correct mobile number",
   passwordChanged: "Password changed successfully",
   acceptEmail: "This field only accepts input in the email format",
   invalidTime: "Enter correct time",

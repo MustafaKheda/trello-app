@@ -50,6 +50,7 @@ const CardComponent = ({
           <IconButton
             id="setting"
             onClick={(event) => handleOpenMenu(event, id)}
+            className="cardEditIcon"
           >
             <MoreHoriz className="cardHeaderIconButton" />
           </IconButton>
@@ -58,7 +59,7 @@ const CardComponent = ({
 
       <Divider />
       <CardContent className="innerCardContent">
-        <Typography variant="body2" textAlign={"left"}>
+        <Typography className="maxLines" variant="body2" textAlign={"left"}>
           {description}
         </Typography>
       </CardContent>
@@ -103,7 +104,7 @@ const CardComponent = ({
           <IconButton
             aria-label="cart"
             className="innerActionIconButton"
-            onClick={() => handleEditStage(card, "commentMode")}
+            onClick={() => handleEditStage(card, "commentMode", true)}
           >
             <Badge
               className="innerActionBadge"

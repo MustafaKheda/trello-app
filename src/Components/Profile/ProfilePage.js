@@ -125,6 +125,10 @@ function ProfilePage() {
       ...prvProfile,
       editProfile: !editProfile,
       type: "",
+      mobileNumber: editMobileNumber,
+      email: editEmail,
+      firstName: editFirstName,
+      lastName: editLastName,
     }));
   };
   const handleOpenDialogBox = (e) => {
@@ -261,6 +265,7 @@ function ProfilePage() {
       showForgetPassword: false,
       showForgetPasswordConfirm: false,
       openDialog: false,
+      editProfile: false,
       newPassword: "",
       oldPassword: "",
       firstName: "",
